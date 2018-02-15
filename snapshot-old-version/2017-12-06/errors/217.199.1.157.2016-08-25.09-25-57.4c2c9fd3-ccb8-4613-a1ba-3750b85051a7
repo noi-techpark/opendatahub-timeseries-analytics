@@ -1,0 +1,831 @@
+(dp1
+S'output'
+p2
+S"<class 'simplejson.scanner.JSONDecodeError'> Expecting value: line 1 column 1 (char 0)"
+p3
+sS'layer'
+p4
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf-8 -*-\nimport requests\nfrom functools import partial\nbaseurl = "http://ipchannels.integreen-life.bz.it"\ncache_t = (3600*24)\n\nbaseurl = "http://ipchannels.integreen-life.bz.it"\nfrontends = {\'Meteo\':\'MeteoFrontEnd\', \n             \'Vehicle\': \'VehicleFrontEnd\', \n             \'Environment\':\'EnvironmentFrontEnd\', \n             \'Parking\': \'parkingFrontEnd\',\n             \'Bluetooth\':\'BluetoothFrontEnd\', \n             \'Link\':\'LinkFrontEnd\', \n             \'Street\': \'StreetFrontEnd\', \n             \'Traffic\': \'TrafficFrontEnd\',\n             }\n\ndef get_frontends():\n    session.forget(request)\n    response.headers[\'web2py-component-content\'] = \'append\'\n\n    #response.headers[\'web2py-component-content\'] = \'hide\'\n    #response.headers[\'web2py-component-command\'] = "add_after_form(xhr, \'form_frontend\');"\n    \n    return response.render(\'data/frontends_form.html\', {\'frontends\':frontends, \'frontend\':\'RWISFrontEnd\'})\n\ndef get_stations():\n    session.forget(request)\n    frontend = request.vars.frontend    \n    if not frontend or frontend not in frontends:\n        return HTTP(404)\n\n    response.headers[\'web2py-component-content\'] = \'append\'\n    stations = __get_stations(frontends[frontend])\n    response.headers[\'web2py-component-content\'] = \'hide\'\n    response.headers[\'web2py-component-command\'] = "add_after_form(xhr, \'form_frontend\');"\n    \n    return response.render(\'data/stations_form.html\', {\'stations\':stations, \'frontend\':frontend})\n\ndef _get_station(stationcode, frontend):\n    for s in __get_stations(frontend):\n        if s[\'id\'] == stationcode:\n            return s\n    return None\n\ndef get_data_types():\n    session.forget(request)\n    station = request.vars.station\n    frontend = request.vars.frontend\n    if not frontend or frontend not in frontends:\n        return HTTP(404)\n    s_obj = _get_station(station, frontends[frontend])\n    tab_name = request.vars.tab if request.vars.tab else \'sidebar_console\'\n    tab = "#%s .sidebar" % request.vars.tab if request.vars.tab else \'#sidebar_console\'\n    if s_obj == None:\n        raise HTTP(404, \'Station not found\')\n    name = s_obj[\'name\']\n    \n    response.headers[\'web2py-component-content\'] = \'hide\'\n    response.headers[\'web2py-component-command\'] = "fix_dynamic_accordion(\'%(tab)s\'); append_to(xhr, \'%(tab)s\');" % {\'tab\':tab}\n\n    data_types = __get_types(station, frontends[frontend])\n    if frontend.lower() == \'vehicle\':\n        data_types_filtered = filter(lambda r: \'valid\' not in r[0], data_types)\n        data_types_filtered = filter(lambda r: \'runtime\' not in r[0], data_types_filtered)\n        data_types_filtered = filter(lambda r: \'id_\' not in r[0], data_types_filtered)\n        data_types_filtered = filter(lambda r: \'gps_\' not in r[0] or \'speed\' in r[0], data_types_filtered)\n    else:\n        data_types_filtered = data_types\n    data_types_filtered.sort(key=lambda v: (v[0],int(v[3])) if len(v)>3 and v[3].isdigit() else v[0])\n    return response.render(\'data/data_types_legend.html\', {\'data_types\':data_types_filtered, \'frontend\':frontend, \'name\':name, \'station\':station, \'tab_name\':tab_name })\n\n@cache.action(time_expire=180, cache_model=cache.ram, vars=True)\ndef get_data():\n    session.forget(request)\n    station = request.vars.station \n    data_type = request.vars.data_type\n    data_label = request.vars.data_label\n    unit = request.vars.unit\n    period = request.vars.period\n    seconds = request.vars.seconds\n    from_epoch = int(request.vars[\'from\'])\n    to_epoch = int(request.vars.to)\n    frontend = request.vars.frontend\n    if not frontend or frontend not in frontends:\n        return HTTP(404)\n    url = "%s/%s/rest/get-records-in-timeframe" % (baseurl, frontends[frontend])\n    params = {\'station\':station, \'name\':data_type, \'unit\':unit, \'from\':from_epoch, \'to\': to_epoch}\n    if period:\n        params[\'period\'] = period\n    r = requests.get(url, params=params)\n    #print r.url\n    data = r.json()\n    output = [ [d[\'timestamp\'], "%.2f" % float(d[\'value\'])] for d in data]\n \n    # the id must be the same of the A element in the data type list\n    series = [{\'data\':output, \'id\': IS_SLUG()(\'type_%s_%s_%s\' % (station,data_type,period))[0], \'station_id\':\'station_iud\', \'label\': "%s - %s" % (station, data_label)}]\n    return response.json({\'series\': series})\n\ndef __get_stations(frontend):\n    def local():\n        url = "%s/%s/rest/get-station-details" % (baseurl, frontend)\n        r = requests.get(url) # params=url_vars)\n        print r.url\n        stations = r.json()\n        stations.sort(key=lambda v: v[\'name\'])\n        return stations\n    stations = cache.ram(\'stations_%s\' % frontend, local, cache_t)\n    return stations\n\ndef __get_types(station, frontend):\n    def local(station):\n        url = "%s/%s/rest/get-data-types" % (baseurl, frontend)\n        r = requests.get(url, params={\'station\':station})\n        types = r.json()\n        types.sort(key=lambda v: v)\n        return types\n    types = cache.ram(\'types_%s\' % station, partial(local, station), cache_t)\n    return types\n    \n#@cache.action(time_expire=180, cache_model=cache.ram, vars=True)\ndef get_geojson():\n    session.forget(request)\n    frontend = request.vars.frontend\n    frontend = frontends[frontend] if frontend in frontends else \'\'\n    data_type = request.vars.type\n    period = request.vars.period\n\n    stations = cache.ram(\'__get_stations_info_%s\' % frontend, lambda: __get_stations_info(frontend), (3600 * 24))\n\n    for s in stations:\n        s[\'last_value\'] = __get_last_value(frontend, s[\'id\'], data_type, period)\n    \n    features= [{"type": "Feature",\n                "properties": {\n                    "id":s[\'id\'],\n                    "popupContent": "%s %s" % (s[\'name\'], s[\'last_value\']),\n                    "openPopup": False,\n                    "last_value": s[\'last_value\'],\n                },\n                "geometry": {\n                    "type": "Point",\n                    "coordinates": [s[\'longitude\'], s[\'latitude\']]\n                },} for s in stations] \n\n    response.headers[\'Content-Type\'] = \'application/json\'\n    return response.json({"type": "FeatureCollection", \'features\': features}) \n\n# Return basic info for all available parking lots\ndef __get_stations_info(frontend):\n    r = requests.get("%s/%s/rest/get-station-details" % (baseurl, frontend))\n    #print r.url\n    if \'exceptionMessage\' in r.json():\n        return []\n    return r.json()\n\ndef __get_last_value(frontend, _id,  _type, _period):\n    rest_url = "%s/%s" % (baseurl, frontend)\n    method = "rest/get-records"\n    params = {\'name\':_type, \'period\':_period, \'station\':_id, \'seconds\': 7200}\n    r = requests.get("%s/%s" % (rest_url, method), params=params)\n    data=r.json()\n\n    index = len(data)-1 # last value\n    if frontend == \'BluetoothFrontEnd\':\n        index = len(data)-2      # last but one value\n\n    if \'exceptionMessage\' in data or len(data) < -(index):\n        return -1\n\n    obj=data[index]\n    return int(obj[\'value\'])\n\nresponse._vars=response._caller(get_geojson)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__module__'
+p12
+S"'simplejson.scanner'"
+p13
+sS'__getslice__'
+p14
+S"<method-wrapper '__getslice__' of JSONDecodeError object>"
+p15
+sS'__str__'
+p16
+S"<method-wrapper '__str__' of JSONDecodeError object>"
+p17
+sS'__reduce__'
+p18
+S"<bound method JSONDecodeError.__reduce__ of JSON...or('Expecting value: line 1 column 1 (char 0)',)>"
+p19
+sS'pos'
+p20
+S'0'
+sS'endlineno'
+p21
+S'None'
+p22
+sS'__dict__'
+p23
+S'{\'colno\': 1, \'doc\': u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\', \'end\': None, \'endcolno\': None, \'endlineno\': None, \'lineno\': 1, \'msg\': \'Expecting value\', \'pos\': 0}'
+p24
+sS'__sizeof__'
+p25
+S'<built-in method __sizeof__ of JSONDecodeError object>'
+p26
+sS'__weakref__'
+p27
+S'None'
+p28
+sS'__init__'
+p29
+S"<bound method JSONDecodeError.__init__ of JSONDe...or('Expecting value: line 1 column 1 (char 0)',)>"
+p30
+sS'__setattr__'
+p31
+S"<method-wrapper '__setattr__' of JSONDecodeError object>"
+p32
+sS'__reduce_ex__'
+p33
+S'<built-in method __reduce_ex__ of JSONDecodeError object>'
+p34
+sS'end'
+p35
+S'None'
+p36
+sS'__new__'
+p37
+S'<built-in method __new__ of type object>'
+p38
+sS'__format__'
+p39
+S'<built-in method __format__ of JSONDecodeError object>'
+p40
+sS'__class__'
+p41
+S"<class 'simplejson.scanner.JSONDecodeError'>"
+p42
+sS'lineno'
+p43
+S'1'
+sS'msg'
+p44
+S"'Expecting value'"
+p45
+sS'__doc__'
+p46
+S"'Subclass of ValueError with the following additi...e column corresponding to end (may be None)\\n\\n    '"
+p47
+sS'__getitem__'
+p48
+S"<method-wrapper '__getitem__' of JSONDecodeError object>"
+p49
+sS'__setstate__'
+p50
+S'<built-in method __setstate__ of JSONDecodeError object>'
+p51
+sS'__getattribute__'
+p52
+S"<method-wrapper '__getattribute__' of JSONDecodeError object>"
+p53
+sS'args'
+p54
+S"('Expecting value: line 1 column 1 (char 0)',)"
+p55
+sS'__subclasshook__'
+p56
+S'<built-in method __subclasshook__ of type object>'
+p57
+sS'colno'
+p58
+S'1'
+sS'__unicode__'
+p59
+S'<built-in method __unicode__ of JSONDecodeError object>'
+p60
+sS'doc'
+p61
+S'u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\''
+p62
+sS'endcolno'
+p63
+S'None'
+p64
+sS'__delattr__'
+p65
+S"<method-wrapper '__delattr__' of JSONDecodeError object>"
+p66
+sS'__repr__'
+p67
+S"<method-wrapper '__repr__' of JSONDecodeError object>"
+p68
+sS'__hash__'
+p69
+S"<method-wrapper '__hash__' of JSONDecodeError object>"
+p70
+ssS'evalue'
+p71
+S'Expecting value: line 1 column 1 (char 0)'
+p72
+sS'request'
+p73
+cgluon.html
+XML_unpickle
+p74
+(S'sW[\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>data</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">ajs_group_id</td><td style="vertical-align:top;">:</td><td><div>null<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">ajs_user_id</td><td style="vertical-align:top;">:</td><td><div>null<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">lang</td><td style="vertical-align:top;">:</td><td><div>de<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_ethical</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157-fefcca75-006d-4dd9-ac1d-76ac4e78eff0<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_LENGTH</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_TYPE</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">DOCUMENT_ROOT</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>application/json, text/javascript, */*; q=0.01</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>__utma=177085241.2099247679.1440409627.1468938698.1469008508.15; __utmz=177085241.1443096183.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); session_id_ethical=217.199.1.157-fefcca75-006d-4dd9-ac1d-76ac4e78eff0; ajs_group_id=null; ajs_user_id=null; lang=de; _ga=GA1.3.2099247679.1440409627; _gat=1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>analytics.mobility.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_REFERER</td><td style="vertical-align:top;">:</td><td><div>http://analytics.mobility.bz.it/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_X_REQUESTED_WITH</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/data/get_geojson</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div>frontend=Traffic&amp;amp;period=1800&amp;amp;type=Traffic+Count+record</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>51942</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_URI</td><td style="vertical-align:top;">:</td><td><div>/data/get_geojson?frontend=Traffic&amp;amp;period=1800&amp;amp;type=Traffic+Count+record</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>80</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>nginx/1.5.3</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">UWSGI_SCHEME</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py.git/applications/parkbzNew/&#x27;, &#x27;/home/www-data/web2py.git/applications/vtraffic/&#x27;, &#x27;/home/www-data/web2py.git/applications/ethical/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_length</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_type</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">document_root</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_application</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_controller</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_function</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>application/json, text/javascript, */*; q=0.01</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.8</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>__utma=177085241.2099247679.1440409627.1468938698.1469008508.15; __utmz=177085241.1443096183.1.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); session_id_ethical=217.199.1.157-fefcca75-006d-4dd9-ac1d-76ac4e78eff0; ajs_group_id=null; ajs_user_id=null; lang=de; _ga=GA1.3.2099247679.1440409627; _gat=1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>analytics.mobility.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_referer</td><td style="vertical-align:top;">:</td><td><div>http://analytics.mobility.bz.it/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_x_requested_with</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>traffic</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/data/get_geojson</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div>frontend=Traffic&amp;amp;period=1800&amp;amp;type=Traffic+Count+record</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>51942</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/ethical/data/get_geojson?frontend=Traffic&amp;amp;period=1800&amp;amp;type=Traffic+Count+record</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>80</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>nginx/1.5.3</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.node</td><td style="vertical-align:top;">:</td><td><div>traffic</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.version</td><td style="vertical-align:top;">:</td><td><div>1.9.14</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_node</td><td style="vertical-align:top;">:</td><td><div>traffic</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_version</td><td style="vertical-align:top;">:</td><td><div>1.9.14</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_original_uri</td><td style="vertical-align:top;">:</td><td><div>/data/get_geojson?frontend=Traffic&amp;amp;period=1800&amp;amp;type=Traffic+Count+record</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.5-stable+timestamp.2014.03.15.21.24.06</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x1d94f60&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7fdaefbb8498&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x1d94f60&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7fdaefbb8498&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git/applications/ethical/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>get_geojson</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py.git/applications/parkbzNew/&#x27;, &#x27;/home/www-data/web2py.git/applications/vtraffic/&#x27;, &#x27;/home/www-data/web2py.git/applications/ethical/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>traffic</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.5-stable+timestamp.2014.03.15.21.24.06</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 8, 25, 9, 25, 57, 720667)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/data/get_geojson</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 8, 25, 7, 25, 57, 720688)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uuid</td><td style="vertical-align:top;">:</td><td><div>ethical/217.199.1.157.2016-08-25.09-25-57.4c2c9fd3-ccb8-4613-a1ba-3750b85051a7</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0x2a43850&gt;</div></td></tr></table></div>'
+tRp75
+sS'frames'
+p76
+(lp77
+(dp78
+S'file'
+p79
+S'/home/www-data/web2py/gluon/restricted.py'
+p80
+sS'dump'
+p81
+(dp82
+S'environment'
+p83
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, 'CAT': <class 'gluon.html.CAT'>, 'CENTER': <class 'gluon.html.CENTER'>, ...}"
+p84
+sS'ccode'
+p85
+S'<code object <module> at 0x2624230, file "/home/...pplications/ethical/controllers/data.py", line 2>'
+p86
+ssS'lnum'
+p87
+I220
+sS'lines'
+p88
+(dp89
+I224
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p90
+sI215
+S'    try:'
+p91
+sI216
+S'        if isinstance(code, types.CodeType):'
+p92
+sI217
+S'            ccode = code'
+p93
+sI218
+S'        else:'
+p94
+sI219
+S'            ccode = compile2(code, layer)'
+p95
+sI220
+S'        exec ccode in environment'
+p96
+sI221
+S'    except HTTP:'
+p97
+sI222
+S'        raise'
+p98
+sI223
+S'    except RestrictedError:'
+p99
+ssS'call'
+p100
+S"(code='# -*- coding: utf-8 -*-\\nimport requests\\nfrom fun...])\\n\\nresponse._vars=response._caller(get_geojson)\\n', environment={'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, 'CAT': <class 'gluon.html.CAT'>, 'CENTER': <class 'gluon.html.CENTER'>, ...}, layer='/home/www-data/web2py.git/applications/ethical/controllers/data.py')"
+p101
+sS'func'
+p102
+S'restricted'
+p103
+sa(dp104
+g79
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p105
+sg81
+(dp106
+sg87
+I174
+sg88
+(dp107
+I163
+S''
+sI164
+S'    index = len(data)-1 # last value'
+p108
+sI165
+S"    if frontend == 'BluetoothFrontEnd':"
+p109
+sI166
+S'        index = len(data)-2      # last but one value'
+p110
+sI167
+S''
+sI168
+S"    if 'exceptionMessage' in data or len(data) < -(index):"
+p111
+sI169
+S'        return -1'
+p112
+sI170
+S''
+sI171
+S'    obj=data[index]'
+p113
+sI172
+S"    return int(obj['value'])"
+p114
+ssg100
+S'()'
+p115
+sg102
+S'<module>'
+p116
+sa(dp117
+g79
+S'/home/www-data/web2py/gluon/globals.py'
+p118
+sg81
+(dp119
+S'self'
+p120
+S'undefined'
+p121
+sS'f'
+S'<function get_geojson>'
+p122
+ssg87
+I385
+sg88
+(dp123
+I384
+S'        self._vars = None'
+p124
+sI385
+S'        self._caller = lambda f: f()'
+p125
+sI386
+S'        self._view_environment = None'
+p126
+sI387
+S'        self._custom_commit = None'
+p127
+sI388
+S'        self._custom_rollback = None'
+p128
+sI389
+S''
+sI380
+S'        self.menu = []             # used by the default view layout'
+p129
+sI381
+S'        self.files = []            # used by web2py_ajax.html'
+p130
+sI382
+S'        self.generic_patterns = []  # patterns to allow generic views'
+p131
+sI383
+S"        self.delimiters = ('{{', '}}')"
+p132
+ssg100
+S'(f=<function get_geojson>)'
+p133
+sg102
+S'<lambda>'
+p134
+sa(dp135
+g79
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p136
+sg81
+(dp137
+S'global __get_stations_info'
+p138
+S'<function __get_stations_info>'
+p139
+sS'global cache'
+p140
+S'<gluon.cache.Cache object>'
+p141
+sS'frontend'
+p142
+S"'TrafficFrontEnd'"
+p143
+sS'cache.ram'
+p144
+S'<gluon.cache.CacheInRam object>'
+p145
+sS'stations'
+p146
+g121
+ssg87
+I129
+sg88
+(dp147
+I128
+S''
+sI129
+S"    stations = cache.ram('__get_stations_info_%s' % frontend, lambda: __get_stations_info(frontend), (3600 * 24))"
+p148
+sI130
+S''
+sI131
+S'    for s in stations:'
+p149
+sI132
+S"        s['last_value'] = __get_last_value(frontend, s['id'], data_type, period)"
+p150
+sI133
+S''
+sI124
+S'    frontend = request.vars.frontend'
+p151
+sI125
+S"    frontend = frontends[frontend] if frontend in frontends else ''"
+p152
+sI126
+S'    data_type = request.vars.type'
+p153
+sI127
+S'    period = request.vars.period'
+p154
+ssg100
+S'()'
+p155
+sg102
+S'get_geojson'
+p156
+sa(dp157
+g79
+S'/home/www-data/web2py/gluon/cache.py'
+p158
+sg81
+(dp159
+S'value'
+p160
+g121
+sS'f'
+S'<function <lambda>>'
+p161
+ssg87
+I216
+sg88
+(dp162
+I211
+S'            return None'
+p163
+sI212
+S'        if item and (dt is None or item[0] > now - dt):'
+p164
+sI213
+S'            return item[1]'
+p165
+sI214
+S'        elif item and (item[0] < now - dt) and destroyer:'
+p166
+sI215
+S'            destroyer(item[1])'
+p167
+sI216
+S'        value = f()'
+p168
+sI217
+S''
+sI218
+S'        self.locker.acquire()'
+p169
+sI219
+S'        self.storage[key] = (now, value)'
+p170
+sI220
+S"        self.storage[CacheAbstract.cache_stats_name]['misses'] += 1"
+p171
+ssg100
+S"(self=<gluon.cache.CacheInRam object>, key='__get_stations_info_TrafficFrontEnd', f=<function <lambda>>, time_expire=86400, destroyer=None)"
+p172
+sg102
+S'__call__'
+p173
+sa(dp174
+g79
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p175
+sg81
+(dp176
+S'global __get_stations_info'
+p177
+S'<function __get_stations_info>'
+p178
+sS'global cache'
+p179
+S'<gluon.cache.Cache object>'
+p180
+sS'frontend'
+p181
+S"'TrafficFrontEnd'"
+p182
+sS'cache.ram'
+p183
+S'<gluon.cache.CacheInRam object>'
+p184
+sS'stations'
+p185
+g121
+ssg87
+I129
+sg88
+(dp186
+I128
+S''
+sI129
+S"    stations = cache.ram('__get_stations_info_%s' % frontend, lambda: __get_stations_info(frontend), (3600 * 24))"
+p187
+sI130
+S''
+sI131
+S'    for s in stations:'
+p188
+sI132
+S"        s['last_value'] = __get_last_value(frontend, s['id'], data_type, period)"
+p189
+sI133
+S''
+sI124
+S'    frontend = request.vars.frontend'
+p190
+sI125
+S"    frontend = frontends[frontend] if frontend in frontends else ''"
+p191
+sI126
+S'    data_type = request.vars.type'
+p192
+sI127
+S'    period = request.vars.period'
+p193
+ssg100
+S'()'
+p194
+sg102
+g134
+sa(dp195
+g79
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p196
+sg81
+(dp197
+S'r.json'
+p198
+S'<bound method Response.json of <Response [404]>>'
+p199
+sS'r'
+S'<Response [404]>'
+p200
+ssg87
+I153
+sg88
+(dp201
+I148
+S''
+sI149
+S'# Return basic info for all available parking lots'
+p202
+sI150
+S'def __get_stations_info(frontend):'
+p203
+sI151
+S'    r = requests.get("%s/%s/rest/get-station-details" % (baseurl, frontend))'
+p204
+sI152
+S'    #print r.url'
+p205
+sI153
+S"    if 'exceptionMessage' in r.json():"
+p206
+sI154
+S'        return []'
+p207
+sI155
+S'    return r.json()'
+p208
+sI156
+S''
+sI157
+S'def __get_last_value(frontend, _id,  _type, _period):'
+p209
+ssg100
+S"(frontend='TrafficFrontEnd')"
+p210
+sg102
+S'__get_stations_info'
+p211
+sa(dp212
+g79
+S'/usr/local/lib/python2.7/dist-packages/requests/models.py'
+p213
+sg81
+(dp214
+S'self.text'
+p215
+S'u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\''
+p216
+sS'json.loads'
+p217
+S'<function loads>'
+p218
+sS'global json'
+p219
+S"<module 'simplejson' from '/usr/local/lib/python2.7/dist-packages/simplejson/__init__.pyc'>"
+p220
+sS'self'
+p221
+S'<Response [404]>'
+p222
+sS'kwargs'
+p223
+S'{}'
+p224
+ssg87
+I741
+sg88
+(dp225
+I736
+S'            # decoding fails, fall back to `self.text` (using chardet to make'
+p226
+sI737
+S'            # a best guess).'
+p227
+sI738
+S'            encoding = guess_json_utf(self.content)'
+p228
+sI739
+S'            if encoding is not None:'
+p229
+sI740
+S'                return json.loads(self.content.decode(encoding), **kwargs)'
+p230
+sI741
+S'        return json.loads(self.text, **kwargs)'
+p231
+sI742
+S''
+sI743
+S'    @property'
+p232
+sI744
+S'    def links(self):'
+p233
+sI745
+S'        """Returns the parsed header links of the response, if any."""'
+p234
+ssg100
+S'(self=<Response [404]>, **kwargs={})'
+p235
+sg102
+S'json'
+p236
+sa(dp237
+g79
+S'/usr/local/lib/python2.7/dist-packages/simplejson/__init__.py'
+p238
+sg81
+(dp239
+S's'
+S'u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\''
+p240
+sS'global _default_decoder'
+p241
+S'<simplejson.decoder.JSONDecoder object>'
+p242
+sS'_default_decoder.decode'
+p243
+S'<bound method JSONDecoder.decode of <simplejson.decoder.JSONDecoder object>>'
+p244
+ssg87
+I488
+sg88
+(dp245
+I483
+S'    """'
+p246
+sI484
+S'    if (cls is None and encoding is None and object_hook is None and'
+p247
+sI485
+S'            parse_int is None and parse_float is None and'
+p248
+sI486
+S'            parse_constant is None and object_pairs_hook is None'
+p249
+sI487
+S'            and not use_decimal and not kw):'
+p250
+sI488
+S'        return _default_decoder.decode(s)'
+p251
+sI489
+S'    if cls is None:'
+p252
+sI490
+S'        cls = JSONDecoder'
+p253
+sI491
+S'    if object_hook is not None:'
+p254
+sI492
+S"        kw['object_hook'] = object_hook"
+p255
+ssg100
+S'(s=u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\', encoding=None, cls=None, object_hook=None, parse_float=None, parse_int=None, parse_constant=None, object_pairs_hook=None, use_decimal=False, **kw={})'
+p256
+sg102
+S'loads'
+p257
+sa(dp258
+g79
+S'/usr/local/lib/python2.7/dist-packages/simplejson/decoder.py'
+p259
+sg81
+(dp260
+S'self.raw_decode'
+p261
+S'<bound method JSONDecoder.raw_decode of <simplejson.decoder.JSONDecoder object>>'
+p262
+sS'end'
+p263
+g121
+sS'self'
+p264
+S'<simplejson.decoder.JSONDecoder object>'
+p265
+sS'obj'
+p266
+g121
+sS's'
+S'u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\''
+p267
+ssg87
+I370
+sg88
+(dp268
+I365
+S'        instance containing a JSON document)'
+p269
+sI366
+S''
+sI367
+S'        """'
+p270
+sI368
+S'        if _PY3 and isinstance(s, binary_type):'
+p271
+sI369
+S'            s = s.decode(self.encoding)'
+p272
+sI370
+S'        obj, end = self.raw_decode(s)'
+p273
+sI371
+S'        end = _w(s, end).end()'
+p274
+sI372
+S'        if end != len(s):'
+p275
+sI373
+S'            raise JSONDecodeError("Extra data", s, end, len(s))'
+p276
+sI374
+S'        return obj'
+p277
+ssg100
+S'(self=<simplejson.decoder.JSONDecoder object>, s=u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\', _w=<built-in method match of _sre.SRE_Pattern object>, _PY3=False)'
+p278
+sg102
+S'decode'
+p279
+sa(dp280
+g79
+S'/usr/local/lib/python2.7/dist-packages/simplejson/decoder.py'
+p281
+sg81
+(dp282
+S').end'
+p283
+g121
+sS'idx'
+p284
+S'0'
+sS'_w'
+p285
+S'<built-in method match of _sre.SRE_Pattern object>'
+p286
+sS'self'
+p287
+S'<simplejson.decoder.JSONDecoder object>'
+p288
+sS's'
+S'u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\''
+p289
+sS'self.scan_once'
+p290
+S'<simplejson._speedups.Scanner object>'
+p291
+ssg87
+I389
+sg88
+(dp292
+I384
+S'        have extraneous data at the end.'
+p293
+sI385
+S''
+sI386
+S'        """'
+p294
+sI387
+S'        if _PY3 and not isinstance(s, text_type):'
+p295
+sI388
+S'            raise TypeError("Input string must be text, not bytes")'
+p296
+sI389
+S'        return self.scan_once(s, idx=_w(s, idx).end())'
+p297
+sI380
+S'        Optionally, ``idx`` can be used to specify an offset in ``s`` where'
+p298
+sI381
+S'        the JSON document begins.'
+p299
+sI382
+S''
+sI383
+S'        This can be used to decode a JSON document from a string that may'
+p300
+ssg100
+S'(self=<simplejson.decoder.JSONDecoder object>, s=u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\', idx=0, _w=<built-in method match of _sre.SRE_Pattern object>, _PY3=False)'
+p301
+sg102
+S'raw_decode'
+p302
+sasS'pyver'
+p303
+S'Python 2.7.3: /usr/local/bin/uwsgi (prefix: /usr)'
+p304
+sS'session'
+p305
+g74
+(S's\x81\t\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">auth</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">expiration</td><td style="vertical-align:top;">:</td><td><div>3600</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">hmac_key</td><td style="vertical-align:top;">:</td><td><div>03fa9ce6-6084-4ce1-9060-b7f8a98ab1dd</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_visit</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 8, 25, 9, 25, 41, 742143)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remember</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">email</td><td style="vertical-align:top;">:</td><td><div>project@integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">first_name</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">id</td><td style="vertical-align:top;">:</td><td><div>1L</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_name</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_id</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">reset_password_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">username</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user_groups</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">1</td><td style="vertical-align:top;">:</td><td><div>user_1</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr></table></div>'
+tRp306
+sS'etype'
+p307
+S"<class 'simplejson.scanner.JSONDecodeError'>"
+p308
+sS'date'
+p309
+S'Thu Aug 25 09:25:58 2016'
+p310
+sS'response'
+p311
+g74
+(S'sR\x17\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0x2a51ae8&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_ethical</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157-fefcca75-006d-4dd9-ac1d-76ac4e78eff0<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^data/\\w+\\.py$</div></td></tr><tr><td><div>^data/get_geojson/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_key</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;/home/www-data/web2py.git/applications/ethical/sessions/217.199.1.157-fefcca75-006d-4dd9-ac1d-76ac4e78eff0&#x27;, mode &#x27;rb+&#x27; at 0x2507ae0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git/applications/ethical/sessions/217.199.1.157-fefcca75-006d-4dd9-ac1d-76ac4e78eff0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>ff1d45b9d96ad7ae68dc5cce67fb5d15</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157-fefcca75-006d-4dd9-ac1d-76ac4e78eff0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_locked</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">static_version</td><td style="vertical-align:top;">:</td><td><div>0.0.2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>data/get_geojson.html</div></td></tr></table></div>'
+tRp312
+sS'locals'
+p313
+(dp314
+S'_w'
+p315
+S'<built-in method match of _sre.SRE_Pattern object>'
+p316
+sS's'
+S'u\'<html><head><title>Apache Tomcat/7.0.26 - Erro...ade"><h3>Apache Tomcat/7.0.26</h3></body></html>\''
+p317
+sS'_PY3'
+p318
+S'False'
+p319
+sS'idx'
+p320
+S'0'
+sS'self'
+p321
+S'<simplejson.decoder.JSONDecoder object>'
+p322
+sssS'traceback'
+p323
+S'Traceback (most recent call last):\n  File "/home/www-data/web2py/gluon/restricted.py", line 220, in restricted\n    exec ccode in environment\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 174, in <module>\n  File "/home/www-data/web2py/gluon/globals.py", line 385, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 129, in get_geojson\n    stations = cache.ram(\'__get_stations_info_%s\' % frontend, lambda: __get_stations_info(frontend), (3600 * 24))\n  File "/home/www-data/web2py/gluon/cache.py", line 216, in __call__\n    value = f()\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 129, in <lambda>\n    stations = cache.ram(\'__get_stations_info_%s\' % frontend, lambda: __get_stations_info(frontend), (3600 * 24))\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 153, in __get_stations_info\n    if \'exceptionMessage\' in r.json():\n  File "/usr/local/lib/python2.7/dist-packages/requests/models.py", line 741, in json\n    return json.loads(self.text, **kwargs)\n  File "/usr/local/lib/python2.7/dist-packages/simplejson/__init__.py", line 488, in loads\n    return _default_decoder.decode(s)\n  File "/usr/local/lib/python2.7/dist-packages/simplejson/decoder.py", line 370, in decode\n    obj, end = self.raw_decode(s)\n  File "/usr/local/lib/python2.7/dist-packages/simplejson/decoder.py", line 389, in raw_decode\n    return self.scan_once(s, idx=_w(s, idx).end())\nJSONDecodeError: Expecting value: line 1 column 1 (char 0)\n'
+p324
+s.

@@ -1,0 +1,948 @@
+(dp1
+S'output'
+p2
+S"<class 'requests.exceptions.ConnectionError'> HTTPConnectionPool(host='ipchannels.integreen-life.bz.it', port=80): Max retries exceeded with url: /BluetoothFrontEnd/rest/get-station-details (Caused by <class 'socket.error'>: [Errno 104] Connection reset by peer)"
+p3
+sS'layer'
+p4
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p5
+sS'code'
+p6
+S'# -*- coding: utf-8 -*-\nimport requests\nfrom functools import partial\nbaseurl = "http://ipchannels.integreen-life.bz.it"\ncache_t = (3600*24)\n\nbaseurl = "http://ipchannels.integreen-life.bz.it"\nfrontends = {\'Meteo\':\'MeteoFrontEnd\', \n             \'Vehicle\': \'VehicleFrontEnd\', \n             \'Environment\':\'EnvironmentFrontEnd\', \n             \'Parking\': \'parkingFrontEnd\',\n             \'Bluetooth\':\'BluetoothFrontEnd\', \n             \'Link\':\'LinkFrontEnd\', \n             \'Street\': \'StreetFrontEnd\', \n             \'Traffic\': \'TrafficFrontEnd\',\n             }\n\ndef get_frontends():\n    session.forget(request)\n    response.headers[\'web2py-component-content\'] = \'append\'\n\n    #response.headers[\'web2py-component-content\'] = \'hide\'\n    #response.headers[\'web2py-component-command\'] = "add_after_form(xhr, \'form_frontend\');"\n    \n    return response.render(\'data/frontends_form.html\', {\'frontends\':frontends, \'frontend\':\'RWISFrontEnd\'})\n\ndef get_stations():\n    session.forget(request)\n    frontend = request.vars.frontend    \n    if not frontend or frontend not in frontends:\n        return HTTP(404)\n\n    response.headers[\'web2py-component-content\'] = \'append\'\n    stations = __get_stations(frontends[frontend])\n    response.headers[\'web2py-component-content\'] = \'hide\'\n    response.headers[\'web2py-component-command\'] = "add_after_form(xhr, \'form_frontend\');"\n    \n    return response.render(\'data/stations_form.html\', {\'stations\':stations, \'frontend\':frontend})\n\ndef _get_station(stationcode, frontend):\n    for s in __get_stations(frontend):\n        if s[\'id\'] == stationcode:\n            return s\n    return None\n\ndef get_data_types():\n    session.forget(request)\n    station = request.vars.station\n    frontend = request.vars.frontend\n    if not frontend or frontend not in frontends:\n        return HTTP(404)\n    s_obj = _get_station(station, frontends[frontend])\n    tab_name = request.vars.tab if request.vars.tab else \'sidebar_console\'\n    tab = "#%s .sidebar" % request.vars.tab if request.vars.tab else \'#sidebar_console\'\n    if s_obj == None:\n        raise HTTP(404, \'Station not found\')\n    name = s_obj[\'name\']\n    \n    response.headers[\'web2py-component-content\'] = \'hide\'\n    response.headers[\'web2py-component-command\'] = "fix_dynamic_accordion(\'%(tab)s\'); append_to(xhr, \'%(tab)s\');" % {\'tab\':tab}\n\n    data_types = __get_types(station, frontends[frontend])\n    if frontend.lower() == \'vehicle\':\n        data_types_filtered = filter(lambda r: \'valid\' not in r[0], data_types)\n        data_types_filtered = filter(lambda r: \'runtime\' not in r[0], data_types_filtered)\n        data_types_filtered = filter(lambda r: \'id_\' not in r[0], data_types_filtered)\n        data_types_filtered = filter(lambda r: \'gps_\' not in r[0] or \'speed\' in r[0], data_types_filtered)\n    else:\n        data_types_filtered = data_types\n    data_types_filtered.sort(key=lambda v: (v[0],int(v[3])) if len(v)>3 and v[3].isdigit() else v[0])\n    return response.render(\'data/data_types_legend.html\', {\'data_types\':data_types_filtered, \'frontend\':frontend, \'name\':name, \'station\':station, \'tab_name\':tab_name })\n\n@cache.action(time_expire=180, cache_model=cache.ram, vars=True)\ndef get_data():\n    session.forget(request)\n    station = request.vars.station \n    data_type = request.vars.data_type\n    data_label = request.vars.data_label\n    unit = request.vars.unit\n    period = request.vars.period\n    seconds = request.vars.seconds\n    from_epoch = int(request.vars[\'from\'])\n    to_epoch = int(request.vars.to)\n    frontend = request.vars.frontend\n    if not frontend or frontend not in frontends:\n        return HTTP(404)\n    url = "%s/%s/rest/get-records-in-timeframe" % (baseurl, frontends[frontend])\n    params = {\'station\':station, \'name\':data_type, \'unit\':unit, \'from\':from_epoch, \'to\': to_epoch}\n    if period:\n        params[\'period\'] = period\n    r = requests.get(url, params=params)\n    #print r.url\n    data = r.json()\n    output = [ [d[\'timestamp\'], "%.2f" % float(d[\'value\'])] for d in data]\n \n    # the id must be the same of the A element in the data type list\n    series = [{\'data\':output, \'id\': IS_SLUG()(\'type_%s_%s_%s\' % (station,data_type,period))[0], \'station_id\':\'station_iud\', \'label\': "%s - %s" % (station, data_label)}]\n    return response.json({\'series\': series})\n\ndef __get_stations(frontend):\n    def local():\n        url = "%s/%s/rest/get-station-details" % (baseurl, frontend)\n        r = requests.get(url) # params=url_vars)\n        print r.url\n        stations = r.json()\n        stations.sort(key=lambda v: v[\'name\'])\n        return stations\n    stations = cache.ram(\'stations_%s\' % frontend, local, cache_t)\n    return stations\n\ndef __get_types(station, frontend):\n    def local(station):\n        url = "%s/%s/rest/get-data-types" % (baseurl, frontend)\n        r = requests.get(url, params={\'station\':station})\n        types = r.json()\n        types.sort(key=lambda v: v)\n        return types\n    types = cache.ram(\'types_%s\' % station, partial(local, station), cache_t)\n    return types\n    \n#@cache.action(time_expire=180, cache_model=cache.ram, vars=True)\ndef get_geojson():\n    session.forget(request)\n    frontend = request.vars.frontend\n    frontend = frontends[frontend] if frontend in frontends else \'\'\n    data_type = request.vars.type\n    period = request.vars.period\n\n    stations = cache.ram(\'__get_stations_info_%s\' % frontend, lambda: __get_stations_info(frontend), (3600 * 24))\n\n    for s in stations:\n        s[\'last_value\'] = __get_last_value(frontend, s[\'id\'], data_type, period)\n    \n    features= [{"type": "Feature",\n                "properties": {\n                    "id":s[\'id\'],\n                    "popupContent": "%s %s" % (s[\'name\'], s[\'last_value\']),\n                    "openPopup": False,\n                    "last_value": s[\'last_value\'],\n                },\n                "geometry": {\n                    "type": "Point",\n                    "coordinates": [s[\'longitude\'], s[\'latitude\']]\n                },} for s in stations] \n\n    response.headers[\'Content-Type\'] = \'application/json\'\n    return response.json({"type": "FeatureCollection", \'features\': features}) \n\n# Return basic info for all available parking lots\ndef __get_stations_info(frontend):\n    r = requests.get("%s/%s/rest/get-station-details" % (baseurl, frontend))\n    #print r.url\n    if \'exceptionMessage\' in r.json():\n        return []\n    return r.json()\n\ndef __get_last_value(frontend, _id,  _type, _period):\n    rest_url = "%s/%s" % (baseurl, frontend)\n    method = "rest/get-records"\n    params = {\'name\':_type, \'period\':_period, \'station\':_id, \'seconds\': 7200}\n    r = requests.get("%s/%s" % (rest_url, method), params=params)\n    data=r.json()\n\n    index = len(data)-1 # last value\n    if frontend == \'BluetoothFrontEnd\':\n        index = len(data)-2      # last but one value\n\n    if \'exceptionMessage\' in data or len(data) < -(index):\n        return -1\n\n    obj=data[index]\n    return int(obj[\'value\'])\n\nresponse._vars=response._caller(get_data_types)\n'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__module__'
+p12
+S"'requests.exceptions'"
+p13
+sS'__getslice__'
+p14
+S"<method-wrapper '__getslice__' of ConnectionError object>"
+p15
+sS'__str__'
+p16
+S"<method-wrapper '__str__' of ConnectionError object>"
+p17
+sS'__reduce__'
+p18
+S'<built-in method __reduce__ of ConnectionError object>'
+p19
+sS'__dict__'
+p20
+S'{}'
+p21
+sS'__sizeof__'
+p22
+S'<built-in method __sizeof__ of ConnectionError object>'
+p23
+sS'__weakref__'
+p24
+S'None'
+p25
+sS'__init__'
+p26
+S"<method-wrapper '__init__' of ConnectionError object>"
+p27
+sS'__setattr__'
+p28
+S"<method-wrapper '__setattr__' of ConnectionError object>"
+p29
+sS'__reduce_ex__'
+p30
+S'<built-in method __reduce_ex__ of ConnectionError object>'
+p31
+sS'__new__'
+p32
+S'<built-in method __new__ of type object>'
+p33
+sS'errno'
+p34
+S'None'
+p35
+sS'__format__'
+p36
+S'<built-in method __format__ of ConnectionError object>'
+p37
+sS'__class__'
+p38
+S"<class 'requests.exceptions.ConnectionError'>"
+p39
+sS'filename'
+p40
+S'None'
+p41
+sS'__doc__'
+p42
+S"'A Connection error occurred.'"
+p43
+sS'__getitem__'
+p44
+S"<method-wrapper '__getitem__' of ConnectionError object>"
+p45
+sS'__setstate__'
+p46
+S'<built-in method __setstate__ of ConnectionError object>'
+p47
+sS'__getattribute__'
+p48
+S"<method-wrapper '__getattribute__' of ConnectionError object>"
+p49
+sS'args'
+p50
+S'(MaxRetryError("HTTPConnectionPool(host=\'ipchanne...error\'>: [Errno 104] Connection reset by peer)",),)'
+p51
+sS'__subclasshook__'
+p52
+S'<built-in method __subclasshook__ of type object>'
+p53
+sS'__unicode__'
+p54
+S'<built-in method __unicode__ of ConnectionError object>'
+p55
+sS'strerror'
+p56
+S'None'
+p57
+sS'__delattr__'
+p58
+S"<method-wrapper '__delattr__' of ConnectionError object>"
+p59
+sS'__repr__'
+p60
+S"<method-wrapper '__repr__' of ConnectionError object>"
+p61
+sS'__hash__'
+p62
+S"<method-wrapper '__hash__' of ConnectionError object>"
+p63
+ssS'evalue'
+p64
+S"HTTPConnectionPool(host='ipchannels.integreen-life.bz.it', port=80): Max retries exceeded with url: /BluetoothFrontEnd/rest/get-station-details (Caused by <class 'socket.error'>: [Errno 104] Connection reset by peer)"
+p65
+sS'request'
+p66
+cgluon.html
+XML_unpickle
+p67
+(S'sYd\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>84.18.150.186</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>data</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">ajs_group_id</td><td style="vertical-align:top;">:</td><td><div>null<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">ajs_user_id</td><td style="vertical-align:top;">:</td><td><div>null<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">lang</td><td style="vertical-align:top;">:</td><td><div>it<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">length_link_active</td><td style="vertical-align:top;">:</td><td><div>1<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_ethical</td><td style="vertical-align:top;">:</td><td><div>84.18.150.186-79d40006-87c3-43b8-9ee2-fc7665314d4c<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">spinner</td><td style="vertical-align:top;">:</td><td><div>1<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_LENGTH</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_TYPE</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">DOCUMENT_ROOT</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>*/*</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>__utma=177085241.431438423.1382542583.1455183514.1487832495.40; _ga=GA1.3.431438423.1382542583; ajs_group_id=null; ajs_user_id=null; lang=it; __utmz=177085241.1487832495.40.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); _gid=GA1.3.410250071.1502342764; length_link_active=1; spinner=1; session_id_ethical=84.18.150.186-79d40006-87c3-43b8-9ee2-fc7665314d4c; _gat=1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>analytics.mobility.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_REFERER</td><td style="vertical-align:top;">:</td><td><div>http://analytics.mobility.bz.it/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_X_REQUESTED_WITH</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/data/get_data_types</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div>station=cfirmiano&amp;tab=grafici&amp;frontend=Bluetooth</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>84.18.150.186</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>13698</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_URI</td><td style="vertical-align:top;">:</td><td><div>/data/get_data_types?station=cfirmiano&amp;tab=grafici&amp;frontend=Bluetooth</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>80</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>nginx/1.5.3</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">UWSGI_SCHEME</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py.git/applications/parkbzNew/&#x27;, &#x27;/home/www-data/web2py.git/applications/ethical/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_length</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_type</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">document_root</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_application</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_controller</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_function</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>*/*</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>en-US,en;q=0.5</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>__utma=177085241.431438423.1382542583.1455183514.1487832495.40; _ga=GA1.3.431438423.1382542583; ajs_group_id=null; ajs_user_id=null; lang=it; __utmz=177085241.1487832495.40.1.utmcsr=(direct)|utmccn=(direct)|utmcmd=(none); _gid=GA1.3.410250071.1502342764; length_link_active=1; spinner=1; session_id_ethical=84.18.150.186-79d40006-87c3-43b8-9ee2-fc7665314d4c; _gat=1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>analytics.mobility.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_referer</td><td style="vertical-align:top;">:</td><td><div>http://analytics.mobility.bz.it/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:54.0) Gecko/20100101 Firefox/54.0</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_x_requested_with</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>traffic</div></td></tr><tr><td><div>parking.bz.it</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>62.146.6.205</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/data/get_data_types</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div>station=cfirmiano&amp;tab=grafici&amp;frontend=Bluetooth</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>84.18.150.186</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>13698</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/ethical/data/get_data_types?station=cfirmiano&amp;tab=grafici&amp;frontend=Bluetooth</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>80</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>nginx/1.5.3</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.node</td><td style="vertical-align:top;">:</td><td><div>traffic</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.version</td><td style="vertical-align:top;">:</td><td><div>1.9.14</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_node</td><td style="vertical-align:top;">:</td><td><div>traffic</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_version</td><td style="vertical-align:top;">:</td><td><div>1.9.14</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_original_uri</td><td style="vertical-align:top;">:</td><td><div>/data/get_data_types?station=cfirmiano&amp;tab=grafici&amp;frontend=Bluetooth</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.5-stable+timestamp.2014.03.15.21.24.06</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x2f2ff60&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7ff3fbd5f480&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x2f2ff60&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7ff3fbd5f480&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git/applications/ethical/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>get_data_types</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py.git/applications/parkbzNew/&#x27;, &#x27;/home/www-data/web2py.git/applications/ethical/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>traffic</div></td></tr><tr><td><div>parking.bz.it</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>62.146.6.205</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.5-stable+timestamp.2014.03.15.21.24.06</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2017, 8, 11, 14, 51, 6, 865989)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/data/get_data_types</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2017, 8, 11, 12, 51, 6, 866008)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uuid</td><td style="vertical-align:top;">:</td><td><div>ethical/84.18.150.186.2017-08-11.14-51-06.2ed39af7-4276-4e4b-9684-50ea038a4625</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0x37bda10&gt;</div></td></tr></table></div>'
+tRp68
+sS'frames'
+p69
+(lp70
+(dp71
+S'file'
+p72
+S'/home/www-data/web2py/gluon/restricted.py'
+p73
+sS'dump'
+p74
+(dp75
+S'environment'
+p76
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, 'CAT': <class 'gluon.html.CAT'>, 'CENTER': <class 'gluon.html.CENTER'>, ...}"
+p77
+sS'ccode'
+p78
+S'<code object <module> at 0x36ca8b0, file "/home/...pplications/ethical/controllers/data.py", line 2>'
+p79
+ssS'lnum'
+p80
+I220
+sS'lines'
+p81
+(dp82
+I224
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p83
+sI215
+S'    try:'
+p84
+sI216
+S'        if isinstance(code, types.CodeType):'
+p85
+sI217
+S'            ccode = code'
+p86
+sI218
+S'        else:'
+p87
+sI219
+S'            ccode = compile2(code, layer)'
+p88
+sI220
+S'        exec ccode in environment'
+p89
+sI221
+S'    except HTTP:'
+p90
+sI222
+S'        raise'
+p91
+sI223
+S'    except RestrictedError:'
+p92
+ssS'call'
+p93
+S"(code='# -*- coding: utf-8 -*-\\nimport requests\\nfrom fun...\\nresponse._vars=response._caller(get_data_types)\\n', environment={'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, 'CAT': <class 'gluon.html.CAT'>, 'CENTER': <class 'gluon.html.CENTER'>, ...}, layer='/home/www-data/web2py.git/applications/ethical/controllers/data.py')"
+p94
+sS'func'
+p95
+S'restricted'
+p96
+sa(dp97
+g72
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p98
+sg74
+(dp99
+sg80
+I174
+sg81
+(dp100
+I163
+S''
+sI164
+S'    index = len(data)-1 # last value'
+p101
+sI165
+S"    if frontend == 'BluetoothFrontEnd':"
+p102
+sI166
+S'        index = len(data)-2      # last but one value'
+p103
+sI167
+S''
+sI168
+S"    if 'exceptionMessage' in data or len(data) < -(index):"
+p104
+sI169
+S'        return -1'
+p105
+sI170
+S''
+sI171
+S'    obj=data[index]'
+p106
+sI172
+S"    return int(obj['value'])"
+p107
+ssg93
+S'()'
+p108
+sg95
+S'<module>'
+p109
+sa(dp110
+g72
+S'/home/www-data/web2py/gluon/globals.py'
+p111
+sg74
+(dp112
+S'self'
+p113
+S'undefined'
+p114
+sS'f'
+S'<function get_data_types>'
+p115
+ssg80
+I385
+sg81
+(dp116
+I384
+S'        self._vars = None'
+p117
+sI385
+S'        self._caller = lambda f: f()'
+p118
+sI386
+S'        self._view_environment = None'
+p119
+sI387
+S'        self._custom_commit = None'
+p120
+sI388
+S'        self._custom_rollback = None'
+p121
+sI389
+S''
+sI380
+S'        self.menu = []             # used by the default view layout'
+p122
+sI381
+S'        self.files = []            # used by web2py_ajax.html'
+p123
+sI382
+S'        self.generic_patterns = []  # patterns to allow generic views'
+p124
+sI383
+S"        self.delimiters = ('{{', '}}')"
+p125
+ssg93
+S'(f=<function get_data_types>)'
+p126
+sg95
+S'<lambda>'
+p127
+sa(dp128
+g72
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p129
+sg74
+(dp130
+S's_obj'
+p131
+g114
+sS'frontend'
+p132
+S"'Bluetooth'"
+p133
+sS'station'
+p134
+S"'cfirmiano'"
+p135
+sS'global _get_station'
+p136
+S'<function _get_station>'
+p137
+sS'global frontends'
+p138
+S"{'Bluetooth': 'BluetoothFrontEnd', 'Environment': 'EnvironmentFrontEnd', 'Link': 'LinkFrontEnd', 'Meteo': 'MeteoFrontEnd', 'Parking': 'parkingFrontEnd', 'Street': 'StreetFrontEnd', 'Traffic': 'TrafficFrontEnd', 'Vehicle': 'VehicleFrontEnd'}"
+p139
+ssg80
+I52
+sg81
+(dp140
+I47
+S'    session.forget(request)'
+p141
+sI48
+S'    station = request.vars.station'
+p142
+sI49
+S'    frontend = request.vars.frontend'
+p143
+sI50
+S'    if not frontend or frontend not in frontends:'
+p144
+sI51
+S'        return HTTP(404)'
+p145
+sI52
+S'    s_obj = _get_station(station, frontends[frontend])'
+p146
+sI53
+S"    tab_name = request.vars.tab if request.vars.tab else 'sidebar_console'"
+p147
+sI54
+S'    tab = "#%s .sidebar" % request.vars.tab if request.vars.tab else \'#sidebar_console\''
+p148
+sI55
+S'    if s_obj == None:'
+p149
+sI56
+S"        raise HTTP(404, 'Station not found')"
+p150
+ssg93
+S'()'
+p151
+sg95
+S'get_data_types'
+p152
+sa(dp153
+g72
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p154
+sg74
+(dp155
+S'frontend'
+p156
+S"'BluetoothFrontEnd'"
+p157
+sS's'
+g114
+sS'global __get_stations'
+p158
+S'<function __get_stations>'
+p159
+ssg80
+I41
+sg81
+(dp160
+I36
+S'    response.headers[\'web2py-component-command\'] = "add_after_form(xhr, \'form_frontend\');"'
+p161
+sI37
+S''
+sI38
+S"    return response.render('data/stations_form.html', {'stations':stations, 'frontend':frontend})"
+p162
+sI39
+S''
+sI40
+S'def _get_station(stationcode, frontend):'
+p163
+sI41
+S'    for s in __get_stations(frontend):'
+p164
+sI42
+S"        if s['id'] == stationcode:"
+p165
+sI43
+S'            return s'
+p166
+sI44
+S'    return None'
+p167
+sI45
+S''
+ssg93
+S"(stationcode='cfirmiano', frontend='BluetoothFrontEnd')"
+p168
+sg95
+S'_get_station'
+p169
+sa(dp170
+g72
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p171
+sg74
+(dp172
+S'global cache_t'
+p173
+S'86400'
+p174
+sS'stations'
+p175
+g114
+sS'global cache'
+p176
+S'<gluon.cache.Cache object>'
+p177
+sS'cache.ram'
+p178
+S'<gluon.cache.CacheInRam object>'
+p179
+sS'frontend'
+p180
+S"'BluetoothFrontEnd'"
+p181
+sS'local'
+p182
+S'<function local>'
+p183
+ssg80
+I108
+sg81
+(dp184
+I103
+S'        r = requests.get(url) # params=url_vars)'
+p185
+sI104
+S'        print r.url'
+p186
+sI105
+S'        stations = r.json()'
+p187
+sI106
+S"        stations.sort(key=lambda v: v['name'])"
+p188
+sI107
+S'        return stations'
+p189
+sI108
+S"    stations = cache.ram('stations_%s' % frontend, local, cache_t)"
+p190
+sI109
+S'    return stations'
+p191
+sI110
+S''
+sI111
+S'def __get_types(station, frontend):'
+p192
+sI112
+S'    def local(station):'
+p193
+ssg93
+S"(frontend='BluetoothFrontEnd')"
+p194
+sg95
+S'__get_stations'
+p195
+sa(dp196
+g72
+S'/home/www-data/web2py/gluon/cache.py'
+p197
+sg74
+(dp198
+S'value'
+p199
+g114
+sS'f'
+S'<function local>'
+p200
+ssg80
+I216
+sg81
+(dp201
+I211
+S'            return None'
+p202
+sI212
+S'        if item and (dt is None or item[0] > now - dt):'
+p203
+sI213
+S'            return item[1]'
+p204
+sI214
+S'        elif item and (item[0] < now - dt) and destroyer:'
+p205
+sI215
+S'            destroyer(item[1])'
+p206
+sI216
+S'        value = f()'
+p207
+sI217
+S''
+sI218
+S'        self.locker.acquire()'
+p208
+sI219
+S'        self.storage[key] = (now, value)'
+p209
+sI220
+S"        self.storage[CacheAbstract.cache_stats_name]['misses'] += 1"
+p210
+ssg93
+S"(self=<gluon.cache.CacheInRam object>, key='stations_BluetoothFrontEnd', f=<function local>, time_expire=86400, destroyer=None)"
+p211
+sg95
+S'__call__'
+p212
+sa(dp213
+g72
+S'/home/www-data/web2py.git/applications/ethical/controllers/data.py'
+p214
+sg74
+(dp215
+S'requests.get'
+p216
+S'<function get>'
+p217
+sS'url'
+p218
+S"'http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details'"
+p219
+sS'r'
+g114
+sS'global requests'
+p220
+S"<module 'requests' from '/usr/local/lib/python2.7/dist-packages/requests/__init__.pyc'>"
+p221
+ssg80
+I103
+sg81
+(dp222
+I98
+S"    return response.json({'series': series})"
+p223
+sI99
+S''
+sI100
+S'def __get_stations(frontend):'
+p224
+sI101
+S'    def local():'
+p225
+sI102
+S'        url = "%s/%s/rest/get-station-details" % (baseurl, frontend)'
+p226
+sI103
+S'        r = requests.get(url) # params=url_vars)'
+p227
+sI104
+S'        print r.url'
+p228
+sI105
+S'        stations = r.json()'
+p229
+sI106
+S"        stations.sort(key=lambda v: v['name'])"
+p230
+sI107
+S'        return stations'
+p231
+ssg93
+S'()'
+p232
+sg95
+S'local'
+p233
+sa(dp234
+g72
+S'/usr/local/lib/python2.7/dist-packages/requests/api.py'
+p235
+sg74
+(dp236
+S'global request'
+p237
+S'<function request>'
+p238
+sS'url'
+p239
+S"'http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details'"
+p240
+sS'kwargs'
+p241
+S"{'allow_redirects': True}"
+p242
+ssg80
+I55
+sg81
+(dp243
+I50
+S'    :param url: URL for the new :class:`Request` object.'
+p244
+sI51
+S'    :param \\*\\*kwargs: Optional arguments that ``request`` takes.'
+p245
+sI52
+S'    """'
+p246
+sI53
+S''
+sI54
+S"    kwargs.setdefault('allow_redirects', True)"
+p247
+sI55
+S"    return request('get', url, **kwargs)"
+p248
+sI56
+S''
+sI57
+S''
+sI58
+S'def options(url, **kwargs):'
+p249
+sI59
+S'    """Sends a OPTIONS request. Returns :class:`Response` object.'
+p250
+ssg93
+S"(url='http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details', **kwargs={'allow_redirects': True})"
+p251
+sg95
+S'get'
+p252
+sa(dp253
+g72
+S'/usr/local/lib/python2.7/dist-packages/requests/api.py'
+p254
+sg74
+(dp255
+S'url'
+p256
+S"'http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details'"
+p257
+sS'session'
+p258
+S'<requests.sessions.Session object>'
+p259
+sS'method'
+p260
+S"'get'"
+p261
+sS'session.request'
+p262
+S'<bound method Session.request of <requests.sessions.Session object>>'
+p263
+sS'kwargs'
+p264
+S"{'allow_redirects': True}"
+p265
+ssg80
+I44
+sg81
+(dp266
+I39
+S"      >>> req = requests.request('GET', 'http://httpbin.org/get')"
+p267
+sI40
+S'      <Response [200]>'
+p268
+sI41
+S'    """'
+p269
+sI42
+S''
+sI43
+S'    session = sessions.Session()'
+p270
+sI44
+S'    return session.request(method=method, url=url, **kwargs)'
+p271
+sI45
+S''
+sI46
+S''
+sI47
+S'def get(url, **kwargs):'
+p272
+sI48
+S'    """Sends a GET request. Returns :class:`Response` object.'
+p273
+ssg93
+S"(method='get', url='http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details', **kwargs={'allow_redirects': True})"
+p274
+sg95
+g66
+sa(dp275
+g72
+S'/usr/local/lib/python2.7/dist-packages/requests/sessions.py'
+p276
+sg74
+(dp277
+S'resp'
+p278
+g114
+sS'send_kwargs'
+p279
+S"{'allow_redirects': True, 'cert': None, 'proxies': OrderedDict(), 'stream': False, 'timeout': None, 'verify': True}"
+p280
+sS'prep'
+p281
+S'<PreparedRequest [GET]>'
+p282
+sS'self'
+p283
+S'<requests.sessions.Session object>'
+p284
+sS'self.send'
+p285
+S'<bound method Session.send of <requests.sessions.Session object>>'
+p286
+ssg80
+I383
+sg81
+(dp287
+I384
+S''
+sI385
+S'        return resp'
+p288
+sI386
+S''
+sI387
+S'    def get(self, url, **kwargs):'
+p289
+sI378
+S"            'verify': verify,"
+p290
+sI379
+S"            'cert': cert,"
+p291
+sI380
+S"            'proxies': proxies,"
+p292
+sI381
+S"            'allow_redirects': allow_redirects,"
+p293
+sI382
+S'        }'
+p294
+sI383
+S'        resp = self.send(prep, **send_kwargs)'
+p295
+ssg93
+S"(self=<requests.sessions.Session object>, method='get', url='http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details', params=None, data=None, headers=None, cookies=None, files=None, auth=None, timeout=None, allow_redirects=True, proxies=OrderedDict(), hooks=None, stream=False, verify=True, cert=None)"
+p296
+sg95
+g66
+sa(dp297
+g72
+S'/usr/local/lib/python2.7/dist-packages/requests/sessions.py'
+p298
+sg74
+(dp299
+S'request'
+p300
+S'<PreparedRequest [GET]>'
+p301
+sS'adapter'
+p302
+S'<requests.adapters.HTTPAdapter object>'
+p303
+sS'r'
+g114
+sS'adapter.send'
+p304
+S'<bound method HTTPAdapter.send of <requests.adapters.HTTPAdapter object>>'
+p305
+sS'kwargs'
+p306
+S"{'cert': None, 'proxies': OrderedDict(), 'stream': False, 'timeout': None, 'verify': True}"
+p307
+ssg80
+I486
+sg81
+(dp308
+I481
+S'        adapter = self.get_adapter(url=request.url)'
+p309
+sI482
+S''
+sI483
+S'        # Start time (approximately) of the request'
+p310
+sI484
+S'        start = datetime.utcnow()'
+p311
+sI485
+S'        # Send the request'
+p312
+sI486
+S'        r = adapter.send(request, **kwargs)'
+p313
+sI487
+S'        # Total elapsed time of the request (approximately)'
+p314
+sI488
+S'        r.elapsed = datetime.utcnow() - start'
+p315
+sI489
+S''
+sI490
+S'        # Response manipulation hooks'
+p316
+ssg93
+S"(self=<requests.sessions.Session object>, request=<PreparedRequest [GET]>, **kwargs={'cert': None, 'proxies': OrderedDict(), 'stream': False, 'timeout': None, 'verify': True})"
+p317
+sg95
+S'send'
+p318
+sa(dp319
+g72
+S'/usr/local/lib/python2.7/dist-packages/requests/adapters.py'
+p320
+sg74
+(dp321
+S'global ConnectionError'
+p322
+S"<class 'requests.exceptions.ConnectionError'>"
+p323
+sS'e'
+S'MaxRetryError("HTTPConnectionPool(host=\'ipchanne...error\'>: [Errno 104] Connection reset by peer)",)'
+p324
+ssg80
+I378
+sg81
+(dp325
+I373
+S''
+sI374
+S'        except socket.error as sockerr:'
+p326
+sI375
+S'            raise ConnectionError(sockerr)'
+p327
+sI376
+S''
+sI377
+S'        except MaxRetryError as e:'
+p328
+sI378
+S'            raise ConnectionError(e)'
+p329
+sI379
+S''
+sI380
+S'        except _ProxyError as e:'
+p330
+sI381
+S'            raise ProxyError(e)'
+p331
+sI382
+S''
+ssg93
+S'(self=<requests.adapters.HTTPAdapter object>, request=<PreparedRequest [GET]>, stream=False, timeout=<requests.packages.urllib3.util.Timeout object>, verify=True, cert=None, proxies=OrderedDict())'
+p332
+sg95
+g318
+sasS'pyver'
+p333
+S'Python 2.7.3: /usr/local/bin/uwsgi (prefix: /usr)'
+p334
+sS'session'
+p335
+g67
+(S's\x82\t\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">auth</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">expiration</td><td style="vertical-align:top;">:</td><td><div>3600</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">hmac_key</td><td style="vertical-align:top;">:</td><td><div>45b9d96f-2229-49c0-a126-0642574208ef</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_visit</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2017, 8, 11, 14, 50, 23, 203871)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remember</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">email</td><td style="vertical-align:top;">:</td><td><div>project@integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">first_name</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">id</td><td style="vertical-align:top;">:</td><td><div>1L</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_name</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_id</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">reset_password_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">username</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user_groups</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">1</td><td style="vertical-align:top;">:</td><td><div>user_1</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr></table></div>'
+tRp336
+sS'etype'
+p337
+S"<class 'requests.exceptions.ConnectionError'>"
+p338
+sS'date'
+p339
+S'Fri Aug 11 14:51:07 2017'
+p340
+sS'response'
+p341
+g67
+(S'sX\x17\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0x351dd18&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_ethical</td><td style="vertical-align:top;">:</td><td><div>84.18.150.186-79d40006-87c3-43b8-9ee2-fc7665314d4c<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^data/\\w+\\.py$</div></td></tr><tr><td><div>^data/get_data_types/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>84.18.150.186</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_key</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;/home/www-data/web2py.git/applications/ethical/sessions/84.18.150.186-79d40006-87c3-43b8-9ee2-fc7665314d4c&#x27;, mode &#x27;rb+&#x27; at 0x32778a0&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git/applications/ethical/sessions/84.18.150.186-79d40006-87c3-43b8-9ee2-fc7665314d4c</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>34882557a89ae80b1365f0d91cb9f547</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>84.18.150.186-79d40006-87c3-43b8-9ee2-fc7665314d4c</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_locked</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">static_version</td><td style="vertical-align:top;">:</td><td><div>0.0.2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>data/get_data_types.html</div></td></tr></table></div>'
+tRp342
+sS'locals'
+p343
+(dp344
+S'proxies'
+p345
+S'OrderedDict()'
+p346
+sS'e'
+S'MaxRetryError("HTTPConnectionPool(host=\'ipchanne...error\'>: [Errno 104] Connection reset by peer)",)'
+p347
+sS'stream'
+p348
+S'False'
+p349
+sS'url'
+p350
+S"'/BluetoothFrontEnd/rest/get-station-details'"
+p351
+sS'verify'
+p352
+S'True'
+p353
+sS'self'
+p354
+S'<requests.adapters.HTTPAdapter object>'
+p355
+sg66
+S'<PreparedRequest [GET]>'
+p356
+sS'cert'
+p357
+S'None'
+p358
+sS'timeout'
+p359
+S'<requests.packages.urllib3.util.Timeout object>'
+p360
+sS'chunked'
+p361
+g349
+sS'conn'
+p362
+S'<requests.packages.urllib3.connectionpool.HTTPConnectionPool object>'
+p363
+sssS'traceback'
+p364
+S'Traceback (most recent call last):\n  File "/home/www-data/web2py/gluon/restricted.py", line 220, in restricted\n    exec ccode in environment\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 174, in <module>\n  File "/home/www-data/web2py/gluon/globals.py", line 385, in <lambda>\n    self._caller = lambda f: f()\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 52, in get_data_types\n    s_obj = _get_station(station, frontends[frontend])\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 41, in _get_station\n    for s in __get_stations(frontend):\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 108, in __get_stations\n    stations = cache.ram(\'stations_%s\' % frontend, local, cache_t)\n  File "/home/www-data/web2py/gluon/cache.py", line 216, in __call__\n    value = f()\n  File "/home/www-data/web2py.git/applications/ethical/controllers/data.py", line 103, in local\n    r = requests.get(url) # params=url_vars)\n  File "/usr/local/lib/python2.7/dist-packages/requests/api.py", line 55, in get\n    return request(\'get\', url, **kwargs)\n  File "/usr/local/lib/python2.7/dist-packages/requests/api.py", line 44, in request\n    return session.request(method=method, url=url, **kwargs)\n  File "/usr/local/lib/python2.7/dist-packages/requests/sessions.py", line 383, in request\n    resp = self.send(prep, **send_kwargs)\n  File "/usr/local/lib/python2.7/dist-packages/requests/sessions.py", line 486, in send\n    r = adapter.send(request, **kwargs)\n  File "/usr/local/lib/python2.7/dist-packages/requests/adapters.py", line 378, in send\n    raise ConnectionError(e)\nConnectionError: HTTPConnectionPool(host=\'ipchannels.integreen-life.bz.it\', port=80): Max retries exceeded with url: /BluetoothFrontEnd/rest/get-station-details (Caused by <class \'socket.error\'>: [Errno 104] Connection reset by peer)\n'
+p365
+s.

@@ -1,0 +1,343 @@
+<main id="main-map">
+    <div class="row-fluid">
+        <div class='col-md-2' id="sidebar">
+             <div class="map-panel">
+                    <h3 tkey="layer-map" class="main-color background-white">Map layers</h3>
+                    <ul class="background-white">
+                        <li id="li-icon-bluetooth"><a href="#" data-bluetooth="bluetooth" class="icon icon-bluetooth" id="icon-bluetooth" onclick="load_geojson_bluetooth()"><span tkey="bluetooth-station">Bluetooth station</span></a></li>
+                        <li id="li-icon-traffic"><a href="#" data-type="traffic" class="icon icon-traffico" id="icon-traffic" onclick="load_geojson_traffic()"><span tkey="traffic-station">Traffic station</span></a></li>
+                        <li id="li-icon-percorrenza"><a href="#" data-type="journey-time"  class="icon icon-percorrenza" id="icon-percorrenza" onclick="load_tileLayer_l_congestion()"><span tkey="journey-time">Journey time</span></a></li>
+                        <li id="li-icon-parcheggi"><a href="#" data-type="parking" class="icon icon-parcheggi" id="icon-parcheggi" onclick="load_geojson_parking()"><span tkey="parking">Parking</span></a></li>
+                        <li id="li-icon-meteo"><a href="#" data-type="weather" class="icon icon-meteo" id="icon-meteo" onclick="load_geojson_weather()"><span tkey="weather">Weather</span></a></li>
+                        <li id="li-icon-inquinamento"><a href="#" data-type="environment" class="icon icon-inquinamento" id="icon-inquinamento" onclick="load_geojson_env()"><span tkey="stations-pollution">Stations pollution</span></a></li>
+                        <li><a href="#" data-type="pm10-dispersion" class="icon icon-inquinanti" id="icon-pm10-inquinanti" onclick="load_tileLayer_l_pm10_dispersion()"><span tkey="pm10-dispersion">PM10 dispersion</span></a></li>
+                         <li id="li-icon-no2-inquinanti"><a href="#" data-type="no2-dispersion" class="icon icon-inquinanti" id="icon-no2-inquinanti" onclick="load_tileLayer_l_no2_dispersion()"><span tkey="no2-dispersion">No2 dispersion</span></a></li>
+                        <li id="li-icon-pm10"><a href="#" data-type="pm10" class="icon icon-pm10" id="icon-pm10" onclick="load_tileLayer_pm10()"><span tkey="pm10-emissions">PM10 emissions</span></a></li>
+                        <li id="li-icon-nox"><a href="#" data-type="nox" class="icon icon-nox" id="icon-nox" onclick="load_tileLayer_l_nox()"><span tkey="nox-emissions">NO<sub>x</sub>emissions</span></a></li>
+                        <li id="li-co2"><a href="#" data-type="co2" class="icon icon-co2"><span tkey="co2-emissions">CO<sub>2</sub>emissions</span></a></li>
+                        <li id="li-probe-vehicle"><a href="#" data-type="probe-vehicle" class="icon icon-veicolo-sonda" onclick="load_tileLayer_l_vehicle()"><span tkey="probe-vehicle">Probe vehicle</span></a></li>
+                    <li><a href="#" id="deselect-layers" tkey="uncheck-all" onclick="reset_map()">Deseleziona tutti</a></li>
+                    </ul>
+            </div>
+        </div>
+        <div class='col-md-10' style="padding:0">
+            <div id="map"></div>
+        </div>
+    </div>
+
+
+</main>
+
+<script>
+    var map = L.map('map').setView([46.493, 11.34], 14);
+    var popup_selected;
+    var geojsonLayer;
+    var geojsonLayerBluetooth;
+    var geojsonLayerEnv;
+    var geojsonLayerParking;
+    var array_parking_free=[];
+    var markersMeteo=[];
+    var geojsonLayerTraffic;
+    var url_request_bluetooth = "{{=URL('data', 'get_geojson', vars={'frontend':'Bluetooth', 'type':'Bluetooth Count record', 'period':'900'})}}";
+    var url_img_bluetooth="{{=URL('static','images/bluetooth-icon.png')}}";
+    var url_img_bluetooth_trasparence="{{=URL('static','images/bluetooth-icon-trasparence.png')}}";
+    var url_request_env = "{{=URL('data', 'get_geojson', vars={'frontend':'Environment', 'type':'NO2', 'period':'3600'})}}";
+    var url_img_env="{{=URL('static','images/inquinamento-icon.png')}}";
+    var url_img_env_trasparence="{{=URL('static','images/inquinamento-icon-trasparence.png')}}";
+    var url_request_parking_free="{{=URL('data', 'get_geojson', vars={'frontend':'Parking', 'type':'free', 'period':1800})}}";
+    var url_request_parking_occupied="{{=URL('data', 'get_geojson', vars={'frontend':'Parking', 'type':'occupied', 'period':'1800'})}}";
+    var url_img_parking="{{=URL('static','images/parking-icon.png')}}";
+    var url_img_parking_traparence="{{=URL('static','images/parking-icon-trasparence.png')}}";
+    var url_img_wheater="{{=URL('static','images/meteo-icon.png')}}";
+    var url_image_weather_cloud_weather="{{=URL('static','images/cloud_weather.png')}}";
+    var url_image_weather_sunny="{{=URL('static','images/sunny.png')}}";
+
+
+</script>
+<script src="{{=URL('static','js/map/bluetooth.js')}}"></script>
+<script src="{{=URL('static','js/map/parking.js')}}"></script>
+<script src="{{=URL('static','js/map/env.js')}}"></script>
+<script src="{{=URL('static','js/map/weather.js')}}"></script>
+<script src="{{=URL('static','js/map/other_stations_tile_layer.js')}}"></script>
+<script src="{{=URL('static','js/map/reset_map.js')}}"></script>
+
+
+<script>
+
+   
+
+    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    
+
+    $('div.leaflet-top').removeClass('leaflet-left').addClass('leaflet-right');
+
+    $(document).on('shown.bs.tab','body a[data-toggle="tab"]', function() {
+        map.invalidateSize(false);
+    });
+
+    
+
+    function load_geojson_traffic() {
+        var text_tiplogy=$("#icon-traffic").text();
+        if(map.hasLayer(geojsonLayerTraffic)==false && $("#icon-traffic").hasClass("active")==false){
+                   $("#icon-traffic").append("<i id='spinner-traffic' data='spinner-traffic' class='fa fa-spinner fa-spin' style='float:right'></i>");
+                   var url_request = '{{=URL('data', 'get_geojson', vars={'frontend':'Traffic', 'type':'Traffic Count record', 'period':'1800'})}}';
+                   $.ajax({
+                       url: url_request,
+                       dataType: 'json',
+                       success: function( data ) {
+                          geojsonLayerTraffic=L.geoJson(data, {
+                            pointToLayer: function (feature, latlng) {
+                                var max_last_value;
+                                var length=data['features'].length
+                                for(var i=0;i<length;i++){
+                                    if(i==0){
+                                        max_last_value= data['features'][i]['properties']['last_value'];
+                                    }else{
+                                        if(max_last_value<data['features'][i]['properties']['last_value']){
+                                            max_last_value=data['features'][i]['properties']['last_value']
+                                        }
+                                    }
+                                }
+                                var v = feature.properties.last_value;
+                                if(v==-1){
+                                     v=0;
+                                }
+                                if(max_last_value==-1){
+                                       max_last_value=0;
+                                }
+                                var markerIcon;
+                                if(v/max_last_value>=0.70){
+                                    markerIcon= new L.Icon.Default({
+                                        iconUrl: '{{=URL('static','images/traffic-icon.png')}}',
+                                        iconRetinaUrl: '{{=URL('static','images/traffic-icon.png')}}',
+                                    });
+                                }else{
+                                    markerIcon= new L.Icon.Default({
+                                        iconUrl: '{{=URL('static','images/traffic-icon-trasparence.png')}}',
+                                        iconRetinaUrl: '{{=URL('static','images/traffic-icon-trasparence.png')}}',
+                                    });
+                                }
+
+                            return L.marker(latlng, {icon: markerIcon});
+                        },
+                        onEachFeature: onEachFeatureTraffic
+                      }).addTo(map);
+                   },
+                   error: function (xhr, ajaxOptions, thrownError) {
+                       error_retrieve_marker("icon-traffic");
+                   }
+               });
+               $("#spinner-traffic").remove();
+         }else{
+                map.removeLayer(geojsonLayerTraffic);
+                setTimeout(function(){$("#icon-traffic").removeClass("active"); },300);
+         }
+    }
+     
+    
+    
+
+    map.on("popupopen", function(e) {
+        popup_open = e.popup;
+        $('.carpark').trigger('reload', true);
+    });
+    map.on("popupclose", function() {
+        popup_open = undefined;
+    });
+
+    function onEachFeatureTraffic(feature, layer) {
+        var popupContent;
+        if (feature.properties && feature.properties.popupContent) {
+            popupContent = feature.properties.popupContent;
+        }
+        var first_text;
+        var second_text;
+        var left_link;
+        var right_link;
+        var tipology="Traffic";
+        var text_tipology;
+        if(langCode=="de"){
+            text_tipology="Verkehr";
+        }else{
+            if(langCode=="it"){
+                text_tipology="Traffico";
+            }else{
+              text_tipology="Traffic";
+            }
+        }
+        var street=adapt_string_for_view(popupContent,tipology);
+        var coordinate_long=feature['geometry']['coordinates'][0];
+        var coordinate_lat=feature['geometry']['coordinates'][1];
+        var last_value=feature['properties']['last_value'];
+        var id_station=feature['properties']['id'];
+        if(langCode=="it"){
+            first_text="Rilevamenti";
+            second_text="Negli ultimi 15 minuti"
+            left_link="Trend ultima ora";
+            right_link="Grafico storico";
+        }else{
+         if(langCode=="de"){
+                first_text="Umfragen";
+                second_text="In den letzten 15 Minuten"
+                left_link="Trend der letzten Stunde";
+                right_link="History Graphen";
+         }
+         else{
+             first_text="Data detect";
+             second_text="In the last 15 minutes"
+             left_link="Trend last hours";
+             right_link="Storic graph";
+         }
+
+        }
+        var popup = L.popup({maxWidth:350,minWidth:350})
+            .setLatLng(coordinate_lat,coordinate_long)
+            .setContent(create_popoup(id_station,last_value,"","","","",street,text_tipology,first_text,second_text,left_link,right_link,"#db4748",street,tipology));
+        layer.bindPopup(popup);
+        if (feature.properties && feature.properties.openPopup) {
+            popup_selected = popup;
+        }
+
+    }
+
+
+ 
+    $(document).on('click', '.forecast h3', function(){
+        var el = $(this);
+	    $(this).toggleClass('open').next().slideToggle('fast', function() {
+	        $(el).trigger('slidend');
+	    });
+    });
+
+
+    function graphTrend(tipology,id_station){
+        change_to_graph();
+        $('#tab a:first').tab('show');
+        if ( $('#container-stations').children().length > 0 ) {
+              $('#container-stations').empty();
+                plot_console.data = [];
+                plot_console.datasets = []
+                $(plot_console).css('visibility', 'hidden');
+                date_set(moment().subtract('days', 7),moment());
+        }
+        var select_street;
+        $('#select2-select_frontend-container').text(tipology);
+        $( "select.form-control_frontends" ).val(tipology);
+        changeTipology();
+        setTimeout(function(){
+                recover_stations(tipology,id_station);
+        }, 2000);
+        setTimeout(function(){
+               date_set(moment().subtract(1,'hours'),moment());
+        }, 2000);
+        setTimeout(function(){
+             $("a[data-station="+id_station+"]").trigger("click");
+        }, 3000);
+       
+
+
+
+    }
+
+    function graphStoric(tipology,id_station){
+        change_to_graph();
+        $('#tab a:first').tab('show');
+        if ( $('#container-stations').children().length > 0 ) {
+              $('#container-stations').empty();
+                plot_console.data = [];
+                plot_console.datasets = []
+                $(plot_console).css('visibility', 'hidden');
+                date_set(moment().subtract('days', 7),moment());
+        }
+        var select_street;
+        $('#select2-select_frontend-container').text(tipology);
+        $( "select.form-control_frontends" ).val(tipology);
+        changeTipology();
+        setTimeout(function(){
+                recover_stations(tipology,id_station);
+        }, 2000);
+         setTimeout(function(){
+             $("a[data-station="+id_station+"]").trigger("click");
+        }, 3000);
+
+
+    }
+    
+    function create_popoup(id_station,last_value,last_value_parking_free,state_occupied,state_free,unit_measure,street,text_tipology,first_text,second_text,left_link,right_link,color,street,tipology){
+        var left_part_popoup;
+        var popoup_footer="<div class='row' style='padding-top:10px;'><div class='col-md-12'><a href='#' onclick='graphTrend(\""+tipology+"\",\""+id_station+"\")' style='float:left;color:"+color+";border-bottom:2px dashed "+color+";border-color:"+color+"'>"+left_link+"</a><a  onclick='graphStoric(\""+tipology+"\",\""+id_station+"\")' href='#' style='float:right;color:"+color+";border-bottom:2px dashed #d5d5d5;border-color:"+color+";'><span style='margin-right:2px'>"+right_link+"</span><i class='glyphicon glyphicon-edit' style='color:"+color+"'/></a></div></div>";
+        if(last_value==-1){
+            color="none repeat scroll 0 0 #ccc";
+            last_value="--";
+            last_value_parking_free="--";
+            popoup_footer="";
+        }else{
+            if(tipology=="Parking"){
+                    if(last_value_parking_free==-1 || last_value_parking_free==undefined || last_value==undefined){
+                        color="none repeat scroll 0 0 #ccc";
+                        last_value="--";
+                        last_value_parking_free="--";
+                        popoup_footer="";
+                    }
+            }
+        }
+        if(tipology=="Parking"){
+             left_part_popoup="<div class='row' style='padding-top:10px;'><div class='col-md-12'><h1 style='font-weight: bold;font-size: 25px;'>"+street+"</h1></div></div><div class='row' style=padding-top:10px;'><div class='col-md-6' style='padding-right:0px'><div style='height:100px;color:#fff;text-align:center;padding-top:25px;background:"+color+"'><h4 style='font-weight:bold;'>"+last_value+" "+state_occupied+"</h4><h4 style='font-weight:bold;'>"+last_value_parking_free+" "+state_free+"</h4></div>";
+        }else{
+            if(tipology=="Environment"){
+               left_part_popoup="<div class='row' style='padding-top:10px;'><div class='col-md-12'><h1 style='font-weight: bold;font-size: 25px;'>"+street+"</h1></div></div><div class='row' style=padding-top:10px;'><div class='col-md-6' style='padding-right:0px'><div style='height:100px;color:#fff;text-align:center;padding-top:25px;background:"+color+"'><h1 style='font-weight:bold;'>"+last_value+"</h1><h4 style='font-weight:bold;'>"+unit_measure+"</h4></div>";
+            }else{
+                  left_part_popoup="<div class='row' style='padding-top:10px;'><div class='col-md-12'><h1 style='font-weight: bold;font-size: 25px;'>"+street+"</h1></div></div><div class='row' style=padding-top:10px;'><div class='col-md-6' style='padding-right:0px'><div style='height:100px;color:#fff;text-align:center;padding-top:25px;background:"+color+"'><h1 style='font-weight:bold;'>"+last_value+"</h1></div>";
+            }
+
+        }
+
+        return left_part_popoup+"</div><div class='col-md-6' style='padding-left:0px'><div style='padding-top:25px;height:100px;color:#fff;background:"+color+"'><h1 style='font-weight: bold;font-size: 15px;display:inline'>"+text_tipology+"</h1><br/><h1 style='font-weight: bold;font-size: 15px;display:inline'>"+first_text+"</h1><br/><h1 style='font-weight: bold;font-size: 15px;display:inline'>"+second_text+"</h1></br></div></div></div>"+popoup_footer;
+    }
+    
+
+
+    function recover_stations(tipology,id_station){
+        $.ajax({
+            url : '{{=URL('data','get_data_types')}}',
+            type: 'GET',
+            data : 'station='+id_station+'&tab=grafici'+'&frontend='+tipology,
+            success: function(data){
+                $('.link_stations').collapse();
+                $('#container-stations').append("<span class='fa-stack fa-lg' id='icon_x' onclick='reset_single_sidebar(this)'><i class='fa fa-square-o fa-stack-2x'></i><i class='fa fa-times fa-stack-1x'></i></span><span class='span-report-station' style='float:right'>"+tipology+"</span>");
+                $( '#container-stations').append(data);
+                $('#container-stations').show();
+                changeTipology();
+
+            },error: function(req, err){alert('Error server' + err); }
+        });
+
+    }
+
+    function adapt_string_for_view(street,typology){
+                if(typology=="Parking" || typology=="Environment" ){
+                    return street.slice(0,street.length-2);
+                }
+                else{
+                    return street.replace(/[0-9,-]/g, '').slice(0,street.length-1);
+                }
+    }
+
+    function error_retrieve_marker(id){
+        $("#"+id).removeClass("active");
+        if(langCode=="de"){
+            alert("FEHLER: Leider ist dieser Datentyp zurzeit nicht verfügbar");
+        }else{
+            if(langCode=="it"){
+                alert("ERRORE: Al momento questo tipo di dato non è disponibile");
+            }else{
+                alert("ERROR: At the moment this data type is not available yet");
+            }
+        }
+
+    }
+
+</script>
