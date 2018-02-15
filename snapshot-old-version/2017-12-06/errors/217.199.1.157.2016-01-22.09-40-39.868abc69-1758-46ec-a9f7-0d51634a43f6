@@ -1,0 +1,764 @@
+(dp1
+S'output'
+p2
+S"<type 'exceptions.KeyError'> 'id'"
+p3
+sS'layer'
+p4
+S'/home/www-data/web2py.git/applications/ethical/views/data/stations_form.html'
+p5
+sS'code'
+p6
+S'response.write(\'<select class="form-control_stations" name="station" id="form-control_stations" >\\n    \\t\\t<option  tkey="select-source" id="first-option-select-stations">Seleziona sorgente</option>\\n\\t\\t\', escape=False)\nfor station in stations:\n    response.write(\'\\n\\t\\t\\t<option value="\', escape=False)\n    response.write(station[\'id\'])\n    response.write(\'">\', escape=False)\n    response.write(station[\'name\'])\n    response.write(\'</option>\\n\\t\\t\', escape=False)\n    pass\nresponse.write(\'\\n</select>\\n\', escape=False)'
+p7
+sS'snapshot'
+p8
+(dp9
+S'exception'
+p10
+(dp11
+S'__hash__'
+p12
+S"<method-wrapper '__hash__' of exceptions.KeyError object>"
+p13
+sS'__setattr__'
+p14
+S"<method-wrapper '__setattr__' of exceptions.KeyError object>"
+p15
+sS'__reduce_ex__'
+p16
+S'<built-in method __reduce_ex__ of exceptions.KeyError object>'
+p17
+sS'__getslice__'
+p18
+S"<method-wrapper '__getslice__' of exceptions.KeyError object>"
+p19
+sS'__getitem__'
+p20
+S"<method-wrapper '__getitem__' of exceptions.KeyError object>"
+p21
+sS'__setstate__'
+p22
+S'<built-in method __setstate__ of exceptions.KeyError object>'
+p23
+sS'args'
+p24
+S"('id',)"
+p25
+sS'__reduce__'
+p26
+S'<built-in method __reduce__ of exceptions.KeyError object>'
+p27
+sS'__str__'
+p28
+S"<method-wrapper '__str__' of exceptions.KeyError object>"
+p29
+sS'__format__'
+p30
+S'<built-in method __format__ of exceptions.KeyError object>'
+p31
+sS'__getattribute__'
+p32
+S"<method-wrapper '__getattribute__' of exceptions.KeyError object>"
+p33
+sS'__class__'
+p34
+S"<type 'exceptions.KeyError'>"
+p35
+sS'__unicode__'
+p36
+S'<built-in method __unicode__ of exceptions.KeyError object>'
+p37
+sS'__delattr__'
+p38
+S"<method-wrapper '__delattr__' of exceptions.KeyError object>"
+p39
+sS'__subclasshook__'
+p40
+S'<built-in method __subclasshook__ of type object>'
+p41
+sS'__repr__'
+p42
+S"<method-wrapper '__repr__' of exceptions.KeyError object>"
+p43
+sS'__dict__'
+p44
+S'{}'
+p45
+sS'__sizeof__'
+p46
+S'<built-in method __sizeof__ of exceptions.KeyError object>'
+p47
+sS'__doc__'
+p48
+S"'Mapping key not found.'"
+p49
+sS'__init__'
+p50
+S"<method-wrapper '__init__' of exceptions.KeyError object>"
+p51
+sS'__new__'
+p52
+S'<built-in method __new__ of type object>'
+p53
+ssS'evalue'
+p54
+S"'id'"
+p55
+sS'request'
+p56
+cgluon.html
+XML_unpickle
+p57
+(S's\xd6X\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">ajax</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">application</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">args</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cid</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">client</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">controller</td><td style="vertical-align:top;">:</td><td><div>data</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">ajs_group_id</td><td style="vertical-align:top;">:</td><td><div>null<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">ajs_user_id</td><td style="vertical-align:top;">:</td><td><div>null<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">lang</td><td style="vertical-align:top;">:</td><td><div>it<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_ethical</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157-6ad09f28-bfaf-4a72-ba15-800bc3f32de6<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">env</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_LENGTH</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">CONTENT_TYPE</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">DOCUMENT_ROOT</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT</td><td style="vertical-align:top;">:</td><td><div>*/*</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_ENCODING</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_ACCEPT_LANGUAGE</td><td style="vertical-align:top;">:</td><td><div>it,de;q=0.8,en;q=0.6,en-US;q=0.4</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_CONNECTION</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_COOKIE</td><td style="vertical-align:top;">:</td><td><div>_gat=1; session_id_ethical=217.199.1.157-6ad09f28-bfaf-4a72-ba15-800bc3f32de6; ajs_group_id=null; ajs_user_id=null; lang=it; _ga=GA1.3.1791054086.1447089948</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_HOST</td><td style="vertical-align:top;">:</td><td><div>analytics.mobility.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_REFERER</td><td style="vertical-align:top;">:</td><td><div>http://analytics.mobility.bz.it/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_USER_AGENT</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">HTTP_X_REQUESTED_WITH</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">PATH_INFO</td><td style="vertical-align:top;">:</td><td><div>/data/get_stations</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">QUERY_STRING</td><td style="vertical-align:top;">:</td><td><div>frontend=Bluetooth&amp;tab=grafici</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_ADDR</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REMOTE_PORT</td><td style="vertical-align:top;">:</td><td><div>57294</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_METHOD</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">REQUEST_URI</td><td style="vertical-align:top;">:</td><td><div>/data/get_stations?frontend=Bluetooth&amp;tab=grafici</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_NAME</td><td style="vertical-align:top;">:</td><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PORT</td><td style="vertical-align:top;">:</td><td><div>80</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_PROTOCOL</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">SERVER_SOFTWARE</td><td style="vertical-align:top;">:</td><td><div>nginx/1.5.3</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">UWSGI_SCHEME</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py.git/applications/parkbzNew/&#x27;, &#x27;/home/www-data/web2py.git/applications/ethical/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_length</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">content_type</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">document_root</td><td style="vertical-align:top;">:</td><td><div>/usr/share/nginx/html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_application</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_controller</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain_function</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept</td><td style="vertical-align:top;">:</td><td><div>*/*</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_encoding</td><td style="vertical-align:top;">:</td><td><div>gzip, deflate, sdch</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_accept_language</td><td style="vertical-align:top;">:</td><td><div>it,de;q=0.8,en;q=0.6,en-US;q=0.4</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_connection</td><td style="vertical-align:top;">:</td><td><div>keep-alive</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_cookie</td><td style="vertical-align:top;">:</td><td><div>_gat=1; session_id_ethical=217.199.1.157-6ad09f28-bfaf-4a72-ba15-800bc3f32de6; ajs_group_id=null; ajs_user_id=null; lang=it; _ga=GA1.3.1791054086.1447089948</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_host</td><td style="vertical-align:top;">:</td><td><div>analytics.mobility.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_referer</td><td style="vertical-align:top;">:</td><td><div>http://analytics.mobility.bz.it/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_user_agent</td><td style="vertical-align:top;">:</td><td><div>Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.80 Safari/537.36</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">http_x_requested_with</td><td style="vertical-align:top;">:</td><td><div>XMLHttpRequest</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>traffic</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path_info</td><td style="vertical-align:top;">:</td><td><div>/data/get_stations</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">query_string</td><td style="vertical-align:top;">:</td><td><div>frontend=Bluetooth&amp;tab=grafici</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_addr</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remote_port</td><td style="vertical-align:top;">:</td><td><div>57294</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_method</td><td style="vertical-align:top;">:</td><td><div>GET</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">request_uri</td><td style="vertical-align:top;">:</td><td><div>/ethical/data/get_stations?frontend=Bluetooth&amp;tab=grafici</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_name</td><td style="vertical-align:top;">:</td><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_port</td><td style="vertical-align:top;">:</td><td><div>80</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_protocol</td><td style="vertical-align:top;">:</td><td><div>HTTP/1.1</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">server_software</td><td style="vertical-align:top;">:</td><td><div>nginx/1.5.3</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.node</td><td style="vertical-align:top;">:</td><td><div>traffic</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi.version</td><td style="vertical-align:top;">:</td><td><div>1.9.14</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_node</td><td style="vertical-align:top;">:</td><td><div>traffic</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uwsgi_version</td><td style="vertical-align:top;">:</td><td><div>1.9.14</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_original_uri</td><td style="vertical-align:top;">:</td><td><div>/data/get_stations?frontend=Bluetooth&amp;tab=grafici</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_path</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.5-stable+timestamp.2014.03.15.21.24.06</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x1d94f60&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7fdaefbb8390&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi.version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_errors</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;wsgi_errors&#x27;, mode &#x27;w&#x27; at 0x1d94f60&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_file_wrapper</td><td style="vertical-align:top;">:</td><td><div>&lt;built-in function uwsgi_sendfile&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_input</td><td style="vertical-align:top;">:</td><td><div>&lt;uwsgi._Input object at 0x7fdaefbb8390&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multiprocess</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_multithread</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_run_once</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_url_scheme</td><td style="vertical-align:top;">:</td><td><div>http</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi_version</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>1</div></td></tr><tr><td><div>0</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">extension</td><td style="vertical-align:top;">:</td><td><div>html</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">folder</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git/applications/ethical/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">function</td><td style="vertical-align:top;">:</td><td><div>get_stations</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">global_settings</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">app_folders</td><td style="vertical-align:top;">:</td><td><div>set([&#x27;/home/www-data/web2py.git/applications/parkbzNew/&#x27;, &#x27;/home/www-data/web2py.git/applications/ethical/&#x27;])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">applications_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">db_sessions</td><td style="vertical-align:top;">:</td><td><div>set([])</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">debugging</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">gluon_parent</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_jython</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_pypy</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_source</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">local_hosts</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>traffic.integreen-life.bz.it</div></td></tr><tr><td><div>::ffff:127.0.0.1</div></td></tr><tr><td><div>::1</div></td></tr><tr><td><div>traffic</div></td></tr><tr><td><div>127.0.1.1</div></td></tr><tr><td><div>127.0.0.1</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py_version</td><td style="vertical-align:top;">:</td><td><div>2.9.5-stable+timestamp.2014.03.15.21.24.06</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_https</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_local</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">is_restful</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">now</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 1, 22, 9, 40, 39, 4125)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">url</td><td style="vertical-align:top;">:</td><td><div>/data/get_stations</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">utcnow</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 1, 22, 8, 40, 39, 4146)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">uuid</td><td style="vertical-align:top;">:</td><td><div>ethical/217.199.1.157.2016-01-22.09-40-39.868abc69-1758-46ec-a9f7-0d51634a43f6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">wsgi</td><td style="vertical-align:top;">:</td><td><div>&lt;gluon.main.LazyWSGI object at 0x2307850&gt;</div></td></tr></table></div>'
+tRp58
+sS'frames'
+p59
+(lp60
+(dp61
+S'file'
+p62
+S'/home/www-data/web2py/gluon/restricted.py'
+p63
+sS'dump'
+p64
+(dp65
+S'environment'
+p66
+S"{'A': <class 'gluon.html.A'>, 'ANY_OF': <class 'gluon.validators.ANY_OF'>, 'Auth': <class 'gluon.tools.Auth'>, 'B': <class 'gluon.html.B'>, 'BEAUTIFY': <class 'gluon.html.BEAUTIFY'>, 'BODY': <class 'gluon.html.BODY'>, 'BR': <class 'gluon.html.BR'>, 'BUTTON': <class 'gluon.html.BUTTON'>, 'CAT': <class 'gluon.html.CAT'>, 'CENTER': <class 'gluon.html.CENTER'>, ...}"
+p67
+sS'ccode'
+p68
+S'<code object <module> at 0x22e45b0, file "/home/...s/ethical/views/data/stations_form.html", line 1>'
+p69
+ssS'lnum'
+p70
+I220
+sS'lines'
+p71
+(dp72
+I224
+S'        # do not encapsulate (obfuscate) the original RestrictedError'
+p73
+sI215
+S'    try:'
+p74
+sI216
+S'        if isinstance(code, types.CodeType):'
+p75
+sI217
+S'            ccode = code'
+p76
+sI218
+S'        else:'
+p77
+sI219
+S'            ccode = compile2(code, layer)'
+p78
+sI220
+S'        exec ccode in environment'
+p79
+sI221
+S'    except HTTP:'
+p80
+sI222
+S'        raise'
+p81
+sI223
+S'    except RestrictedError:'
+p82
+ssS'call'
+p83
+S'(code=\'response.write(\\\'<select class="form-control_stat...ass\\nresponse.write(\\\'\\\\n</select>\\\\n\\\', escape=False)\', environment={\'A\': <class \'gluon.html.A\'>, \'ANY_OF\': <class \'gluon.validators.ANY_OF\'>, \'Auth\': <class \'gluon.tools.Auth\'>, \'B\': <class \'gluon.html.B\'>, \'BEAUTIFY\': <class \'gluon.html.BEAUTIFY\'>, \'BODY\': <class \'gluon.html.BODY\'>, \'BR\': <class \'gluon.html.BR\'>, \'BUTTON\': <class \'gluon.html.BUTTON\'>, \'CAT\': <class \'gluon.html.CAT\'>, \'CENTER\': <class \'gluon.html.CENTER\'>, ...}, layer=\'/home/www-data/web2py.git/applications/ethical/views/data/stations_form.html\')'
+p84
+sS'func'
+p85
+S'restricted'
+p86
+sa(dp87
+g62
+S'/home/www-data/web2py.git/applications/ethical/views/data/stations_form.html'
+p88
+sg64
+(dp89
+S'station'
+p90
+S"{u'latitude': 46.47118129886608, u'longitude': 11.31684489511241, u'name': u'Agip Einstein'}"
+p91
+sS'option'
+p92
+S'undefined'
+p93
+sS'value'
+p94
+g93
+ssg70
+I4
+sg71
+(dp95
+I1
+S'response.write(\'<select class="form-control_stations" name="station" id="form-control_stations" >\\n    \\t\\t<option  tkey="select-source" id="first-option-select-stations">Seleziona sorgente</option>\\n\\t\\t\', escape=False)'
+p96
+sI2
+S'for station in stations:'
+p97
+sI3
+S'    response.write(\'\\n\\t\\t\\t<option value="\', escape=False)'
+p98
+sI4
+S"    response.write(station['id'])"
+p99
+sI5
+S'    response.write(\'">\', escape=False)'
+p100
+sI6
+S"    response.write(station['name'])"
+p101
+sI7
+S"    response.write('</option>\\n\\t\\t', escape=False)"
+p102
+sI8
+S'    pass'
+p103
+sI9
+S"response.write('\\n</select>\\n', escape=False)"
+p104
+ssg83
+S'()'
+p105
+sg85
+S'<module>'
+p106
+sasS'pyver'
+p107
+S'Python 2.7.3: /usr/local/bin/uwsgi (prefix: /usr)'
+p108
+sS'session'
+p109
+g57
+(S's\x81\t\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">auth</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">expiration</td><td style="vertical-align:top;">:</td><td><div>3600</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">hmac_key</td><td style="vertical-align:top;">:</td><td><div>f2bd5639-3ef4-45a1-a170-c1c3c5c32188</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_visit</td><td style="vertical-align:top;">:</td><td><div>datetime.datetime(2016, 1, 22, 9, 40, 27, 325585)</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">remember</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">email</td><td style="vertical-align:top;">:</td><td><div>project@integreen-life.bz.it</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">first_name</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">id</td><td style="vertical-align:top;">:</td><td><div>1L</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">last_name</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_id</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">registration_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">reset_password_key</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">username</td><td style="vertical-align:top;">:</td><td><div>integreen</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">user_groups</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">1</td><td style="vertical-align:top;">:</td><td><div>user_1</div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr></table></div>'
+tRp110
+sS'etype'
+p111
+S"<type 'exceptions.KeyError'>"
+p112
+sS'date'
+p113
+S'Fri Jan 22 09:41:58 2016'
+p114
+sS'response'
+p115
+g57
+(S's\xaa\x18\x00\x00<div><table><tr><td style="font-weight:bold;vertical-align:top;">body</td><td style="vertical-align:top;">:</td><td><div>&lt;cStringIO.StringO object at 0x2467e30&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">cookies</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">session_id_ethical</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157-6ad09f28-bfaf-4a72-ba15-800bc3f32de6<table><tr><td style="font-weight:bold;vertical-align:top;">comment</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">domain</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">expires</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">httponly</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">max-age</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">path</td><td style="vertical-align:top;">:</td><td><div>/</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">secure</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">version</td><td style="vertical-align:top;">:</td><td><div></div></td></tr></table></div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">delimiters</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>{{</div></td></tr><tr><td><div>}}</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">files</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">flash</td><td style="vertical-align:top;">:</td><td><div></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">generic_patterns</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">headers</td><td style="vertical-align:top;">:</td><td><div><table><tr><td style="font-weight:bold;vertical-align:top;">X-Powered-By</td><td style="vertical-align:top;">:</td><td><div>web2py</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py-component-command</td><td style="vertical-align:top;">:</td><td><div>add_after_form(xhr, &#x27;form_frontend&#x27;);</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">web2py-component-content</td><td style="vertical-align:top;">:</td><td><div>hide</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">menu</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">meta</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">models_to_run</td><td style="vertical-align:top;">:</td><td><div><table><tr><td><div>^\\w+\\.py$</div></td></tr><tr><td><div>^data/\\w+\\.py$</div></td></tr><tr><td><div>^data/get_stations/\\w+\\.py$</div></td></tr></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">postprocessing</td><td style="vertical-align:top;">:</td><td><div><table></table></div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_client</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_compression_level</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_expires</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_cookie_key</td><td style="vertical-align:top;">:</td><td><div>None</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_data_name</td><td style="vertical-align:top;">:</td><td><div>session_data_ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_file</td><td style="vertical-align:top;">:</td><td><div>&lt;open file &#x27;/home/www-data/web2py.git/applications/ethical/sessions/217.199.1.157-6ad09f28-bfaf-4a72-ba15-800bc3f32de6&#x27;, mode &#x27;rb+&#x27; at 0x223da50&gt;</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_filename</td><td style="vertical-align:top;">:</td><td><div>/home/www-data/web2py.git/applications/ethical/sessions/217.199.1.157-6ad09f28-bfaf-4a72-ba15-800bc3f32de6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_hash</td><td style="vertical-align:top;">:</td><td><div>1b9541c1ea254562376fa990b079da80</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id</td><td style="vertical-align:top;">:</td><td><div>217.199.1.157-6ad09f28-bfaf-4a72-ba15-800bc3f32de6</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_id_name</td><td style="vertical-align:top;">:</td><td><div>session_id_ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_locked</td><td style="vertical-align:top;">:</td><td><div>True</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_masterapp</td><td style="vertical-align:top;">:</td><td><div>ethical</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_new</td><td style="vertical-align:top;">:</td><td><div>False</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">session_storage_type</td><td style="vertical-align:top;">:</td><td><div>file</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">static_version</td><td style="vertical-align:top;">:</td><td><div>0.0.2</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">status</td><td style="vertical-align:top;">:</td><td><div>200</div></td></tr><tr><td style="font-weight:bold;vertical-align:top;">view</td><td style="vertical-align:top;">:</td><td><div>data/stations_form.html</div></td></tr></table></div>'
+tRp116
+sS'locals'
+p117
+(dp118
+S'frontend'
+p119
+S"'Bluetooth'"
+p120
+sS'OBJECT'
+p121
+S"<class 'gluon.html.OBJECT'>"
+p122
+sS'SQLDB'
+p123
+S"<class 'gluon.dal.DAL'>"
+p124
+sg109
+S"<Storage {'_auth_next': None, 'flash': None, '_f...gin]': ['9a69e02f-fa2d-48a9-b057-4150cca3175f']}>"
+p125
+sS'LINK'
+p126
+S"<class 'gluon.html.LINK'>"
+p127
+sS'BR'
+p128
+S"<class 'gluon.html.BR'>"
+p129
+sS'local_import'
+p130
+S'<function <lambda>>'
+p131
+sS'OPTGROUP'
+p132
+S"<class 'gluon.html.OPTGROUP'>"
+p133
+sS'__package__'
+p134
+S'None'
+p135
+sS'PRE'
+p136
+S"<class 'gluon.html.PRE'>"
+p137
+sS'IS_INT_IN_RANGE'
+p138
+S"<class 'gluon.validators.IS_INT_IN_RANGE'>"
+p139
+sS'IS_LOWER'
+p140
+S"<class 'gluon.validators.IS_LOWER'>"
+p141
+sS'IS_STRONG'
+p142
+S"<class 'gluon.validators.IS_STRONG'>"
+p143
+sS'cache'
+p144
+S'<gluon.cache.Cache object>'
+p145
+sS'IS_IN_DB'
+p146
+S"<class 'gluon.validators.IS_IN_DB'>"
+p147
+sS'TAG'
+p148
+S'<gluon.html.__TAG__ object>'
+p149
+sS'SQLField'
+p150
+S"<class 'gluon.dal.Field'>"
+p151
+sS'mail'
+p152
+S'<gluon.tools.Mail object>'
+p153
+sS'BODY'
+p154
+S"<class 'gluon.html.BODY'>"
+p155
+sS'IS_DATE_IN_RANGE'
+p156
+S"<class 'gluon.validators.IS_DATE_IN_RANGE'>"
+p157
+sS'TH'
+p158
+S"<class 'gluon.html.TH'>"
+p159
+sS'URL'
+p160
+S'<function URL>'
+p161
+sS'__file__'
+p162
+S"'/home/www-data/web2py.git/applications/ethical/views/data/stations_form.html'"
+p163
+sS'db'
+p164
+S'<DAL uri="sqlite://storage.sqlite">'
+p165
+sS'auth'
+p166
+S'<gluon.tools.Auth object>'
+p167
+sS'P'
+S"<class 'gluon.html.P'>"
+p168
+sS'TFOOT'
+p169
+S"<class 'gluon.html.TFOOT'>"
+p170
+sS'XHTML'
+p171
+S"<class 'gluon.html.XHTML'>"
+p172
+sS'ON'
+p173
+S'True'
+p174
+sS'OL'
+p175
+S"<class 'gluon.html.OL'>"
+p176
+sS'TEXTAREA'
+p177
+S"<class 'gluon.html.TEXTAREA'>"
+p178
+sS'MENU'
+p179
+S"<class 'gluon.html.MENU'>"
+p180
+sS'EM'
+p181
+S"<class 'gluon.html.EM'>"
+p182
+sS'CODE'
+p183
+S"<class 'gluon.html.CODE'>"
+p184
+sS'HTTP'
+p185
+S"<class 'gluon.http.HTTP'>"
+p186
+sS'HR'
+p187
+S"<class 'gluon.html.HR'>"
+p188
+sS'IS_DATETIME'
+p189
+S"<class 'gluon.validators.IS_DATETIME'>"
+p190
+sS'HEAD'
+p191
+S"<class 'gluon.html.HEAD'>"
+p192
+sS'LABEL'
+p193
+S"<class 'gluon.html.LABEL'>"
+p194
+sS'CLEANUP'
+p195
+S"<class 'gluon.validators.CLEANUP'>"
+p196
+sS'SELECT'
+p197
+S"<class 'gluon.html.SELECT'>"
+p198
+sS'CENTER'
+p199
+S"<class 'gluon.html.CENTER'>"
+p200
+sS'Auth'
+p201
+S"<class 'gluon.tools.Auth'>"
+p202
+sS'__builtins__'
+p203
+S"{'ArithmeticError': <type 'exceptions.ArithmeticError'>, 'AssertionError': <type 'exceptions.AssertionError'>, 'AttributeError': <type 'exceptions.AttributeError'>, 'BaseException': <type 'exceptions.BaseException'>, 'BufferError': <type 'exceptions.BufferError'>, 'BytesWarning': <type 'exceptions.BytesWarning'>, 'DeprecationWarning': <type 'exceptions.DeprecationWarning'>, 'EOFError': <type 'exceptions.EOFError'>, 'Ellipsis': Ellipsis, 'EnvironmentError': <type 'exceptions.EnvironmentError'>, ...}"
+p204
+sS'HTML'
+p205
+S"<class 'gluon.html.HTML'>"
+p206
+sS'SQLFORM'
+p207
+S"<class 'gluon.sqlhtml.SQLFORM'>"
+p208
+sS'LOAD'
+p209
+S'<function LOAD>'
+p210
+sS'redirect'
+p211
+S'<function redirect>'
+p212
+sS'FIELDSET'
+p213
+S"<class 'gluon.html.FIELDSET'>"
+p214
+sS'IS_EQUAL_TO'
+p215
+S"<class 'gluon.validators.IS_EQUAL_TO'>"
+p216
+sS'embed64'
+p217
+S'<function embed64>'
+p218
+sS'IS_LIST_OF'
+p219
+S"<class 'gluon.validators.IS_LIST_OF'>"
+p220
+sS'__name__'
+p221
+S"'__restricted__'"
+p222
+sS'EMBED'
+p223
+S"<class 'gluon.html.EMBED'>"
+p224
+sS'FORM'
+p225
+S"<class 'gluon.html.FORM'>"
+p226
+sS'stations'
+p227
+S"[{u'latitude': 46.47118129886608, u'longitude': 11.31684489511241, u'name': u'Agip Einstein'}, {u'latitude': 46.493382, u'longitude': 11.310146, u'name': u'Castel Firmiano'}, {u'latitude': 46.490294216837974, u'longitude': 11.342115371068838, u'name': u'Ponte Roma'}, {u'latitude': 46.482323, u'longitude': 11.329235, u'name': u'Tis'}, {u'latitude': 46.499077, u'longitude': 11.347846, u'name': u'Via Rosmini'}, {u'latitude': 46.495026254627234, u'longitude': 11.340048132717214, u'name': u'Viale Druso poste'}, {u'latitude': 46.502537, u'longitude': 11.330587, u'name': u'Vittorio veneto'}, {u'latitude': 46.48249106428508, u'longitude': 11.342300401922715, u'name': u'caugusta'}, {u'latitude': 46.46829458043375, u'longitude': 11.328434351357878, u'name': u'meinstein'}, {u'latitude': 46.481330800547724, u'longitude': 11.32383323189666, u'name': u'ponte resia'}, {u'latitude': 46.49404172052414, u'longitude': 11.314340977850515, u'name': u'resiadruso'}, {u'latitude': 46.47408563661909, u'longitude': 11.33186460255768, u'name': u'via Galvani'}]"
+p228
+sS'H2'
+p229
+S"<class 'gluon.html.H2'>"
+p230
+sS'H3'
+p231
+S"<class 'gluon.html.H3'>"
+p232
+sS'BUTTON'
+p233
+S"<class 'gluon.html.BUTTON'>"
+p234
+sS'H1'
+p235
+S"<class 'gluon.html.H1'>"
+p236
+sS'H6'
+p237
+S"<class 'gluon.html.H6'>"
+p238
+sS'H4'
+p239
+S"<class 'gluon.html.H4'>"
+p240
+sS'H5'
+p241
+S"<class 'gluon.html.H5'>"
+p242
+sS'UL'
+p243
+S"<class 'gluon.html.UL'>"
+p244
+sS'IS_UPPER'
+p245
+S"<class 'gluon.validators.IS_UPPER'>"
+p246
+sS'xmlescape'
+p247
+S'<function xmlescape>'
+p248
+sS'IS_TIME'
+p249
+S"<class 'gluon.validators.IS_TIME'>"
+p250
+sS'OPTION'
+p251
+S"<class 'gluon.html.OPTION'>"
+p252
+sS'TITLE'
+p253
+S"<class 'gluon.html.TITLE'>"
+p254
+sS'CRYPT'
+p255
+S"<class 'gluon.validators.CRYPT'>"
+p256
+sS'IS_EMPTY_OR'
+p257
+S"<class 'gluon.validators.IS_EMPTY_OR'>"
+p258
+sS'MARKMIN'
+p259
+S"<class 'gluon.html.MARKMIN'>"
+p260
+sS'INPUT'
+p261
+S"<class 'gluon.html.INPUT'>"
+p262
+sS'STRONG'
+p263
+S"<class 'gluon.html.STRONG'>"
+p264
+sS'COL'
+p265
+S"<class 'gluon.html.COL'>"
+p266
+sS'SCRIPT'
+p267
+S"<class 'gluon.html.SCRIPT'>"
+p268
+sS'station'
+p269
+S"{u'latitude': 46.47118129886608, u'longitude': 11.31684489511241, u'name': u'Agip Einstein'}"
+p270
+sS'TABLE'
+p271
+S"<class 'gluon.html.TABLE'>"
+p272
+sS'IS_IPV4'
+p273
+S"<class 'gluon.validators.IS_IPV4'>"
+p274
+sS'IS_LENGTH'
+p275
+S"<class 'gluon.validators.IS_LENGTH'>"
+p276
+sS'IS_IPV6'
+p277
+S"<class 'gluon.validators.IS_IPV6'>"
+p278
+sS'XML'
+p279
+S"<class 'gluon.html.XML'>"
+p280
+sS'B'
+S"<class 'gluon.html.B'>"
+p281
+sS'IMG'
+p282
+S"<class 'gluon.html.IMG'>"
+p283
+sS'SQLTABLE'
+p284
+S"<class 'gluon.sqlhtml.SQLTABLE'>"
+p285
+sS'IS_MATCH'
+p286
+S"<class 'gluon.validators.IS_MATCH'>"
+p287
+sS'IS_ALPHANUMERIC'
+p288
+S"<class 'gluon.validators.IS_ALPHANUMERIC'>"
+p289
+sS'SPAN'
+p290
+S"<class 'gluon.html.SPAN'>"
+p291
+sS'IS_JSON'
+p292
+S"<class 'gluon.validators.IS_JSON'>"
+p293
+sS'IS_IPADDRESS'
+p294
+S"<class 'gluon.validators.IS_IPADDRESS'>"
+p295
+sS'IS_SLUG'
+p296
+S"<class 'gluon.validators.IS_SLUG'>"
+p297
+sS'MIGRATE'
+p298
+g174
+sS'BEAUTIFY'
+p299
+S"<class 'gluon.html.BEAUTIFY'>"
+p300
+sS'META'
+p301
+S"<class 'gluon.html.META'>"
+p302
+sS'IS_DATE'
+p303
+S"<class 'gluon.validators.IS_DATE'>"
+p304
+sS'IS_EMAIL'
+p305
+S"<class 'gluon.validators.IS_EMAIL'>"
+p306
+sS'IS_NOT_EMPTY'
+p307
+S"<class 'gluon.validators.IS_NOT_EMPTY'>"
+p308
+sS'IS_FLOAT_IN_RANGE'
+p309
+S"<class 'gluon.validators.IS_FLOAT_IN_RANGE'>"
+p310
+sS'TBODY'
+p311
+S"<class 'gluon.html.TBODY'>"
+p312
+sS'CAT'
+p313
+S"<class 'gluon.html.CAT'>"
+p314
+sS'Field'
+p315
+S"<class 'gluon.dal.Field'>"
+p316
+sS'IS_LIST_OF_EMAILS'
+p317
+S"<class 'gluon.validators.IS_LIST_OF_EMAILS'>"
+p318
+sS'DIV'
+p319
+S"<class 'gluon.html.DIV'>"
+p320
+sS'LEGEND'
+p321
+S"<class 'gluon.html.LEGEND'>"
+p322
+sS'COLGROUP'
+p323
+S"<class 'gluon.html.COLGROUP'>"
+p324
+sS'DAL'
+p325
+S"<class 'gluon.dal.DAL'>"
+p326
+sS'TT'
+p327
+S"<class 'gluon.html.TT'>"
+p328
+sS'TR'
+p329
+S"<class 'gluon.html.TR'>"
+p330
+sS'LI'
+p331
+S"<class 'gluon.html.LI'>"
+p332
+sS'IFRAME'
+p333
+S"<class 'gluon.html.IFRAME'>"
+p334
+sS'TD'
+p335
+S"<class 'gluon.html.TD'>"
+p336
+sS'IS_URL'
+p337
+S"<class 'gluon.validators.IS_URL'>"
+p338
+sS'A'
+S"<class 'gluon.html.A'>"
+p339
+sS'STYLE'
+p340
+S"<class 'gluon.html.STYLE'>"
+p341
+sS'IS_DATETIME_IN_RANGE'
+p342
+S"<class 'gluon.validators.IS_DATETIME_IN_RANGE'>"
+p343
+sS'IS_IMAGE'
+p344
+S"<class 'gluon.validators.IS_IMAGE'>"
+p345
+sS'I'
+S"<class 'gluon.html.I'>"
+p346
+sS'IS_NOT_IN_DB'
+p347
+S"<class 'gluon.validators.IS_NOT_IN_DB'>"
+p348
+sg115
+S"<Storage {'body': <cStringIO.StringO object at 0...t 0x22eda28>, 'view': 'data/stations_form.html'}>"
+p349
+sS'THEAD'
+p350
+S"<class 'gluon.html.THEAD'>"
+p351
+sS'ANY_OF'
+p352
+S"<class 'gluon.validators.ANY_OF'>"
+p353
+sS'IS_NULL_OR'
+p354
+S"<class 'gluon.validators.IS_EMPTY_OR'>"
+p355
+sg56
+S"<Storage {'_vars': <Storage {'frontend': 'Blueto...home/www-data/web2py.git/applications/ethical/'}>"
+p356
+sS'IS_EXPR'
+p357
+S"<class 'gluon.validators.IS_EXPR'>"
+p358
+sS'T'
+S'<gluon.languages.translator object>'
+p359
+sS'IS_IN_SET'
+p360
+S"<class 'gluon.validators.IS_IN_SET'>"
+p361
+sS'IS_UPLOAD_FILENAME'
+p362
+S"<class 'gluon.validators.IS_UPLOAD_FILENAME'>"
+p363
+sS'IS_DECIMAL_IN_RANGE'
+p364
+S"<class 'gluon.validators.IS_DECIMAL_IN_RANGE'>"
+p365
+sssS'traceback'
+p366
+S'Traceback (most recent call last):\n  File "/home/www-data/web2py/gluon/restricted.py", line 220, in restricted\n    exec ccode in environment\n  File "/home/www-data/web2py.git/applications/ethical/views/data/stations_form.html", line 4, in <module>\n    <option value="{{=station[\'id\']}}">{{=station[\'name\']}}</option>\nKeyError: \'id\'\n'
+p367
+s.
