@@ -47,10 +47,10 @@ esterno (vecchio):
 http://analytics.mobility.bz.it/data/get_data.json?
 frontend=Meteo&
 station=47400MS&
-unit=mm&
+unit=mm&                                        -> not used
 data_type=precipitation&
-data_label=precipitation+(5m)+(300)s&
-period=300&
+data_label=precipitation+(5m)+(300)s&           -> not used
+period=300& 
 from=1518183630985&
 to=1518788430985
 
