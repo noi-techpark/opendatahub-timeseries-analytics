@@ -1,0 +1,14 @@
+{
+   "endpoints": [
+       {
+          "name": "integreen",
+          "url":  "http://ipchannels.integreen-life.bz.it",
+          "paths": [
+              {
+                 "name": "(MeteoFrontEnd|VehicleFrontEnd)/rest/get-station-details",
+                 "params": []
+              }
+          ]
+       }
+   ]
+}
