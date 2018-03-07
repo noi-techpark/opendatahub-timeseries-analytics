@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class GeobankAnalyticsServlet extends HttpServlet {
 	
-	HashMap<String, String> path2url = new HashMap<>();
+	HashMap<String, String> path2url = new HashMap<String, String>();
 	
 	Pattern firstSubfolder;
 	
