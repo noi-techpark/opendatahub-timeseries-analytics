@@ -26,7 +26,24 @@
   </head>
   <body>
 
-    <div id="placeholder" style="width: 800px; height: 400px;"></div>
+    <p>Proof-of-concept to show Flot is working very well. This needs SOP disabled in the Browser as it fetches data directly from analytics.mobility.bz.it</p>
 
+    <p>
+        <button onclick="d = new Date(); plot(Number(new Date(1900 + d.getYear(), d.getMonth(), d.getDate(), 0, 0, 0)), 86400000)"> today           </button>
+        <button onclick="plot(Number(new Date()) -    86400000,    86400000)"> day to date     </button>
+        <button onclick="plot(Number(new Date()) -  7*86400000,  7*86400000)"> week to date    </button>
+        <button onclick="plot(Number(new Date()) - 14*86400000, 14*86400000)"> 2 weeks to date </button>
+        <button onclick="plot(Number(new Date()) - 30*86400000, 30*86400000)"> month to date   </button>
+    </p>
+
+    <p>
+        <button onclick="plot(current_from - current_period / 2, current_period)"> - 1/2</button>
+        <button onclick="plot(current_from + current_period / 2, current_period)"> + 1/2</button>
+    </p>
+
+    <div style="position: relative">
+    <div id="placeholder" style="width: 1000px; height: 400px; position: absolute; top: 0; left: 0; display: none"></div>
+    <div id="waiting"     style="width: 1000px; height: 400px; text-align: center; border: 10px solid #CCCCCC; position: absolute; top: 0; left: 0; display: none"><img src="loading-icon.gif"></div>
+    </div>
   </body>
 </html>
