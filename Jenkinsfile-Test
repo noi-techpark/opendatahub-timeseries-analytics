@@ -13,7 +13,7 @@ pipeline {
 		}
 		stage('Archive'){
 			steps{
-				sh 'cp -f analytics.war /var/builds/test-server/'
+				sh 'cp -f target/analytics.war /var/builds/test-server/'
 			}
 		}
 	}
