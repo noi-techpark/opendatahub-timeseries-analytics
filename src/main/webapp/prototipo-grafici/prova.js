@@ -25,8 +25,8 @@
 
         // Meran/Gratsch air temperature
 
-        let tempurl = "http://analytics.mobility.bz.it/data/get_data.json?frontend=Meteo&station=23200MS&data_type=air-temperature&period=600&from=" + from + "&to=" + to + "";
-        let precurl = "http://analytics.mobility.bz.it/data/get_data.json?frontend=Meteo&station=23200MS&data_type=precipitation&period=300&from=" + from + "&to=" + to + "";
+        let tempurl = "http://ipchannels.integreen-life.bz.it/MeteoFrontEnd/rest/get-records-in-timeframe?station=23200MS&name=air-temperature&period=600&from=" + from + "&to=" + to + "";
+        let precurl = "http://ipchannels.integreen-life.bz.it/MeteoFrontEnd/rest/get-records-in-timeframe?station=23200MS&name=precipitation&period=300&from=" + from + "&to=" + to + "";
 
         let tempdata = undefined;
         let precdata = undefined;
@@ -40,8 +40,8 @@
         $("#waiting").hide();
         $("#placeholder").show();
 
-        let temp = tempdata.series[0].data.map( el => [ el[0], Number(el[1]) ] ); 
-        let prec = precdata.series[0].data.map( el => [ el[0], Number(el[1]) ] ); 
+        let temp = tempdata.map( el => [ el.timestamp, Number(el.value) ] ); 
+        let prec = precdata.map( el => [ el.timestamp, Number(el.value) ] ); 
 
         console.log(temp.length);
         console.log(prec.length);
@@ -50,8 +50,6 @@
             $("#placeholder").hide();
             return;
         }
-
-
 
         $("#placeholder")
             .plot( 
