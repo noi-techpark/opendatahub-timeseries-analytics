@@ -58,6 +58,28 @@ function map_start()
       xhttp.send()
       var json = JSON.parse(xhttp.responseText)
       console.log(json)
+      
+      var iconStyle = new ol.style.Style({
+        image: new ol.style.Icon({
+          anchor: [0.5, 1.0],
+          anchorXUnits: 'fraction',
+          anchorYUnits: 'fraction',
+          opacity: 1,
+          src: 'meteo-icon.png',
+          scale: 0.5
+        })
+      });
+      
+      var shadowStyle = new ol.style.Style({
+         image: new ol.style.Icon({
+           anchor: [0.3, 1.0],
+           anchorXUnits: 'fraction',
+           anchorYUnits: 'fraction',
+           opacity: 1,
+           src: 'marker-shadow.png',
+           scale: 1
+         })
+       });
 
       for (var i = 0; i < json.length; i++)
       {
@@ -68,6 +90,8 @@ function map_start()
             // name: "Thing",
             geometry : thing
          });
+         featurething.setStyle([shadowStyle, iconStyle]);
+
          sourcevector.addFeature(featurething);
       }
 
