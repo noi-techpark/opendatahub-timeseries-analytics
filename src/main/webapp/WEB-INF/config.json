@@ -5,7 +5,7 @@
           "url":  "http://ipchannels.integreen-life.bz.it",
           "paths": [
               {
-                 "name": "(MeteoFrontEnd|VehicleFrontEnd)/rest/get-station-details",
+                 "name": "([a-zA-Z0-9_]FrontEnd)/rest/get-station-details",
                  "params": []
               }
           ]

@@ -23,78 +23,11 @@ function map_start()
          })
       });
 
-      // http://analytics.mobility.bz.it/data/get_geojson?frontend=Bluetooth&amp;period=900&amp;type=Bluetooth+Count+record 
-
-      var sourcevector = new ol.source.Vector({});
-
-      var layer = new ol.layer.Vector({
-         title : 'layer1',
-         visible : true,
-         source : sourcevector,
-         style : new ol.style.Style({
-            image : new ol.style.Circle({
-               radius : 4,
-               stroke : new ol.style.Stroke({
-                  color : 'blue',
-                  width : 1
-               }),
-               fill : new ol.style.Fill({
-                  color : [ 0, 0, 255, 0.5 ]
-               })
-            }),
-            stroke : new ol.style.Stroke({
-               color : [ 0, 0, 255, 0.5 ],
-               width : 2
-            })
-         })
-      })
-
-      map.addLayer(layer)
-
-      var xhttp = new XMLHttpRequest();
-      xhttp.open('GET',
-                 '../data/integreen/MeteoFrontEnd/rest/get-station-details',
-                 false); // TODO: go async!
-      xhttp.send()
-      var json = JSON.parse(xhttp.responseText)
-      console.log(json)
+      meteoLayer()
+      bluetoothLayer()
+      // parkingLayer()
+      inquinamentoLayer()
       
-      var iconStyle = new ol.style.Style({
-        image: new ol.style.Icon({
-          anchor: [0.5, 1.0],
-          anchorXUnits: 'fraction',
-          anchorYUnits: 'fraction',
-          opacity: 1,
-          src: 'meteo-icon.png',
-          scale: 0.5
-        })
-      });
-      
-      var shadowStyle = new ol.style.Style({
-         image: new ol.style.Icon({
-           anchor: [0.3, 1.0],
-           anchorXUnits: 'fraction',
-           anchorYUnits: 'fraction',
-           opacity: 1,
-           src: 'marker-shadow.png',
-           scale: 1
-         })
-       });
-
-      for (var i = 0; i < json.length; i++)
-      {
-         console.log(json[i])
-         var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
-               json[i].latitude ], 'EPSG:4326', 'EPSG:3857'));
-         var featurething = new ol.Feature({
-            // name: "Thing",
-            geometry : thing
-         });
-         featurething.setStyle([shadowStyle, iconStyle]);
-
-         sourcevector.addFeature(featurething);
-      }
-
       var popup_element = document.getElementById('map-popup');
       var popup_close = document.getElementById('map-popup-close');
       var popup_content = document.getElementById('map-popup-content');
@@ -129,6 +62,189 @@ function map_start()
             popup_overlay.setPosition(coords);
          }
       });
+   }
+   
+   
+   function meteoLayer()
+   {
+      var sourcevector = new ol.source.Vector({});
+
+      var iconStyle = new ol.style.Style({
+         image: new ol.style.Icon({
+           anchor: [0.5, 1.0],
+           anchorXUnits: 'fraction',
+           anchorYUnits: 'fraction',
+           opacity: 1,
+           src: 'meteo-icon.png',
+           scale: 0.5
+         })
+       });
+       
+       var shadowStyle = new ol.style.Style({
+          image: new ol.style.Icon({
+            anchor: [0.3, 1.0],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 1,
+            src: 'marker-shadow.png',
+            scale: 1
+          })
+        });
+
+       var layer = new ol.layer.Vector({
+         title : 'meteoLayer',
+         visible : true,
+         source : sourcevector,
+         style : [shadowStyle, iconStyle]
+      })
+
+      map.addLayer(layer)
+
+      var xhttp = new XMLHttpRequest();
+      xhttp.open('GET',
+                 '../data/integreen/MeteoFrontEnd/rest/get-station-details',
+                 false); // TODO: go async!
+      xhttp.send()
+      var json = JSON.parse(xhttp.responseText)
+      console.log(json)
+      
+
+      for (var i = 0; i < json.length; i++)
+      {
+         console.log(json[i])
+         var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
+               json[i].latitude ], 'EPSG:4326', 'EPSG:3857'));
+         var featurething = new ol.Feature({
+            // name: "Thing",
+            geometry : thing
+         });
+
+         sourcevector.addFeature(featurething);
+      }
+
+      
+   }
+   
+   function bluetoothLayer()
+   {
+      var sourcevector = new ol.source.Vector({});
+
+      var iconStyle = new ol.style.Style({
+         image: new ol.style.Icon({
+           anchor: [0.5, 1.0],
+           anchorXUnits: 'fraction',
+           anchorYUnits: 'fraction',
+           opacity: 1,
+           src: 'bluetooth-icon.png',
+           scale: 0.5
+         })
+       });
+       
+       var shadowStyle = new ol.style.Style({
+          image: new ol.style.Icon({
+            anchor: [0.3, 1.0],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 1,
+            src: 'marker-shadow.png',
+            scale: 1
+          })
+        });
+
+       var layer = new ol.layer.Vector({
+         title : 'meteoLayer',
+         visible : true,
+         source : sourcevector,
+         style : [shadowStyle, iconStyle]
+      })
+
+      map.addLayer(layer)
+
+      var xhttp = new XMLHttpRequest();
+      xhttp.open('GET',
+                 '../data/integreen/BluetoothFrontEnd/rest/get-station-details',
+                 false); // TODO: go async!
+      xhttp.send()
+      var json = JSON.parse(xhttp.responseText)
+      console.log(json)
+      
+
+      for (var i = 0; i < json.length; i++)
+      {
+         console.log(json[i])
+         var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
+               json[i].latitude ], 'EPSG:4326', 'EPSG:3857'));
+         var featurething = new ol.Feature({
+            // name: "Thing",
+            geometry : thing
+         });
+
+         sourcevector.addFeature(featurething);
+      }
+
+      
+   }
+   
+   function inquinamentoLayer()
+   {
+      var sourcevector = new ol.source.Vector({});
+
+      var iconStyle = new ol.style.Style({
+         image: new ol.style.Icon({
+           anchor: [0.5, 1.0],
+           anchorXUnits: 'fraction',
+           anchorYUnits: 'fraction',
+           opacity: 1,
+           src: 'inquinamento-icon.png',
+           scale: 0.5
+         })
+       });
+       
+       var shadowStyle = new ol.style.Style({
+          image: new ol.style.Icon({
+            anchor: [0.3, 1.0],
+            anchorXUnits: 'fraction',
+            anchorYUnits: 'fraction',
+            opacity: 1,
+            src: 'marker-shadow.png',
+            scale: 1
+          })
+        });
+
+       var layer = new ol.layer.Vector({
+         title : 'meteoLayer',
+         visible : true,
+         source : sourcevector,
+         style : [shadowStyle, iconStyle]
+      })
+
+      map.addLayer(layer)
+
+      // TODO Temo che questa url non esiste, e viene invece interrogato il numero di parcheggi con parametri
+      
+      var xhttp = new XMLHttpRequest();
+      xhttp.open('GET',
+                 '../data/integreen/EnvironmentFrontEnd/rest/get-station-details',
+                 false); // TODO: go async!
+      xhttp.send()
+      var json = JSON.parse(xhttp.responseText)
+      console.log(json)
+      
+
+      for (var i = 0; i < json.length; i++)
+      {
+         console.log(json[i])
+         var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
+               json[i].latitude ], 'EPSG:4326', 'EPSG:3857'));
+         var featurething = new ol.Feature({
+            // name: "Thing",
+            geometry : thing
+         });
+
+         sourcevector.addFeature(featurething);
+      }
+
+      
    }
 
    showMap()
