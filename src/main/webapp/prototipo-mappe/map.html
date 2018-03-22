@@ -11,6 +11,12 @@
     <script type="text/javascript" src="map.js"></script>
 
 <style>
+
+html, body
+{
+   height:100%;
+}
+
 #map-popup
 {
    display:inline-block;
@@ -43,13 +49,51 @@
    height:0px;
 }
 
+.layers
+{
+   width: 10em;
+   flex-shrink: 0;
+}
+
+.layers > *
+{
+   height: 2em;
+   line-height: 2em;
+   border-bottom: 1px dotted gray;
+   padding: 4px;
+   cursor: pointer;
+   xoverflow: hidden;
+   white-space: pre;
+}
+
+
+.layers > *.visible
+{
+   background-color:yellow
+}
+
+
+.layers > * > img
+{
+   vertical-align:middle;
+   height:2em;
+   margin-right:4px;
+}
+
 </style>
 
 </head>
-<body style="margin:0px">
-<div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
-<div id="map" style="position:absolute; width:100%;height:100%"></div>
-<div id="network" style="position:absolute; left:2px; bottom:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
+<body style="margin:0px; display:flex">
+
+<div id="layers-container" class="layers">
+	<div>Layers</div>
+
+</div>
+
+<div style="background-color:#c7e0bd; position:relative; flex-grow:1 ">
+   <div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
+   <div id="map" style="width:100%; height:100%"></div>
+</div>
 
 <div id="map-popup" style="display:none">
      

@@ -22,11 +22,17 @@ function map_start()
 
          })
       });
+      
+      createLayers()
 
-      meteoLayer()
-      bluetoothLayer()
+      // meteoLayer()
+      // bluetoothLayer()
       // parkingLayer()
-      inquinamentoLayer()
+      // inquinamentoLayer()
+      
+      // TODO provare con i tempi di percorrenza e PM10 che generano invece linee con colori diversi
+      
+      // non sembra invece ci siano dei parametri, quindi i parametri saranno probabilmente fissi
       
       var popup_element = document.getElementById('map-popup');
       var popup_close = document.getElementById('map-popup-close');
@@ -62,6 +68,107 @@ function map_start()
             popup_overlay.setPosition(coords);
          }
       });
+   }
+   
+   
+   function createLayers()
+   {
+      var layersMetadata = [
+         {
+            name: 'meteo',
+            icon: 'meteo-icon.png',
+            createFunction: meteoLayer,
+         }
+         ,
+         {
+            name: 'bluetooth',
+            icon: 'bluetooth-icon.png',
+            createFunction: bluetoothLayer,
+         }
+         ,
+         {
+            name: 'inquinamento',
+            icon: 'inquinamento-icon.png',
+            createFunction: inquinamentoLayer,
+         }
+         ,
+         {
+            name: 'pollution_pm10',
+            icon: 'icon-pm10-active.png',
+            createFunction: pollution_pm10,
+            zindex: 1
+         }
+      ]
+      var layers_container = document.getElementById('layers-container')
+      for (var l = 0; l < layersMetadata.length; l++)
+      {
+         var div = document.createElement('div')
+         var img = document.createElement('img')
+         img.src = layersMetadata[l]['icon']
+         div.appendChild(img)
+         var span = document.createElement('span')
+         span.textContent = layersMetadata[l]['name']
+         div.appendChild(span)
+         
+         var layer = layersMetadata[l]['createFunction']()
+         if (layersMetadata[l]['zindex'])
+         {
+            layer.setZIndex(parseInt(layersMetadata[l]['zindex']));
+         } 
+         else
+         {
+            layer.setZIndex(1000)
+         }
+         
+         setupToggleClick(div, layer)
+         
+         layers_container.appendChild(div)
+         
+         
+         
+      }
+   }
+   
+   
+   function setupToggleClick(div, layer)
+   {
+      var visible = false;
+      function toggle()
+      {
+         layer.setVisible(visible);
+         if (visible)
+         {
+            div.classList.add('visible')
+         }
+         else
+         {
+            div.classList.remove('visible')
+         }
+         visible = !visible
+      }
+      div.addEventListener('click', toggle)
+      toggle();
+   }
+   
+   
+   function pollution_pm10()
+   {
+      var sourcevector = new ol.source.Vector({});
+      
+      var layer = new ol.layer.Tile({
+         xextent: [-13884991, 2870341, -7455066, 6338219],
+         source: new ol.source.TileWMS({
+           url: 'http://geodata.integreen-life.bz.it/geoserver/edi/wms',
+           params: {'LAYERS': 'edi:pollution_pm10', 'TILED': true},
+           serverType: 'geoserver',
+           // Countries have transparency, so do not fade tiles:
+           transition: 0
+         })
+       })
+
+      map.addLayer(layer)
+      
+      return layer;
    }
    
    
@@ -122,7 +229,7 @@ function map_start()
          sourcevector.addFeature(featurething);
       }
 
-      
+      return layer;
    }
    
    function bluetoothLayer()
@@ -183,6 +290,7 @@ function map_start()
       }
 
       
+      return layer;
    }
    
    function inquinamentoLayer()
@@ -244,7 +352,8 @@ function map_start()
          sourcevector.addFeature(featurething);
       }
 
-      
+      return layer;
+     
    }
 
    showMap()
