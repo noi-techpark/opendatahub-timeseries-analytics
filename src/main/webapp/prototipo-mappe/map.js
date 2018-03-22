@@ -98,6 +98,13 @@ function map_start()
             createFunction: pollution_pm10,
             zindex: 1
          }
+         ,
+         {
+            name: 'congestione',
+            icon: 'icon-journeytime-active.png',
+            createFunction: congestion,
+            zindex: 2
+         }
       ]
       var layers_container = document.getElementById('layers-container')
       for (var l = 0; l < layersMetadata.length; l++)
@@ -160,6 +167,26 @@ function map_start()
          source: new ol.source.TileWMS({
            url: 'http://geodata.integreen-life.bz.it/geoserver/edi/wms',
            params: {'LAYERS': 'edi:pollution_pm10', 'TILED': true},
+           serverType: 'geoserver',
+           // Countries have transparency, so do not fade tiles:
+           transition: 0
+         })
+       })
+
+      map.addLayer(layer)
+      
+      return layer;
+   }
+   
+   function congestion()
+   {
+      var sourcevector = new ol.source.Vector({});
+      
+      var layer = new ol.layer.Tile({
+         xextent: [-13884991, 2870341, -7455066, 6338219],
+         source: new ol.source.TileWMS({
+           url: 'http://geodata.integreen-life.bz.it/geoserver/edi/wms',
+           params: {'LAYERS': 'edi:congestion', 'TILED': true},
            serverType: 'geoserver',
            // Countries have transparency, so do not fade tiles:
            transition: 0
