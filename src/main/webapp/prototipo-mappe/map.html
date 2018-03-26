@@ -22,11 +22,13 @@ html, body
    display:inline-block;
 }
 
-#map-popup-content
+#map-popup-box
 {
    background-color: white;
    padding:6px;
    border-radius: 6px;
+   min-width: 4em;
+   overflow: hidden;
 }
 
 #map-popup-close
@@ -97,8 +99,10 @@ html, body
 
 <div id="map-popup" style="display:none">
      
-     <div id="map-popup-content"><div id="map-popup-close">X</div>
-     popup<br>bbbbbbbbbbbbbbbbbb&nbsp;</div>
+     <div id="map-popup-box"><div id="map-popup-close">X</div>
+     <div id="map-popup-title">title</div>
+     <div id="map-popup-content">content</div>
+     </div>
      <div id="map-popup-arrow"><div></div></div>
   </div>
 <script type="text/javascript">

@@ -37,6 +37,7 @@ function map_start()
       var popup_element = document.getElementById('map-popup');
       var popup_close = document.getElementById('map-popup-close');
       var popup_content = document.getElementById('map-popup-content');
+      var popup_title = document.getElementById('map-popup-title');
 
       popup_close.addEventListener('click', function()
       {
@@ -46,7 +47,7 @@ function map_start()
       var popup_overlay = new ol.Overlay({
          element : popup_element,
          positioning : 'bottom-center',
-         offset : [ 0, 0 ]
+         offset : [ 0, -30 ]
       })
       map.addOverlay(popup_overlay);
       
@@ -61,10 +62,21 @@ function map_start()
          if (features)
          {
             var coords = features[0].getGeometry().getCoordinates();
-            console.log(coords)
             // var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
-            // console.log(hdms)
-            popup_content.contentText = 'aa';
+            popup_title.textContent   = features[0].getProperties()['type'];
+            popup_content.textContent = '' // features[0].getProperties()['value'];
+            // popup_content.textContent = JSON.stringify(features[0].getProperties());
+            var data = features[0].getProperties();
+            for (var name in data) 
+            {
+               if (data.hasOwnProperty(name) && ['_t', 'geometry'].indexOf(name) < 0) 
+               {
+                  var row = document.createElement('div')
+                  row.textContent = name + ': ' + data[name]
+                  popup_content.appendChild(row)
+               }
+            }
+            
             popup_overlay.setPosition(coords);
          }
       });
@@ -240,18 +252,18 @@ function map_start()
                  false); // TODO: go async!
       xhttp.send()
       var json = JSON.parse(xhttp.responseText)
-      console.log(json)
       
 
       for (var i = 0; i < json.length; i++)
       {
-         console.log(json[i])
          var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
                json[i].latitude ], 'EPSG:4326', 'EPSG:3857'));
          var featurething = new ol.Feature({
             // name: "Thing",
             geometry : thing
          });
+         
+         featurething.setProperties(json[i])
 
          sourcevector.addFeature(featurething);
       }
@@ -300,18 +312,18 @@ function map_start()
                  false); // TODO: go async!
       xhttp.send()
       var json = JSON.parse(xhttp.responseText)
-      console.log(json)
       
 
       for (var i = 0; i < json.length; i++)
       {
-         console.log(json[i])
          var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
                json[i].latitude ], 'EPSG:4326', 'EPSG:3857'));
          var featurething = new ol.Feature({
             // name: "Thing",
             geometry : thing
          });
+         
+         featurething.setProperties(json[i])
 
          sourcevector.addFeature(featurething);
       }
@@ -363,18 +375,18 @@ function map_start()
                  false); // TODO: go async!
       xhttp.send()
       var json = JSON.parse(xhttp.responseText)
-      console.log(json)
       
 
       for (var i = 0; i < json.length; i++)
       {
-         console.log(json[i])
          var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
                json[i].latitude ], 'EPSG:4326', 'EPSG:3857'));
          var featurething = new ol.Feature({
             // name: "Thing",
             geometry : thing
          });
+         
+         featurething.setProperties(json[i])
 
          sourcevector.addFeature(featurething);
       }
