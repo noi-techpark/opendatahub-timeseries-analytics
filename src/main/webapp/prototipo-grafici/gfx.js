@@ -13,13 +13,22 @@ let state = {
           name:             "air-temperature",
           period:           "600"
         },
-        {}
+        { kind:             "MeteoFrontEnd",
+          station:          "23200MS",
+          station_human:    "Meran/Gratsch",
+          name:             "precipitation",
+          period:           "300"
+        }
 
     ]    
 };
 /* iname=air-temperature&period=600&from=1522010124044&to=1522096524044 */
 
-// console.log(encodeURI(JSON.stringify(state)));
+const dump_state = () => {
+
+    console.log("#" + encodeURI(JSON.stringify(state)));
+
+};
 
 
 const $  = document.querySelector.bind(document);
@@ -35,6 +44,8 @@ const show_tab = ix => {
     let panels = Array.from($$("#gfx_panels > div"));
     panels.forEach( el => el.style.display = "none" );
     panels[ix].style.display = "block";
+
+    state.active_tab = ix;
 
 };
 

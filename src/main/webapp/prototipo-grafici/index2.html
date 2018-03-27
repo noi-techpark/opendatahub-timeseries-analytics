@@ -34,6 +34,8 @@
         }
         #gfx_wait {
             background-color: #FFFFFF;
+            width: 100%;
+            height: 100%;
         }
 
         #gfx_tabs {
@@ -63,6 +65,18 @@
             color: #FF0000;
         }
 
+        td {
+            border-collapse: collapse;
+            padding: 2px;
+            border: 1px solid black;
+        }
+
+        .sel {
+            background-color: #FFCCAA;
+        }
+        .nsel {
+            background-color: #FFFFFF;
+        }
 
     </style>
 
@@ -78,7 +92,7 @@
 
         <div id="gfx_plot">
             <div id="gfx_flot" style="position: absolute; top: 0; left: 0; display: none"></div>
-            <div id="gfx_wait" style="text-align: center; border: 10px solid #CCCCCC; position: absolute; top: 0; left: 0; display: none"><img src="loading-icon.gif"></div>
+            <div id="gfx_wait" style="text-align: center; position: absolute; top: 0; left: 0; display: none"><img src="loading-icon.gif"></div>
         </div>
 
         <div class="gfx_vspacer"></div>
@@ -88,14 +102,67 @@
         </div>
 
         <div id="gfx_panels">
-            <div id="gfx_legend">
-                Yo. I'm the legend.
+           <div id="gfx_legend">
+
+                <p>Yo. I'm the legend.</p>
+
+                <table>
+                    <!--
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    -->
+                    <tr>
+                        <td style="color: red">colore</td>
+                        <td>MeteoFrontEnd</td>
+                        <td>Meran/Gratsch (23200MS)</td>
+                        <td>air temperature [C]</td>
+                        <td>600</td>
+                        <td><button class="sel">&lt;</button> <button class="nsel">&gt;</button></td>
+                        <td><button class="nsel">X</button</td>
+                    </tr>
+                    <tr>
+                        <td style="color: blue">colore</td>
+                        <td>MeteoFrontEnd</td>
+                        <td>Meran/Gratsch (23200MS)</td>
+                        <td>precipitation [mm]</td>
+                        <td>300</td>
+                        <td><button class="nsel">&lt;</button> <button class="sel">&gt;</button></td>
+                        <td><button class="nsel">X</button</td>
+                    </tr>
+                  </table>
+
             </div>
             <div id="gfx_time">
-                Yo. I show the from/to chooser.
+            
+                <p>Yo. I am the from/to chooser.</p>
+                <p>I'm a demo.</p>
+
+                <p>
+                    <button onclick="d = new Date(); plot(Number(new Date(1900 + d.getYear(), d.getMonth(), d.getDate(), 0, 0, 0)), 86400000, true)"> today           </button>
+                    <button onclick="plot(Number(new Date()) -    86400000,    86400000, true)"> day to date     </button>
+                    <button onclick="plot(Number(new Date()) -  7*86400000,  7*86400000, true)"> week to date    </button>
+                    <button onclick="plot(Number(new Date()) - 14*86400000, 14*86400000, true)"> 2 weeks to date </button>
+                    <button onclick="plot(Number(new Date()) - 30*86400000, 30*86400000, true)"> month to date   </button>
+                </p>
+
+                <p>
+                    <button onclick="plot(state.scale.from - state.scale.range / 2, state.scale.range, true)"> - 1/2</button>
+                    <button onclick="plot(state.scale.from + state.scale.range / 2, state.scale.range, true)"> + 1/2</button>
+                </p>
+
             </div>
             <div id="gfx_moredata">
-                Yo. I let you add more graphs.
+
+                <p>Yo. I let you add more graphs.</p>
+
+
+                <p>Todo: permalink, height Y and scale Y, live view on button, CSV dump</p>
+
             </div>
 
         </div>
@@ -104,19 +171,6 @@
 
     <!--
     <p>Proof-of-concept to show Flot is working very well. Currently data is fed directly from ipchannels.integreen-life.bz.it (with CORS header!).</p>
-
-    <p>
-        <button onclick="d = new Date(); plot(Number(new Date(1900 + d.getYear(), d.getMonth(), d.getDate(), 0, 0, 0)), 86400000)"> today           </button>
-        <button onclick="plot(Number(new Date()) -    86400000,    86400000)"> day to date     </button>
-        <button onclick="plot(Number(new Date()) -  7*86400000,  7*86400000)"> week to date    </button>
-        <button onclick="plot(Number(new Date()) - 14*86400000, 14*86400000)"> 2 weeks to date </button>
-        <button onclick="plot(Number(new Date()) - 30*86400000, 30*86400000)"> month to date   </button>
-    </p>
-
-    <p>
-        <button onclick="plot(current_from - current_period / 2, current_period)"> - 1/2</button>
-        <button onclick="plot(current_from + current_period / 2, current_period)"> + 1/2</button>
-    </p>
 
     -->
 
