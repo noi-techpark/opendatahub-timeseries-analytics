@@ -142,6 +142,8 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 	}
 	private static void responseError(HttpServletResponse resp, int code, String msg) throws IOException
 	{
+		// imposta il content type a test semplice in caso di errore
+		resp.setContentType("text/plain");
 		resp.setStatus(code);
 		resp.getOutputStream().write(("Error: " + code + (msg == null ? "" : "\n" + msg)).getBytes(StandardCharsets.US_ASCII));
 	}
