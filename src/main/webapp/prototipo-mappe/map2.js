@@ -9,14 +9,17 @@ function fetchJson_promise(url)
            if (xhttp.readyState == 4) // DONE:
                                         // https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
            {
-
+               console.log('status')
+               console.log(xhttp.status)
                if (xhttp.status == 200)
                {
+                   console.log('qui1')
                    var data = JSON.parse(xhttp.responseText)
                    success(data)
                }
                else
                {
+                   console.log('qui2')
                    fail(xhttp.status)
                }
            }
@@ -72,6 +75,9 @@ async function map_start_promise()
          case 'integreen':
             loadIntegreenLayer(map, layer_info, layer_display)
             break;
+         case 'wms':
+            loadWMSLayer(map, layer_info, layer_display)
+            break;
          default:
             alert('Unknow format: ' + format)
             break;
@@ -79,7 +85,29 @@ async function map_start_promise()
       
       
    }
-   
+
+   async function loadWMSLayer(map, layer_info, layer_display)
+   {
+      var sourcetile = new ol.source.TileWMS({
+         url: layer_info.url ,
+         serverType: 'geoserver'
+       })
+      
+      sourcetile.on('tileloadend', function(event) {
+         console.log('immagini wms caricate!') 
+      })
+      
+      sourcetile.on('tileloaderror', function(event) {
+         console.log('immagini wms caricate!') 
+      })
+      
+      var layer = new ol.layer.Tile({
+         source: sourcetile
+       })
+
+      map.addLayer(layer)
+   }
+
    async function loadIntegreenLayer(map, layer_info, layer_display)
    {
       var iconStyle = new ol.style.Style({
@@ -112,7 +140,7 @@ async function map_start_promise()
       let spinner = layer_display.querySelector('.spinner')
       
        
-      layer_display.querySelector('.label').addEventListener('click', async function()
+      layer_display.addEventListener('click', async function()
       {
          
          if (layer)
@@ -141,7 +169,11 @@ async function map_start_promise()
          }
       })
       
-      spinner.addEventListener('click', load_refresh_features);
+      spinner.addEventListener('click', function(e)
+      {
+         e.stopPropagation(); // evita che il click passi a tutta la riga se gestito da me
+         load_refresh_features()         
+      });
       
       async function load_refresh_features()
       {
@@ -151,30 +183,44 @@ async function map_start_promise()
          
          spinner.classList.add('loading')
          loading_in_progress = true;
-         
-         let json = await fetchJson_promise(layer_info.url)
-         console.log(json)
-         
-         var sourcevector = new ol.source.Vector({});
 
-         for (var i = 0; i < json.length; i++)
+         layer_display.querySelector('.error').classList.remove('show')
+         
+         try
          {
-            var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
-                  json[i].latitude ], layer_info.projection, 'EPSG:3857'));
-            var featurething = new ol.Feature({
-               // name: "Thing",
-               geometry : thing
-            });
+            let json = await fetchJson_promise(layer_info.url)
+         
+            var sourcevector = new ol.source.Vector({});
             
-            featurething.setProperties(json[i])
+            for (var i = 0; i < json.length; i++)
+            {
+               var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
+                     json[i].latitude ], layer_info.projection, 'EPSG:3857'));
+               var featurething = new ol.Feature({
+                  // name: "Thing",
+                  geometry : thing
+               });
+               
+               featurething.setProperties(json[i])
 
-            sourcevector.addFeature(featurething);
+               sourcevector.addFeature(featurething);
+            }
+            
+            layer.setSource(sourcevector)
+         }
+         catch (err)
+         {
+            layer_display.querySelector('.error').classList.add('show')
+         }
+         finally
+         {
+            spinner.classList.remove('loading')
+            loading_in_progress = false;
          }
          
-         layer.setSource(sourcevector)
          
-         spinner.classList.remove('loading')
-         loading_in_progress = false;
+         
+         
       }
       
       /*
