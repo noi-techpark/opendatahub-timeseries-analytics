@@ -8,7 +8,7 @@
     <script type="text/javascript" src="ol.js"></script>
     <link rel="stylesheet" href="ol.css" />
 
-    <script type="text/javascript" src="map.js"></script>
+    <script type="text/javascript" src="map2.js"></script>
 
 <style>
 
@@ -65,11 +65,11 @@ html, body
    padding: 4px;
    cursor: pointer;
    xoverflow: hidden;
-   white-space: pre;
+   xwhite-space: pre;
 }
 
 
-.layers > *.visible
+.layers > *.selected
 {
    background-color:yellow
 }
@@ -82,13 +82,37 @@ html, body
    margin-right:4px;
 }
 
+@keyframes example {
+    0%   {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+
+.layers .spinner.loading
+{
+   animation: example 2s linear infinite;
+}
+
+.layers .spinner
+{
+   visibility: hidden
+}
+
+.layers .layer_template.selected .spinner
+{
+   visibility: visible
+}
+
 </style>
 
 </head>
 <body style="margin:0px; display:flex">
 
 <div id="layers-container" class="layers">
-	<div>Layers</div>
+	<div id="layer_template_id" class="layer_template">
+		<img class="icon" src=""></img>
+		<span class="label"></span>
+		<img src="loading.png" style="width:20px;height:20px" class="spinner">
+	</div>
 
 </div>
 
@@ -106,7 +130,7 @@ html, body
      <div id="map-popup-arrow"><div></div></div>
   </div>
 <script type="text/javascript">
-    map_start()
+   map_start_promise()
 </script>
 
 </body>

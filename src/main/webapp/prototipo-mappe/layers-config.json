@@ -1,0 +1,20 @@
+[
+   {
+      "id": "weather",
+      "icon": "meteo-icon.png",
+      "url": "../data/integreen/MeteoFrontEnd/rest/get-station-details",
+      "format": "integreen",
+      "projection": "EPSG:4326",
+      "custom-function": null
+   }
+   ,
+   {
+      "id": "bluetooth",
+      "icon": "bluetooth-icon.png",
+      "url": "../data/integreen/BluetoothFrontEnd/rest/get-station-details",
+      "format": "integreen",
+      "projection": "EPSG:4326",
+      "custom-function": null
+   }
+   
+]

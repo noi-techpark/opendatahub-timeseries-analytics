@@ -1,0 +1,7 @@
+/*
+   id: sigla del layer. parola univoca e senza spazi
+   url: l'url un cui trovare i dati
+   format: il formato dei dati forniti dall'url. Valori implementati: integreen, wms
+   projection: projezione dei dati gis. usare il nome riconosciuto da openlayer. alcune projezioni richiedono l'inclusione di ulteriori liberie a supporto
+   custom-function: ulteriore personalizzazione del comportamento standard mediante una funzione programmata ad hoc
+ */
