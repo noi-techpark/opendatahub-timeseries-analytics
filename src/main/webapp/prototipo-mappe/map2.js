@@ -72,6 +72,60 @@ async function map_start_promise()
       
    }
    
+   setupFeatureClickPopup()
+   
+   function setupFeatureClickPopup()
+   {
+      var popup_element = document.getElementById('map-popup');
+      var popup_close = document.getElementById('map-popup-close');
+      var popup_content = document.getElementById('map-popup-content');
+      var popup_title = document.getElementById('map-popup-title');
+
+      popup_close.addEventListener('click', function()
+      {
+         popup_overlay.setPosition() // nascondi il popup passando una posizione undefined
+      })
+
+      var popup_overlay = new ol.Overlay({
+         element : popup_element,
+         positioning : 'bottom-center',
+         offset : [ 0, -30 ]
+      })
+      map.addOverlay(popup_overlay);
+      
+      // attiva la visualizzazione del popup nascosto durante il caricamento
+      // a questo punto openlayer lo ha già nascosto
+      popup_element.style.display = 'block'
+         
+      map.on('click', function(e)
+       {
+          // overlay.setPosition();
+          var features = map.getFeaturesAtPixel(e.pixel);
+          console.log(features)
+          if (features)
+          {
+             var coords = features[0].getGeometry().getCoordinates();
+             // var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
+             popup_title.textContent   = features[0].getProperties()['type'];
+             popup_content.textContent = '' // features[0].getProperties()['value'];
+             // popup_content.textContent = JSON.stringify(features[0].getProperties());
+             var data = features[0].getProperties();
+             for (var name in data) 
+             {
+                if (data.hasOwnProperty(name) && ['_t', 'geometry'].indexOf(name) < 0) 
+                {
+                   var row = document.createElement('div')
+                   row.textContent = name + ': ' + data[name]
+                   popup_content.appendChild(row)
+                }
+             }
+             
+             popup_overlay.setPosition(coords);
+          }
+       });
+            
+   }
+   
    function configureLayer(map, layer_info, layer_display)
    {
       let spinner = layer_display.querySelector('.spinner')
