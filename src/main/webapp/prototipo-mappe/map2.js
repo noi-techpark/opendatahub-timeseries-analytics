@@ -6,8 +6,7 @@ function fetchJson_promise(url)
         xhttp.open("GET", url , true);
         xhttp.onreadystatechange = function(readystatechange)
         {
-           if (xhttp.readyState == 4) // DONE:
-                                        // https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
+           if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
            {
                console.log('status')
                console.log(xhttp.status)
@@ -27,7 +26,6 @@ function fetchJson_promise(url)
         xhttp.send();
    })
 }
-
 
 async function map_start_promise()
 {
@@ -71,21 +69,6 @@ async function map_start_promise()
       console.log(format)
       
       configureLayer(map, layer_info, layer_display)
-      
-      /*
-      switch (format)
-      {
-         case 'integreen':
-            // loadIntegreenLayer(map, layer_info, layer_display)
-            break;
-         case 'wms':
-            // loadWMSLayer(map, layer_info, layer_display)
-            break;
-         default:
-            alert('Unknow format: ' + format)
-            break;
-      }
-      */
       
    }
    
@@ -143,7 +126,6 @@ async function map_start_promise()
                alert('Unknow format: ' + format)
                break;
          }
-         // setTimeout(function(){ ok(1) }, 1000)
       })
    }
    
@@ -225,142 +207,6 @@ async function map_start_promise()
          ok(layer)
 
       })
-   }
 
-   async function loadIntegreenLayer(map, layer_info, layer_display)
-   {
-      var iconStyle = new ol.style.Style({
-         image: new ol.style.Icon({
-           anchor: [0.5, 1.0],
-           anchorXUnits: 'fraction',
-           anchorYUnits: 'fraction',
-           opacity: 1,
-           src: layer_info.icon,
-           scale: 0.5
-         })
-       });
-       
-       var shadowStyle = new ol.style.Style({
-          image: new ol.style.Icon({
-            anchor: [0.3, 1.0],
-            anchorXUnits: 'fraction',
-            anchorYUnits: 'fraction',
-            opacity: 1,
-            src: 'marker-shadow.png',
-            scale: 1
-          })
-        });
-      
-       
-      let layer = null;
-      let loading_in_progress = false;
-      
-      
-      let spinner = layer_display.querySelector('.spinner')
-      
-       
-      layer_display.addEventListener('click', async function()
-      {
-         
-         if (layer)
-         {
-            // rimuovi dalla lista di autoaggiornamenti!
-            layer_display.classList.remove('selected')
-            map.removeLayer(layer)
-            layer = null;
-         } 
-         else
-         {         
-            layer_display.classList.add('selected')
-            
-            var sourcevector = new ol.source.Vector({});
-   
-            layer = new ol.layer.Vector({
-              title : 'meteoLayer',
-              visible : true,
-              source : sourcevector,
-              style : [shadowStyle, iconStyle]
-            })
-            
-            map.addLayer(layer)
-            
-            await load_refresh_features()
-         }
-      })
-      
-      spinner.addEventListener('click', function(e)
-      {
-         e.stopPropagation(); // evita che il click passi a tutta la riga se gestito da me
-         load_refresh_features()         
-      });
-      
-      async function load_refresh_features()
-      {
-         // cliccare su reload se il layer non è visibile, salta questa parte!
-         if (layer == null)
-            return;
-         
-         spinner.classList.add('loading')
-         loading_in_progress = true;
-
-         layer_display.querySelector('.error').classList.remove('show')
-         
-         try
-         {
-            let json = await fetchJson_promise(layer_info.url)
-         
-            var sourcevector = new ol.source.Vector({});
-            
-            for (var i = 0; i < json.length; i++)
-            {
-               var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
-                     json[i].latitude ], layer_info.projection, 'EPSG:3857'));
-               var featurething = new ol.Feature({
-                  // name: "Thing",
-                  geometry : thing
-               });
-               
-               featurething.setProperties(json[i])
-
-               sourcevector.addFeature(featurething);
-            }
-            
-            layer.setSource(sourcevector)
-         }
-         catch (err)
-         {
-            layer_display.querySelector('.error').classList.add('show')
-         }
-         finally
-         {
-            spinner.classList.remove('loading')
-            loading_in_progress = false;
-         }
-         
-         
-         
-         
-      }
-      
-      /*
-      var sourcevector = new ol.source.Vector({});
-
-      
-       var layer = new ol.layer.Vector({
-         title : 'meteoLayer',
-         visible : false,
-         source : sourcevector,
-         style : [shadowStyle, iconStyle]
-      })
-
-      map.addLayer(layer)
-      
-      
-      
-         layer.setVisible(true)
-      })
-
-
-      */
    }
 }
