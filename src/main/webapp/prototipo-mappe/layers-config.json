@@ -2,7 +2,9 @@
    {
       "id": "weather",
       "icon": "meteo-icon.png",
-      "url": "../data/integreen/MeteoFrontEnd/rest/get-station-details",
+      "url" : "../data/integreen/MeteoFrontEnd/rest/get-station-details",
+      "url2": "../data/integreen/MeteoFrontEnd/rest/get-data-types?station=65350MS",
+      "url3": "../data/integreen/MeteoFrontEnd/rest/get-records?station=83200MS&name=sunshine-duration&seconds=10000",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null
