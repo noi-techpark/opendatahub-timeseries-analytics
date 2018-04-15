@@ -8,17 +8,13 @@ function fetchJson_promise(url)
         {
            if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
            {
-               console.log('status')
-               console.log(xhttp.status)
                if (xhttp.status == 200)
                {
-                   console.log('qui1')
                    var data = JSON.parse(xhttp.responseText)
                    success(data)
                }
                else
                {
-                   console.log('qui2')
                    fail(xhttp.status)
                }
            }
@@ -54,11 +50,11 @@ async function map_start_promise()
    
 
    let json = await fetchJson_promise('layers-config.json')
-   console.log(json)
+   // console.log(json)
    
    for (var layer_info of json)
    {
-      console.log(layer_info)
+      // console.log(layer_info)
       let layer_display = layer_template.cloneNode(true)
       layer_display.querySelector('.label').textContent = layer_info.id
       layer_display.querySelector('.icon').src = layer_info.icon
@@ -66,7 +62,7 @@ async function map_start_promise()
       
       // inizia caricamento dati (mostrare un progress?)
       let format = layer_info.format
-      console.log(format)
+      // console.log(format)
       
       configureLayer(map, layer_info, layer_display)
       
@@ -134,7 +130,7 @@ async function map_start_promise()
       
       let loading = false;
       
-      layer_display.addEventListener('click', async function()
+      var toggle_layer = async function()
       {
          if (loading)
             return;
@@ -156,7 +152,19 @@ async function map_start_promise()
             spinner.classList.remove('loading')
             loading = false
          }
+      }
+      
+      layer_display.addEventListener('click', toggle_layer)
+      
+      spinner.addEventListener('click', async function(e)
+      {
+         // console.log('cliccato spinner')
+         e.stopPropagation()
+         // ricarica i dati deselezionando e riselezionado il layer
+         await toggle_layer()
+         await toggle_layer()
       })
+      
    }
    
    async function loadLayer_promise(map, layer_info)
@@ -250,15 +258,22 @@ async function map_start_promise()
             serverType: 'geoserver'
           })
          
+         /*
          sourcetile.on('tileloadstart', function(event) {
             console.log('immagini wms caricate!') 
          })
+         */
          
          var layer = new ol.layer.Tile({
             source: sourcetile
          })
          
-         ok(layer)
+         setTimeout(function()
+         {
+            ok(layer)   
+         }, 500)
+         
+         
 
       })
 
