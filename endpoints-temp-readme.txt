@@ -82,3 +82,5 @@ http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-detail
 http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-data-types?station=siemens
 http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-records?station=siemens&name=Bluetooth%20Count%20record&seconds=18000
 
+
+http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details/../get-data-types?station=siemens

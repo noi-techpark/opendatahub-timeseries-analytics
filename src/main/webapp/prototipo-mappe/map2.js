@@ -15,6 +15,7 @@ function fetchJson_promise(url)
                }
                else
                {
+                   console.log(xhttp.status)
                    fail(xhttp.status)
                }
            }
@@ -93,7 +94,7 @@ async function map_start_promise()
       // a questo punto openlayer lo ha già nascosto
       popup_element.style.display = 'block'
          
-      map.on('click', function(e)
+      map.on('click', async function(e)
        {
           // overlay.setPosition();
           var features = map.getFeaturesAtPixel(e.pixel);
@@ -108,12 +109,26 @@ async function map_start_promise()
              var data = features[0].getProperties();
              for (var name in data) 
              {
-                if (data.hasOwnProperty(name) && ['_t', 'geometry'].indexOf(name) < 0) 
+                if (data.hasOwnProperty(name) && ['_t', 'geometry', 'url'].indexOf(name) < 0) 
                 {
                    var row = document.createElement('div')
                    row.textContent = name + ': ' + data[name]
                    popup_content.appendChild(row)
                 }
+             }
+             
+             // leggi i tipi di dati
+             let url = features[0].get('url')
+             url = url + '/../get-data-types?station=' + features[0].get('id')
+             console.log(url)
+             let json = await fetchJson_promise(url)
+             console.log(json)
+             
+             for (var x = 0; x < json.length; x++)
+             {
+                var row = document.createElement('div')
+                row.textContent = json[x][0] + ': '
+                popup_content.appendChild(row)
              }
              
              popup_overlay.setPosition(coords);
@@ -234,7 +249,8 @@ async function map_start_promise()
                    json[i].latitude ], layer_info.projection, 'EPSG:3857'));
              var featurething = new ol.Feature({
                 // name: "Thing",
-                geometry : thing
+                geometry : thing,
+                url: layer_info.url
              });
              
              featurething.setProperties(json[i])
