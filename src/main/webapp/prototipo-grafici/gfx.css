@@ -1,3 +1,13 @@
+/*
+    bz analytics
+    graphics web ui / css 
+
+    (C) 2018 IDM Suedtirol - Alto Adige
+
+    see vendor/ for third pary libraries needed by this code
+
+    author: chris@1006.org  
+*/
 
 
 /* gfx container */
@@ -30,7 +40,6 @@
 /* top panel with graph */
 
 #gfx_plot {
-    background-color: #FFFFAA;
     height: 400px; 
     position: relative;
 }
@@ -45,14 +54,15 @@
     display: none;
 }
 #gfx_wait {
-    background-color: #FFFFFF;
+    background-color: #EEEEEE;
+    font-size: 28px;
     width: 100%;
     height: 100%;
     text-align: center;
     position: absolute;
     top: 0;
     left: 0;
-    display: none
+    display: block;
 }
 
 
@@ -89,8 +99,16 @@
     padding: 8px;
 }
 
-#gfx_tabbed_panels td {
+#gfx_tabbed_panels table {
     border-collapse: collapse;
+}
+
+#gfx_tabbed_panels tr:first-child {
+    background-color: #EEEEEE;
+    font-weight: bold;
+}
+
+#gfx_tabbed_panels td {
     padding: 2px;
     border: 1px solid black;
 }
@@ -104,12 +122,15 @@
 #gfx_moredata {
 }
 
+.gfx_notice {
+    background-color: #FFFFAA;
+}
 
 
 /* links and buttons */
 
 button.gfx_sel {
-    background-color: #FFCCAA;
+    background-color: #AACCFF;
 }
 button.gfx_nsel {
     background-color: #FFFFFF;

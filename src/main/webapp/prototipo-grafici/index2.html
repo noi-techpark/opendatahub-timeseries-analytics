@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
 
-    <title>sketch analytics UI</title>
+    <title>bz analytics / graphics web ui</title>
     <meta charset="UTF-8"> 
 
     <style type="text/css">
@@ -16,6 +16,7 @@
 	<script src="vendor/jquery/3.3.1/jquery.js"></script>
 	<script src="vendor/flot/0.8.3/jquery.flot.js"></script>
 	<script src="vendor/flot/0.8.3/jquery.flot.time.js"></script>
+	<script src="vendor/flot-axislabels/2.0.1/jquery.flot.axislabels.js"></script>
 	<script src="gfx.js" defer></script>
 
   </head>
@@ -27,7 +28,7 @@
 
       <div id="gfx_plot">
           <div id="gfx_flot"></div>
-          <div id="gfx_wait"><img src="loading-icon.gif"></div>
+          <div id="gfx_wait"><br><br><br>empty plot</div>
       </div>
 
       <!-- spacer -->
@@ -44,42 +45,20 @@
 
       <div id="gfx_tabbed_panels">
 
-         <div id="gfx_legend">
-              <p>Yo. I'm the legend.</p>
-              <table>
-                  <!--
-                  <tr>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                  </tr>
-                  -->
-                  <tr>
-                      <td style="color: red">colore</td>
-                      <td>MeteoFrontEnd</td>
-                      <td>Meran/Gratsch (23200MS)</td>
-                      <td>air temperature [C]</td>
-                      <td>600</td>
-                      <td><button class="gfx_sel">&lt;</button> <button class="gfx_nsel">&gt;</button></td>
-                      <td><button class="gfx_nsel">X</button</td>
-                  </tr>
-                  <tr>
-                      <td style="color: blue">colore</td>
-                      <td>MeteoFrontEnd</td>
-                      <td>Meran/Gratsch (23200MS)</td>
-                      <td>precipitation [mm]</td>
-                      <td>300</td>
-                      <td><button class="gfx_nsel">&lt;</button> <button class="gfx_sel">&gt;</button></td>
-                      <td><button class="gfx_nsel">X</button</td>
-                  </tr>
-                </table>
+          <div id="gfx_legend">
+
+            <p>currently selected data sets:</p>
+
+            <table>
+            </table>
+
+                      <!-- <td><button class="gfx_nsel">&lt;</button> <button class="gfx_sel">&gt;</button></td> -->
           </div>
 
           <div id="gfx_time">
-              <p>Yo. I am the from/to chooser.</p>
-              <p>I'm a demo.</p>
+
+              <p>WORK IN PROGRESS</p>
+
               <p>
                   <button onclick="d = new Date(); plot(Number(new Date(1900 + d.getYear(), d.getMonth(), d.getDate(), 0, 0, 0)), 86400000, true)"> today           </button>
                   <button onclick="plot(Number(new Date()) -    86400000,    86400000, true)"> day to date     </button>
@@ -95,7 +74,7 @@
 
           <div id="gfx_moredata">
 
-              <p>Add a data set to the graph.</p>
+              <p>add a data set to the plot:</p>
 
               <select id="gfx_selcategory">
                 <option value="">select category...</option>
@@ -120,7 +99,9 @@
 
           <div id="gfx_extras">
 
-              <p>Todo: permalink, height Y and scale Y, live view on button, CSV dump</p>
+              <p>WORK IN PROGRESS</p>
+
+              <p>permalink button, change height Y, live view on button, CSV dump</p>
 
           </div>
 
