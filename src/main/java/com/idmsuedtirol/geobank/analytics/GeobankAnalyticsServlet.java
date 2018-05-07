@@ -66,6 +66,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
 		String requestPath = req.getPathInfo();
+		String urlParameters = req.getQueryString();
 		Matcher serviceMatcher = firstSubfolder.matcher(requestPath);
 		// If url is not in an expected format, return 404
 		if (!serviceMatcher.matches())
@@ -91,7 +92,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		// TODO: add some headers about browser caching?
 		
 		// TODO: match servicePath against a whitelist
-		String newUrlTxt = serviceUrlTxt + servicePath;
+		String newUrlTxt = serviceUrlTxt + servicePath + "?" + urlParameters;
 		System.out.println(newUrlTxt);
 		
 		URL serviceUrl = new URL(newUrlTxt);
