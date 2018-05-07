@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <title>bz analytics / graphics web ui</title>
+    <meta charset="UTF-8"> 
+
+    <style type="text/css">
+    body {
+        background-color: #666666;
+        margin: 20px;
+    }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="gfx.css">
+	<script src="vendor/jquery/3.3.1/jquery.js"></script>
+	<script src="vendor/flot/0.8.3/jquery.flot.js"></script>
+	<script src="vendor/flot/0.8.3/jquery.flot.time.js"></script>
+	<script src="vendor/flot-axislabels/2.0.1/jquery.flot.axislabels.js"></script>
+	<script src="gfx.js" defer></script>
+
+  </head>
+  <body>
+
+    <div id="gfx">
+
+      <!-- top panel with graph -->
+
+      <div id="gfx_plot">
+          <div id="gfx_flot"></div>
+          <div id="gfx_wait"><br><br><br>empty plot</div>
+      </div>
+
+      <!-- spacer -->
+
+      <div id="gfx_vspacer"></div>
+
+      <!-- tabs -->
+
+      <div id="gfx_tabs">
+          <span class="gfx_tab"><a href="">legend</a></span><span class="gfx_tab"><a href="">select time range</a></span><span class="gfx_tab"><a href="">add data set</a></span><span class="gfx_tab"><a href="">extras</a></span>
+      </div>
+
+      <!-- tabbed panels -->
+
+      <div id="gfx_tabbed_panels">
+
+          <div id="gfx_legend">
+
+            <p>currently selected data sets:</p>
+
+            <table>
+            </table>
+
+                      <!-- <td><button class="gfx_nsel">&lt;</button> <button class="gfx_sel">&gt;</button></td> -->
+          </div>
+
+          <div id="gfx_time">
+
+              <p>WORK IN PROGRESS</p>
+
+              <p>
+                  <button onclick="d = new Date(); plot(Number(new Date(1900 + d.getYear(), d.getMonth(), d.getDate(), 0, 0, 0)), 86400000, true)"> today           </button>
+                  <button onclick="plot(Number(new Date()) -    86400000,    86400000, true)"> day to date     </button>
+                  <button onclick="plot(Number(new Date()) -  7*86400000,  7*86400000, true)"> week to date    </button>
+                  <button onclick="plot(Number(new Date()) - 14*86400000, 14*86400000, true)"> 2 weeks to date </button>
+                  <button onclick="plot(Number(new Date()) - 30*86400000, 30*86400000, true)"> month to date   </button>
+              </p>
+              <p>
+                  <button onclick="plot(state.scale.from - state.scale.range / 2, state.scale.range, true)"> - 1/2</button>
+                  <button onclick="plot(state.scale.from + state.scale.range / 2, state.scale.range, true)"> + 1/2</button>
+              </p>
+          </div>
+
+          <div id="gfx_moredata">
+
+              <p>add a data set to the plot:</p>
+
+              <select id="gfx_selcategory">
+                <option value="">select category...</option>
+                <option value="meteorology">&rarr; meteorology</option>
+              </select>
+
+              <br><br>
+
+              <select id="gfx_selstation">
+              </select>
+
+              <br><br>
+
+              <select id="gfx_seldataset">
+              </select>
+
+              <br><br>
+
+              <button id="gfx_addset">add selected data set</button>
+
+          </div>
+
+          <div id="gfx_extras">
+
+              <p>WORK IN PROGRESS</p>
+
+              <p>permalink button, change height Y, live view on button, CSV dump</p>
+
+          </div>
+
+      </div>
+
+    </div>
+
+  </body>
+</html>
