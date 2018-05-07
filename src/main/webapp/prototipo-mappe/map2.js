@@ -163,9 +163,24 @@ async function map_start_promise()
             spinner.classList.add('loading')
             loading = true
             layer = await loadLayer_promise(map, layer_info)
+            // vediamo se notifica la fine del rendering correttamente e sempre solo una volta
+            
+            layer.getSource().on('tileloadstart', function() {
+               console.log('tileloadstart '  + new Date().getTime())
+             });
+
+            layer.getSource().on('tileloadend', function() {
+               console.log('tileloadend')
+             });
+            layer.getSource().on('tileloaderror', function() {
+               console.log('tileloaderror')
+             });
+            
             map.addLayer(layer)
             spinner.classList.remove('loading')
             loading = false
+            
+            console.log('click finish ' + new Date().getTime())
          }
       }
       
