@@ -1,3 +1,4 @@
+"use strict";
 function fetchJson_promise(url)
 {
    return new Promise(function(success, fail)
@@ -58,14 +59,30 @@ async function map_start_promise()
       // console.log(layer_info)
       let layer_display = layer_template.cloneNode(true)
       layer_display.querySelector('.label').textContent = layer_info.id
-      layer_display.querySelector('.icon').src = layer_info.icon
       layers_container.appendChild(layer_display)
       
       // inizia caricamento dati (mostrare un progress?)
       let format = layer_info.format
-      // console.log(format)
+      console.log(format)
+      switch (format)
+      {
+         case 'integreen':
+            layer_display.querySelector('.icon').src = layer_info.icons[0]
+            var layer = await loadIntegreenLayer2(layer_info)
+            map.addLayer(layer)
+            // ok(layer)
+            break;
+         case 'wms':
+            layer_display.querySelector('.icon').src = layer_info.icon
+            layer = await loadWMSLayer(layer_info)
+            //ok(layer)
+            break;
+         default:
+            alert('Unknow format: ' + format)
+            break;
+      }
       
-      configureLayer(map, layer_info, layer_display)
+      // configureLayer(map, layer_info, layer_display)
       
    }
    
@@ -95,43 +112,46 @@ async function map_start_promise()
       popup_element.style.display = 'block'
          
       map.on('click', async function(e)
-       {
-          // overlay.setPosition();
+      {
+          
+         
           var features = map.getFeaturesAtPixel(e.pixel);
           console.log(features)
           if (features)
           {
              var coords = features[0].getGeometry().getCoordinates();
              // var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
-             popup_title.textContent   = features[0].getProperties()['type'];
-             popup_content.textContent = '' // features[0].getProperties()['value'];
-             // popup_content.textContent = JSON.stringify(features[0].getProperties());
-             var data = features[0].getProperties();
-             for (var name in data) 
+             var integreen_data = features[0].getProperties()['integreen_data'];
+             popup_title.textContent   = integreen_data['name'];
+             popup_content.textContent = '' 
+             for (var name in integreen_data) 
              {
-                if (data.hasOwnProperty(name) && ['_t', 'geometry', 'url'].indexOf(name) < 0) 
+                if (integreen_data.hasOwnProperty(name) && ['_t', 'data_types'].indexOf(name) < 0) 
                 {
                    var row = document.createElement('div')
-                   row.textContent = name + ': ' + data[name]
+                   row.textContent = name + ': ' + integreen_data[name]
                    popup_content.appendChild(row)
                 }
              }
+             var row = document.createElement('div')
+             row.textContent = '---'
+             popup_content.appendChild(row)
              
-             // leggi i tipi di dati
-             let url = features[0].get('url')
-             url = url + '/../get-data-types?station=' + features[0].get('id')
-             console.log(url)
-             let json = await fetchJson_promise(url)
-             console.log(json)
-             
-             for (var x = 0; x < json.length; x++)
+             var data_types = integreen_data['data_types']
+             for (var dt = 0; dt < data_types.length; dt++)
              {
                 var row = document.createElement('div')
-                row.textContent = json[x][0] + ': '
+                var value_struct = data_types[dt]['newest_record']
+                var data_type_struct = data_types[dt]['data_type']
+                row.textContent = value_struct['value'] + ' ' + data_type_struct[0] + ' [' + data_type_struct[3] + ']' + ' (' + new Date(value_struct['timestamp']).toISOString() + ')'
                 popup_content.appendChild(row)
              }
              
              popup_overlay.setPosition(coords);
+          }
+          else
+          {
+             popup_overlay.setPosition() // nascondi il popup passando una posizione undefined
           }
        });
             
@@ -231,7 +251,7 @@ async function map_start_promise()
               anchorXUnits: 'fraction',
               anchorYUnits: 'fraction',
               opacity: 1,
-              src: layer_info.icon,
+              src: layer_info.icons[0],
               scale: 0.5
             })
           });
@@ -256,19 +276,60 @@ async function map_start_promise()
             style : [shadowStyle, iconStyle]
           })
           
-          let json = await fetchJson_promise(layer_info.url)
+          let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
           
           for (var i = 0; i < json.length; i++)
           {
-             var thing = new ol.geom.Point(ol.proj.transform([ json[i].longitude,
-                   json[i].latitude ], layer_info.projection, 'EPSG:3857'));
+             var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
+             
              var featurething = new ol.Feature({
                 // name: "Thing",
                 geometry : thing,
-                url: layer_info.url
+                integreen_data: json_stations[i]
              });
              
-             featurething.setProperties(json[i])
+             // Carica i data types e gli ultimi valori
+             let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + json_stations[i].id)
+             
+             // Arricchisci il json della stazione con i dati dei datatype ricevuti con la seconda chiamata
+             json_stations[i]['data_types'] = json_datatypes
+             
+             for (var dt = 0; dt < json_datatypes.length; dt++)
+             {
+                let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id + '&type=' + json_datatypes[dt][0])
+                let struct = {}
+                struct['data_type'] = json_datatypes[dt]
+                struct['newest_record'] = json_value
+                json_datatypes[dt] = struct
+                
+                // eventualmente personalizza l'icona in base ai valori
+                for (var ic = 1; ic < layer_info.icons.length; ic++)
+                {
+                   var cond = layer_info.icons[ic]
+                   if (cond[1] == struct['data_type'][0] // tipo di misura esempio: "Bluetooth Count record"
+                       && cond[2] == struct['data_type'][3] // intervallo di misura: 21600
+                       && cond[3] <= struct['newest_record']['value'] // minimo
+                       && cond[4] >  struct['newest_record']['value'] // massimo escluso
+                   )
+                   {
+                      var iconStyle = new ol.style.Style({
+                         image: new ol.style.Icon({
+                           anchor: [0.5, 1.0],
+                           anchorXUnits: 'fraction',
+                           anchorYUnits: 'fraction',
+                           opacity: 1,
+                           src: cond[0],
+                           scale: 0.5
+                         })
+                       });
+                       featurething.setStyle([shadowStyle, iconStyle])
+                   }
+                }
+                
+             }
+             
+             
+             // featurething.setProperties(json_stations[i])
 
              sourcevector.addFeature(featurething);
           }

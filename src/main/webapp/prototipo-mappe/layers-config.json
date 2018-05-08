@@ -1,19 +1,17 @@
 [
    {
       "id": "weather",
-      "icon": "meteo-icon.png",
-      "url" : "../data/integreen/MeteoFrontEnd/rest/get-station-details",
-      "url2": "../data/integreen/MeteoFrontEnd/rest/get-data-types?station=65350MS",
-      "url3": "../data/integreen/MeteoFrontEnd/rest/get-records?station=83200MS&name=sunshine-duration&seconds=10000",
-      "format": "integreen",
+      "icons": ["meteo-icon.png"],
+      "base_url" : "../data/integreen/MeteoFrontEnd/rest/",
       "projection": "EPSG:4326",
+      "format": "integreen",
       "custom-function": null
    }
    ,
    {
       "id": "bluetooth",
-      "icon": "bluetooth-icon.png",
-      "url": "../data/integreen/BluetoothFrontEnd/rest/get-station-details",
+      "icons": ["bluetooth-icon.png", ["bluetooth-icon2.png", "Bluetooth Count record", 21600, 100, 250], ["bluetooth-icon3.png", "Bluetooth Count record", 21600, 0, 100]],
+      "base_url": "../data/integreen/BluetoothFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null
