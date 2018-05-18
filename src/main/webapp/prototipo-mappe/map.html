@@ -90,16 +90,12 @@ html, body
 .layers .spinner.loading
 {
    animation: example 2s linear infinite;
+   visibility: visible;
 }
 
 .layers .spinner
 {
    visibility: hidden
-}
-
-.layers .layer_template.selected .spinner
-{
-   visibility: visible
 }
 
 .layer_template .error
@@ -111,7 +107,19 @@ html, body
 
 .layer_template.selected .error.show
 {
-   visibility: visible
+   
+}
+
+.layer_template .progressbar_container
+{
+   
+}
+
+.layer_template .progressbar_container .progressbar_line
+{
+   height: 4px;
+   width: 0%;
+   background-color: red;
 }
 
 </style>
@@ -125,8 +133,10 @@ html, body
 		<span class="label"></span>
 		<img src="loading.png" style="width:20px;height:20px" class="spinner">
 		<span class="error">!</span>
+		<div class="progressbar_container">
+		    <div class="progressbar_line"></div>
+		</div>
 	</div>
-
 </div>
 
 <div style="background-color:#c7e0bd; position:relative; flex-grow:1 ">

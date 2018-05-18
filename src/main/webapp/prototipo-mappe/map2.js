@@ -56,32 +56,79 @@ async function map_start_promise()
    
    for (var layer_info of json)
    {
+      setupLayer_promise(layer_info)
+   }
+   
+   async function setupLayer_promise(layer_info)
+   {
       // console.log(layer_info)
       let layer_display = layer_template.cloneNode(true)
       layer_display.querySelector('.label').textContent = layer_info.id
       layers_container.appendChild(layer_display)
       
-      // inizia caricamento dati (mostrare un progress?)
       let format = layer_info.format
-      console.log(format)
+      
       switch (format)
       {
          case 'integreen':
             layer_display.querySelector('.icon').src = layer_info.icons[0]
-            var layer = await loadIntegreenLayer(layer_info)
-            map.addLayer(layer)
-            // ok(layer)
-            break;
-         case 'wms':
-            layer_display.querySelector('.icon').src = layer_info.icon
-            layer = await loadWMSLayer(layer_info)
-            //ok(layer)
             break;
          default:
-            alert('Unknow format: ' + format)
+            layer_display.querySelector('.icon').src = layer_info.icon
             break;
       }
+             
       
+      let layer_selected = false;
+      let layer_loading = false;
+      
+      var layer = null;
+      
+      layer_display.addEventListener('click', async function()
+      {
+          // se il layer sta caricando ignora il click
+          if (layer_loading)
+             return;
+          
+          if (layer_selected)
+          {
+             // spegni layer
+             layer_selected = false;
+             layer_display.classList.remove('selected')
+             map.removeLayer(layer);
+          }
+          else
+          {
+             // crea layer
+             // mostrare progress di caricamento
+             layer_loading = true;
+             layer_display.querySelector('.spinner').classList.add('loading')
+             layer_selected = true;
+             layer_display.classList.add('selected')
+             switch (format)
+             {
+                case 'integreen':
+                   layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
+                   map.addLayer(layer)
+                   break;
+                case 'wms':
+                   layer = await loadWMSLayer(layer_info)
+                   break;
+                default:
+                   // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+                   alert('Unknow format: ' + format)
+                   break;
+             }
+             
+             // spegnere progress di caricamento
+             
+             layer_loading = false;
+             layer_display.querySelector('.spinner').classList.remove('loading')
+          }
+      })
+      
+      
+          
    }
    
    setupFeatureClickPopup()
@@ -155,7 +202,7 @@ async function map_start_promise()
             
    }
    
-   async function loadIntegreenLayer(layer_info)
+   async function loadIntegreenLayer(layer_info, progressbar_line)
    {
       return new Promise(async function(ok,fail)
       {
@@ -194,6 +241,8 @@ async function map_start_promise()
           
           for (var i = 0; i < json_stations.length; i++)
           {
+             progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + 'px'
+             
              var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
              
              var featurething = new ol.Feature({
@@ -251,7 +300,7 @@ async function map_start_promise()
           }
           
           layer.setSource(sourcevector)
-          
+          progressbar_line.style.width = '0px'
           ok(layer)
       })
        
