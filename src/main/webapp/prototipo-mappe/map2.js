@@ -109,7 +109,6 @@ async function map_start_promise()
              {
                 case 'integreen':
                    layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
-                   map.addLayer(layer)
                    break;
                 case 'wms':
                    layer = await loadWMSLayer(layer_info)
@@ -237,6 +236,8 @@ async function map_start_promise()
             style : [shadowStyle, iconStyle]
           })
           
+          map.addLayer(layer)
+          
           let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
           
           for (var i = 0; i < json_stations.length; i++)
@@ -324,6 +325,8 @@ async function map_start_promise()
          var layer = new ol.layer.Tile({
             source: sourcetile
          })
+         
+         map.addLayer(layer)
          
          setTimeout(function()
          {
