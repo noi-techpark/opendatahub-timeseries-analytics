@@ -68,7 +68,7 @@ async function map_start_promise()
       {
          case 'integreen':
             layer_display.querySelector('.icon').src = layer_info.icons[0]
-            var layer = await loadIntegreenLayer2(layer_info)
+            var layer = await loadIntegreenLayer(layer_info)
             map.addLayer(layer)
             // ok(layer)
             break;
@@ -81,8 +81,6 @@ async function map_start_promise()
             alert('Unknow format: ' + format)
             break;
       }
-      
-      // configureLayer(map, layer_info, layer_display)
       
    }
    
@@ -157,91 +155,7 @@ async function map_start_promise()
             
    }
    
-   function configureLayer(map, layer_info, layer_display)
-   {
-      let spinner = layer_display.querySelector('.spinner')
-      
-      let layer = null;
-      
-      let loading = false;
-      
-      var toggle_layer = async function()
-      {
-         if (loading)
-            return;
-         
-         if (layer)
-         {
-            // rimuovi dalla lista di autoaggiornamenti!
-            layer_display.classList.remove('selected')
-            map.removeLayer(layer)
-            layer = null;
-         } 
-         else
-         {         
-            layer_display.classList.add('selected')
-            spinner.classList.add('loading')
-            loading = true
-            layer = await loadLayer_promise(map, layer_info)
-            // vediamo se notifica la fine del rendering correttamente e sempre solo una volta
-            
-            layer.getSource().on('tileloadstart', function() {
-               console.log('tileloadstart '  + new Date().getTime())
-             });
-
-            layer.getSource().on('tileloadend', function() {
-               console.log('tileloadend')
-             });
-            layer.getSource().on('tileloaderror', function() {
-               console.log('tileloaderror')
-             });
-            
-            map.addLayer(layer)
-            spinner.classList.remove('loading')
-            loading = false
-            
-            console.log('click finish ' + new Date().getTime())
-         }
-      }
-      
-      layer_display.addEventListener('click', toggle_layer)
-      
-      spinner.addEventListener('click', async function(e)
-      {
-         // console.log('cliccato spinner')
-         e.stopPropagation()
-         // ricarica i dati deselezionando e riselezionado il layer
-         await toggle_layer()
-         await toggle_layer()
-      })
-      
-   }
-   
-   async function loadLayer_promise(map, layer_info)
-   {
-      return new Promise(async function(ok, fail)
-      {
-         let format = layer_info.format
-         let layer = null;
-         switch (format)
-         {
-            case 'integreen':
-               // loadIntegreenLayer(map, layer_info, layer_display)
-               layer = await loadIntegreenLayer2(layer_info)
-               ok(layer)
-               break;
-            case 'wms':
-               layer = await loadWMSLayer(layer_info)
-               ok(layer)
-               break;
-            default:
-               alert('Unknow format: ' + format)
-               break;
-         }
-      })
-   }
-   
-   async function loadIntegreenLayer2(layer_info)
+   async function loadIntegreenLayer(layer_info)
    {
       return new Promise(async function(ok,fail)
       {
