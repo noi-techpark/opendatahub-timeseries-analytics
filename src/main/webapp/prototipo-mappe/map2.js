@@ -143,7 +143,7 @@ async function map_start_promise()
                 var row = document.createElement('div')
                 var value_struct = data_types[dt]['newest_record']
                 var data_type_struct = data_types[dt]['data_type']
-                row.textContent = value_struct['value'] + ' ' + data_type_struct[0] + ' [' + data_type_struct[3] + ']' + ' (' + new Date(value_struct['timestamp']).toISOString() + ')'
+                row.textContent = value_struct['value'] + ' ' + data_type_struct[0] + ' [' + data_type_struct[3] + ']' + ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
                 popup_content.appendChild(row)
              }
              
@@ -278,7 +278,7 @@ async function map_start_promise()
           
           let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
           
-          for (var i = 0; i < json.length; i++)
+          for (var i = 0; i < json_stations.length; i++)
           {
              var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
              
@@ -296,7 +296,9 @@ async function map_start_promise()
              
              for (var dt = 0; dt < json_datatypes.length; dt++)
              {
-                let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id + '&type=' + json_datatypes[dt][0])
+                let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id 
+                                                                             + '&type=' + json_datatypes[dt][0]
+                                                                             + '&period=' + json_datatypes[dt][3])
                 let struct = {}
                 struct['data_type'] = json_datatypes[dt]
                 struct['newest_record'] = json_value
