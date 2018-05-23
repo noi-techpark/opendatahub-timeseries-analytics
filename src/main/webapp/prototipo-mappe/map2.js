@@ -1,32 +1,12 @@
 "use strict";
-function fetchJson_promise(url)
-{
-   return new Promise(function(success, fail)
-   {
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", url , true);
-        xhttp.onreadystatechange = function(readystatechange)
-        {
-           if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
-           {
-               if (xhttp.status == 200)
-               {
-                   var data = JSON.parse(xhttp.responseText)
-                   success(data)
-               }
-               else
-               {
-                   console.log(xhttp.status)
-                   fail(xhttp.status)
-               }
-           }
-        }
-        xhttp.send();
-   })
-}
+
 
 async function map_start_promise()
 {
+   let autorefresh_functions = []
+   
+   startAutoRefresh();
+   
    var layers_container = document.getElementById('layers-container')
    var layer_template = document.getElementById('layer_template_id');
    layer_template.removeAttribute('id')
@@ -59,6 +39,12 @@ async function map_start_promise()
       setupLayer_promise(layer_info)
    }
    
+   setupFeatureClickPopup()
+   
+   //////////////////////////////////////////////////////
+   // Functions
+   //////////////////////////////////////////////////////
+   
    async function setupLayer_promise(layer_info)
    {
       // console.log(layer_info)
@@ -84,53 +70,98 @@ async function map_start_promise()
       
       var layer = null;
       
-      layer_display.addEventListener('click', async function()
+      let spinner = layer_display.querySelector('.spinner')
+      
+      let refresh_function = async function()
       {
-          // se il layer sta caricando ignora il click
-          if (layer_loading)
-             return;
-          
-          if (layer_selected)
-          {
-             // spegni layer
-             layer_selected = false;
-             layer_display.classList.remove('selected')
-             map.removeLayer(layer);
-          }
-          else
-          {
-             // crea layer
-             // mostrare progress di caricamento
-             layer_loading = true;
-             layer_display.querySelector('.spinner').classList.add('loading')
-             layer_selected = true;
-             layer_display.classList.add('selected')
-             switch (format)
-             {
-                case 'integreen':
-                   layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
-                   break;
-                case 'wms':
-                   layer = await loadWMSLayer(layer_info)
-                   break;
-                default:
-                   // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-                   alert('Unknow format: ' + format)
-                   break;
-             }
-             
-             // spegnere progress di caricamento
-             
-             layer_loading = false;
-             layer_display.querySelector('.spinner').classList.remove('loading')
-          }
-      })
+         // refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
+         if (!layer_selected || layer_loading)
+         {
+            console.log('caso che non dovrebbe succedere 1!');
+            return;
+         }
+         await toggle_layer_function()
+         
+         if (layer_selected)
+         {
+            console.log('caso che non dovrebbe succedere 2!');
+            return;
+         }
+         
+         await toggle_layer_function()
+      }
       
+      let toggle_layer_function = async function()
+      {
+         // se il layer sta caricando ignora il click
+         if (layer_loading)
+            return;
+         
+         if (layer_selected)
+         {
+            // spegni layer
+            layer_selected = false;
+            layer_display.classList.remove('selected')
+            map.removeLayer(layer);
+            
+            // rimuovi il timer di aggiornamento automatico
+            autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function),1)
+         }
+         else
+         {
+            // crea layer
+            // mostrare progress di caricamento
+            layer_loading = true;
+            spinner.classList.add('loading')
+            layer_selected = true;
+            layer_display.classList.add('selected')
+            switch (format)
+            {
+               case 'integreen':
+                  layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
+                  break;
+               case 'wms':
+                  layer = await loadWMSLayer(layer_info)
+                  break;
+               default:
+                  // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+                  alert('Unknow format: ' + format)
+                  break;
+            }
+            
+            // spegnere progress di caricamento
+            
+            layer_loading = false;
+            spinner.classList.remove('loading')
+            
+            // aggiungi al timer di aggiornamento automatico!
+            autorefresh_functions.push(refresh_function)
+         }
+     }
       
+      layer_display.addEventListener('click', toggle_layer_function)
+      spinner.addEventListener('click', refresh_function)
           
    }
    
-   setupFeatureClickPopup()
+   
+   function startAutoRefresh()
+   {
+      let now_millis = new Date().getTime()
+      let next_time = 20000 - now_millis % 20000 
+      setTimeout(async function()
+      {
+         let refresh_local_copy = autorefresh_functions.slice();
+         console.log('refresh automatico1 ' + autorefresh_functions.length)
+         for (let i = 0; i < refresh_local_copy.length; i++)
+         {
+            console.log(i)
+            refresh_local_copy[i]()
+         }
+         console.log('refresh automatico2')
+         startAutoRefresh()
+      }, next_time)
+   }
    
    function setupFeatureClickPopup()
    {
@@ -157,8 +188,6 @@ async function map_start_promise()
          
       map.on('click', async function(e)
       {
-          
-         
           var features = map.getFeaturesAtPixel(e.pixel);
           console.log(features)
           if (features)
@@ -242,6 +271,11 @@ async function map_start_promise()
           
           for (var i = 0; i < json_stations.length; i++)
           {
+             // RIMUOVERE DOPO I TEST!!!
+             if (i >= 10)
+                break;
+             
+             
              progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + 'px'
              
              var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
@@ -294,9 +328,6 @@ async function map_start_promise()
                 
              }
              
-             
-             // featurething.setProperties(json_stations[i])
-
              sourcevector.addFeature(featurething);
           }
           
@@ -337,5 +368,31 @@ async function map_start_promise()
 
       })
 
+   }
+   
+   function fetchJson_promise(url)
+   {
+      return new Promise(function(success, fail)
+      {
+           var xhttp = new XMLHttpRequest();
+           xhttp.open("GET", url , true);
+           xhttp.onreadystatechange = function(readystatechange)
+           {
+              if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
+              {
+                  if (xhttp.status == 200)
+                  {
+                      var data = JSON.parse(xhttp.responseText)
+                      success(data)
+                  }
+                  else
+                  {
+                      console.log(xhttp.status)
+                      fail(xhttp.status)
+                  }
+              }
+           }
+           xhttp.send();
+      })
    }
 }
