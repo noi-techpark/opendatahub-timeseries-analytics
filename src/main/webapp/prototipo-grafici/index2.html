@@ -13,10 +13,14 @@
     </style>
 
     <link rel="stylesheet" type="text/css" href="gfx.css">
+    <link rel="stylesheet" type="text/css" href="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.css">
+
 	<script src="vendor/jquery/3.3.1/jquery.js"></script>
+	<script src="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.js"></script>
 	<script src="vendor/flot/0.8.3/jquery.flot.js"></script>
 	<script src="vendor/flot/0.8.3/jquery.flot.time.js"></script>
 	<script src="vendor/flot-axislabels/2.0.1/jquery.flot.axislabels.js"></script>
+
 	<script src="gfx.js" defer></script>
 
   </head>
@@ -52,24 +56,26 @@
             <table>
             </table>
 
-                      <!-- <td><button class="gfx_nsel">&lt;</button> <button class="gfx_sel">&gt;</button></td> -->
           </div>
 
           <div id="gfx_time">
 
-              <p>WORK IN PROGRESS</p>
+              <p>select date range:</p>
 
-              <p>
-                  <button onclick="d = new Date(); plot(Number(new Date(1900 + d.getYear(), d.getMonth(), d.getDate(), 0, 0, 0)), 86400000, true)"> today           </button>
-                  <button onclick="plot(Number(new Date()) -    86400000,    86400000, true)"> day to date     </button>
-                  <button onclick="plot(Number(new Date()) -  7*86400000,  7*86400000, true)"> week to date    </button>
-                  <button onclick="plot(Number(new Date()) - 14*86400000, 14*86400000, true)"> 2 weeks to date </button>
-                  <button onclick="plot(Number(new Date()) - 30*86400000, 30*86400000, true)"> month to date   </button>
-              </p>
-              <p>
-                  <button onclick="plot(state.scale.from - state.scale.range / 2, state.scale.range, true)"> - 1/2</button>
-                  <button onclick="plot(state.scale.from + state.scale.range / 2, state.scale.range, true)"> + 1/2</button>
-              </p>
+              <input id="gfx_fromdate" type="text" size="12">
+              to <input id="gfx_todate"   type="text" size="12">
+              &rarr; <span id="gfx_days"></span>
+              <br><br>
+
+              <button id="gfx_update_range">update plot</button>
+
+              <p>pick preset values:</p>
+
+              <button id="gfx_range_today">today</button>
+              <button id="gfx_range_ytoday">yesterday &amp; today</button>
+              <button id="gfx_range_week">one week</button>
+              <button id="gfx_range_month">one month</button>
+
           </div>
 
           <div id="gfx_moredata">
