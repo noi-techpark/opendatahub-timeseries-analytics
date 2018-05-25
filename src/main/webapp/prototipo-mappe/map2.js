@@ -7,6 +7,8 @@ async function map_start_promise()
    
    startAutoRefresh();
    
+   let error_console = document.getElementById('error-console')
+   
    var layers_container = document.getElementById('layers-container')
    var layer_template = document.getElementById('layer_template_id');
    layer_template.removeAttribute('id')
@@ -115,27 +117,39 @@ async function map_start_promise()
             spinner.classList.add('loading')
             layer_selected = true;
             layer_display.classList.add('selected')
-            switch (format)
+            
+            try
             {
-               case 'integreen':
-                  layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
-                  break;
-               case 'wms':
-                  layer = await loadWMSLayer(layer_info)
-                  break;
-               default:
-                  // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-                  alert('Unknow format: ' + format)
-                  break;
+               switch (format)
+               {
+                  case 'integreen':
+                     layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
+                     break;
+                  case 'wms':
+                     layer = await loadWMSLayer(layer_info)
+                     break;
+                  default:
+                     // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+                     alert('Unknow format: ' + format)
+                     break;
+               }
+            }
+            catch (e)
+            {
+               console.log(e)
+               error_console.textContent = new Date().toLocaleString() + ': ' + e;
+            }
+            finally
+            {
+               // spegnere progress di caricamento
+               
+               layer_loading = false;
+               spinner.classList.remove('loading')
+               
+               // aggiungi al timer di aggiornamento automatico!
+               autorefresh_functions.push(refresh_function)
             }
             
-            // spegnere progress di caricamento
-            
-            layer_loading = false;
-            spinner.classList.remove('loading')
-            
-            // aggiungi al timer di aggiornamento automatico!
-            autorefresh_functions.push(refresh_function)
          }
      }
       
@@ -234,106 +248,114 @@ async function map_start_promise()
    {
       return new Promise(async function(ok,fail)
       {
-         var iconStyle = new ol.style.Style({
-            image: new ol.style.Icon({
-              anchor: [0.5, 1.0],
-              anchorXUnits: 'fraction',
-              anchorYUnits: 'fraction',
-              opacity: 1,
-              src: layer_info.icons[0],
-              scale: 0.5
-            })
-          });
-          
-          var shadowStyle = new ol.style.Style({
-             image: new ol.style.Icon({
-               anchor: [0.3, 1.0],
-               anchorXUnits: 'fraction',
-               anchorYUnits: 'fraction',
-               opacity: 1,
-               src: 'marker-shadow.png',
-               scale: 1
-             })
-           });
-          
-          var sourcevector = new ol.source.Vector({});
-          
-          let layer = new ol.layer.Vector({
-            title : 'meteoLayer',
-            visible : true,
-            source : sourcevector,
-            style : [shadowStyle, iconStyle]
-          })
-          
-          map.addLayer(layer)
-          
-          let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
-          
-          for (var i = 0; i < json_stations.length; i++)
-          {
-             // RIMUOVERE DOPO I TEST!!!
-             if (i >= 10)
-                break;
-             
-             
-             progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + 'px'
-             
-             var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
-             
-             var featurething = new ol.Feature({
-                // name: "Thing",
-                geometry : thing,
-                integreen_data: json_stations[i]
+         try
+         {
+            var iconStyle = new ol.style.Style({
+               image: new ol.style.Icon({
+                 anchor: [0.5, 1.0],
+                 anchorXUnits: 'fraction',
+                 anchorYUnits: 'fraction',
+                 opacity: 1,
+                 src: layer_info.icons[0],
+                 scale: 0.5
+               })
              });
              
-             // Carica i data types e gli ultimi valori
-             let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + json_stations[i].id)
+             var shadowStyle = new ol.style.Style({
+                image: new ol.style.Icon({
+                  anchor: [0.3, 1.0],
+                  anchorXUnits: 'fraction',
+                  anchorYUnits: 'fraction',
+                  opacity: 1,
+                  src: 'marker-shadow.png',
+                  scale: 1
+                })
+              });
              
-             // Arricchisci il json della stazione con i dati dei datatype ricevuti con la seconda chiamata
-             json_stations[i]['data_types'] = json_datatypes
+             var sourcevector = new ol.source.Vector({});
              
-             for (var dt = 0; dt < json_datatypes.length; dt++)
+             let layer = new ol.layer.Vector({
+               title : 'meteoLayer',
+               visible : true,
+               source : sourcevector,
+               style : [shadowStyle, iconStyle]
+             })
+             
+             map.addLayer(layer)
+             
+             let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
+             
+             for (var i = 0; i < json_stations.length; i++)
              {
-                let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id 
-                                                                             + '&type=' + json_datatypes[dt][0]
-                                                                             + '&period=' + json_datatypes[dt][3])
-                let struct = {}
-                struct['data_type'] = json_datatypes[dt]
-                struct['newest_record'] = json_value
-                json_datatypes[dt] = struct
+                // RIMUOVERE DOPO I TEST!!!
+                // if (i >= 10)
+                //   break;
                 
-                // eventualmente personalizza l'icona in base ai valori
-                for (var ic = 1; ic < layer_info.icons.length; ic++)
+                
+                progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + 'px'
+                
+                var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
+                
+                var featurething = new ol.Feature({
+                   // name: "Thing",
+                   geometry : thing,
+                   integreen_data: json_stations[i]
+                });
+                
+                // Carica i data types e gli ultimi valori
+                let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + json_stations[i].id)
+                
+                // Arricchisci il json della stazione con i dati dei datatype ricevuti con la seconda chiamata
+                json_stations[i]['data_types'] = json_datatypes
+                
+                for (var dt = 0; dt < json_datatypes.length; dt++)
                 {
-                   var cond = layer_info.icons[ic]
-                   if (cond[1] == struct['data_type'][0] // tipo di misura esempio: "Bluetooth Count record"
-                       && cond[2] == struct['data_type'][3] // intervallo di misura: 21600
-                       && cond[3] <= struct['newest_record']['value'] // minimo
-                       && cond[4] >  struct['newest_record']['value'] // massimo escluso
-                   )
+                   let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id 
+                                                                                + '&type=' + json_datatypes[dt][0]
+                                                                                + '&period=' + json_datatypes[dt][3])
+                   let struct = {}
+                   struct['data_type'] = json_datatypes[dt]
+                   struct['newest_record'] = json_value
+                   json_datatypes[dt] = struct
+                   
+                   // eventualmente personalizza l'icona in base ai valori
+                   for (var ic = 1; ic < layer_info.icons.length; ic++)
                    {
-                      var iconStyle = new ol.style.Style({
-                         image: new ol.style.Icon({
-                           anchor: [0.5, 1.0],
-                           anchorXUnits: 'fraction',
-                           anchorYUnits: 'fraction',
-                           opacity: 1,
-                           src: cond[0],
-                           scale: 0.5
-                         })
-                       });
-                       featurething.setStyle([shadowStyle, iconStyle])
+                      var cond = layer_info.icons[ic]
+                      if (cond[1] == struct['data_type'][0] // tipo di misura esempio: "Bluetooth Count record"
+                          && cond[2] == struct['data_type'][3] // intervallo di misura: 21600
+                          && cond[3] <= struct['newest_record']['value'] // minimo
+                          && cond[4] >  struct['newest_record']['value'] // massimo escluso
+                      )
+                      {
+                         var iconStyle = new ol.style.Style({
+                            image: new ol.style.Icon({
+                              anchor: [0.5, 1.0],
+                              anchorXUnits: 'fraction',
+                              anchorYUnits: 'fraction',
+                              opacity: 1,
+                              src: cond[0],
+                              scale: 0.5
+                            })
+                          });
+                          featurething.setStyle([shadowStyle, iconStyle])
+                      }
                    }
+                   
                 }
                 
+                sourcevector.addFeature(featurething);
              }
              
-             sourcevector.addFeature(featurething);
-          }
-          
-          layer.setSource(sourcevector)
-          progressbar_line.style.width = '0px'
-          ok(layer)
+             layer.setSource(sourcevector)
+             progressbar_line.style.width = '0px'
+             ok(layer)
+         }
+         catch(e)
+         {
+            console.log(e)
+            fail(e)
+         }
       })
        
    }
@@ -388,7 +410,7 @@ async function map_start_promise()
                   else
                   {
                       console.log(xhttp.status)
-                      fail(xhttp.status)
+                      fail(url + ': ' + xhttp.status)
                   }
               }
            }

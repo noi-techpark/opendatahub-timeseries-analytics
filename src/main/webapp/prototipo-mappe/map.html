@@ -125,24 +125,32 @@ html, body
 </style>
 
 </head>
-<body style="margin:0px; display:flex">
+<body style="margin:0px; display:flex; flex-direction:column">
 
-<div id="layers-container" class="layers">
-	<div id="layer_template_id" class="layer_template">
-		<img class="icon" src=""></img>
-		<span class="label"></span>
-		<img src="loading.png" style="width:20px;height:20px" class="spinner">
-		<span class="error">!</span>
-		<div class="progressbar_container">
-		    <div class="progressbar_line"></div>
+<div style="display:flex; flex-grow:1">
+
+	<div id="layers-container" class="layers">
+		<div id="layer_template_id" class="layer_template">
+			<img class="icon" src=""></img>
+			<span class="label"></span>
+			<img src="loading.png" style="width:20px;height:20px" class="spinner">
+			<span class="error">!</span>
+			<div class="progressbar_container">
+			    <div class="progressbar_line"></div>
+			</div>
 		</div>
 	</div>
+	
+	<div style="background-color:#c7e0bd; position:relative; flex-grow:1 ">
+	   <div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
+	   <div id="map" style="width:100%; height:100%"></div>
+	</div>
+	
+	
+
 </div>
 
-<div style="background-color:#c7e0bd; position:relative; flex-grow:1 ">
-   <div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
-   <div id="map" style="width:100%; height:100%"></div>
-</div>
+<div id="error-console" style="height:1.5em; color:red; background-color:black"></div>
 
 <div id="map-popup" style="display:none">
      
