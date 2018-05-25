@@ -29,9 +29,8 @@
 let state = {
     active_tab: 0,
     scale: {
-        from:  1522010124044, 
-        to:    1522096524044,
-        range: 86400000
+        from:  1522010124044,
+        to:    1522096524044
            },
     graphs: [
      {  "category":     "meteorology",
@@ -84,12 +83,13 @@ const debug_log = (msg) => {
 
 // we cycle through these colors for the graphs, as they're being added
 
-const colors = [ "#CC3333",
-           "#33CC33",
-           "#3333CC",
-           "#CCCC33",
-           "#CC33CC",
-           "#33CCCC" ];
+const colors = [
+    "#CC3333",
+    "#33CC33",
+    "#3333CC",
+    "#CCCC33",
+    "#CC33CC",
+    "#33CCCC" ];
 let color_ix = 2;
 
 
@@ -195,6 +195,92 @@ const show_legend = () => {
     });
 
 };
+
+
+// -----------------------------------------------------------------------------
+// --- SECTION_TAB_RANGE: tabbed panel -> select time range --------------------
+// -----------------------------------------------------------------------------
+
+const init_tab_range = () => {
+
+    const refresh = () => {
+        state.scale.from = Number(jQuery("#gfx_fromdate").datepicker( "getDate" ));
+        state.scale.to   = Number(jQuery("#gfx_todate"  ).datepicker( "getDate" ));
+        show_days();
+        statedata.fill(undefined); 
+        show_legend();
+        load_data(); 
+        show_tab(0);
+    };
+
+    // select date range
+
+    jQuery("#gfx_fromdate").datepicker({ dateFormat: "yy-mm-dd",
+                                         onSelect: show_days });
+    jQuery("#gfx_fromdate").datepicker("setDate", "-8");
+
+    jQuery("#gfx_todate"  ).datepicker({ dateFormat: "yy-mm-dd", 
+                                         onSelect: show_days });
+    jQuery("#gfx_todate"  ).datepicker("setDate", "-1");
+
+    qs("#gfx_fromdate").addEventListener("change", show_days);
+    qs("#gfx_todate"  ).addEventListener("change", show_days);
+
+    qs("#gfx_update_range").addEventListener("click", () => {
+        refresh();
+    });
+
+    // pick preset values
+
+    qs("#gfx_range_today").addEventListener("click", () => {
+        jQuery("#gfx_fromdate").datepicker("setDate", "0");
+        jQuery("#gfx_todate"  ).datepicker("setDate", "1");
+        refresh(); 
+    });
+
+    qs("#gfx_range_ytoday").addEventListener("click", () => {
+        jQuery("#gfx_fromdate").datepicker("setDate", "-1");
+        jQuery("#gfx_todate"  ).datepicker("setDate", "1");
+        refresh(); 
+    });
+
+    qs("#gfx_range_week").addEventListener("click", () => {
+        jQuery("#gfx_fromdate").datepicker("setDate", "-7");
+        jQuery("#gfx_todate"  ).datepicker("setDate", "0");
+        refresh(); 
+    });
+    qs("#gfx_range_month").addEventListener("click", () => {
+        jQuery("#gfx_fromdate").datepicker("setDate", "-31");
+        jQuery("#gfx_todate"  ).datepicker("setDate", "0");
+        refresh(); 
+    });
+
+
+
+
+    show_days();
+};
+
+const show_days = () => {
+    let diff = Math.round((Number(jQuery("#gfx_todate").datepicker( "getDate" )) - Number(jQuery("#gfx_fromdate").datepicker( "getDate" ))) / (24*3600*1000));
+    let invalid = "";
+    if (diff < 1 || diff > 366) {
+        qs("#gfx_fromdate").style.backgroundColor = "#FFBBAA";
+        qs("#gfx_todate"  ).style.backgroundColor = "#FFBBAA";
+        qs("#gfx_update_range" ).style.textDecoration = "line-through";
+        qs("#gfx_update_range" ).disabled = true;
+        invalid = "(<b>invalid</b>, range must be between 1 and 366 days)"
+    } else {
+        qs("#gfx_fromdate").style.backgroundColor = "#FFFFFF";
+        qs("#gfx_todate"  ).style.backgroundColor = "#FFFFFF";
+        qs("#gfx_update_range" ).style.textDecoration = "";
+        qs("#gfx_update_range" ).disabled = false;
+        invalid = "";
+    }
+    qs("#gfx_days").innerHTML = "&nbsp;" + diff + " days " + invalid + "&nbsp;";
+};
+
+
 
 
 // -----------------------------------------------------------------------------
@@ -511,14 +597,12 @@ let plot = ()  => {
 // -----------------------------------------------------------------------------
 
 init_tabs();
+init_tab_range();
 init_tab_dataset();
 init_state_from_permalink();
 show_legend();
 load_data();
 
-window.addEventListener("resize", () => plot(state.scale.from, state.scale.range, false) );
-
-
-
+window.addEventListener("resize", plot );
 
 

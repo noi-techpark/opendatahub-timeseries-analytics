@@ -18,6 +18,11 @@
     font-size: 14px;
 }
 
+#gfx input {
+    font-family: sans-serif;
+    font-size: 14px;
+}
+
 #gfx select {
     font-family: sans-serif;
     font-size: 14px;
