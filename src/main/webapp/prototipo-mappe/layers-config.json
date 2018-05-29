@@ -1,15 +1,35 @@
 [
    {
-      "id": "weather",
-      "icons": ["meteo-icon.png"],
+      "id": "Weather",
+      "icons": ["bluetooth-icon.png", ["bluetooth-icon2.png", "Bluetooth Count record", 21600, 100, 250], ["bluetooth-icon3.png", "Bluetooth Count record", 21600, 0, 100]],
       "base_url" : "../data/integreen/MeteoFrontEnd/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",
       "custom-function": null
    }
    ,
+
    {
-      "id": "bluetooth",
+      "id": "Air Quality",
+      "icons": ["inquinamento-icon-trasparence.png"],
+      "base_url" : "../data/integreen/EnvironmentFrontEnd/rest/",
+      "projection": "EPSG:4326",
+      "format": "integreen",
+      "custom-function": null
+   }
+   ,
+
+  {
+      "id": "Parking",
+      "icons": ["Pin_green.svg", ["Pin_red.svg", "free", 300, 0, 30]],
+      "base_url" : "../data/integreen/parkingFrontEnd/rest/",
+      "projection": "EPSG:4326",
+      "format": "integreen",
+      "custom-function": null
+   }
+   ,
+   {
+      "id": "Bluetooth",
       "icons": ["bluetooth-icon.png", ["bluetooth-icon2.png", "Bluetooth Count record", 21600, 100, 250], ["bluetooth-icon3.png", "Bluetooth Count record", 21600, 0, 100]],
       "base_url": "../data/integreen/BluetoothFrontEnd/rest/",
       "format": "integreen",
@@ -17,7 +37,68 @@
       "custom-function": null
    }
    ,
+
    {
+      "id": "Traffic",
+      "icons": ["icon-traffic-active.png"],
+      "base_url": "../data/integreen/sensors/rest/",
+      "format": "integreen",
+      "projection": "EPSG:4326",
+      "custom-function": null
+   }
+   ,
+
+   {
+      "id": "Vehicular Travel Time",
+      "icons": ["xxx.png"],
+      "base_url": "../data/integreen/sensors/rest/",
+      "format": "integreen",
+      "projection": "xxx",
+      "custom-function": null
+   }
+   ,
+
+   {
+      "id": "Road Weather",
+      "icons": ["pin-dx-street.png"],
+      "base_url": "../data/integreen/BluetoothFrontEnd/rest/",
+      "format": "integreen",
+      "projection": "EPSG:4326",
+      "custom-function": null
+   }
+   ,
+
+   {
+      "id": "Car Sharing",
+      "icons": ["carmarker_green.svg", ["carmarker_red.svg", "number-available", 600, 0, 1], ["carmarker_orange.svg", "number-available", 600, 1, 2]],
+      "base_url": "../data/integreen/carsharingFrontEnd/rest/",
+      "format": "integreen",
+      "projection": "EPSG:4326",
+      "custom-function": null
+   }
+   ,
+
+   {
+      "id": "Bike Sharing",
+      "icons": ["bikemarker_green.svg", ["bikemarker_red.svg", "number-available", 600, 0, 1], ["bikemarker_orange.svg", "number-available", 600, 1, 5]],
+      "base_url": "../data/integreen/bikesharingFrontEnd/rest/",
+      "format": "integreen",
+      "projection": "EPSG:4326",
+      "custom-function": null
+   }
+   ,
+
+   {
+      "id": "E-Mobility",
+      "icons": ["emarker_green.svg", ["emarker_red.svg", "number-available", 600, 0, 1], ["marker_orange.svg", "number-available", 600, 1, 2]],
+      "base_url": "../data/integreen/bikesharingFrontEnd/rest/",
+      "format": "integreen",
+      "projection": "EPSG:4326",
+      "custom-function": null
+   }
+   ,
+
+{
       "id": "pm10",
       "icon": "icon-pm10-active.png",
       "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:pollution_pm10",
@@ -25,12 +106,13 @@
       "custom-function": null
    }
    ,
-   {
+
+  {
       "id": "congestion",
       "icon": "icon-journeytime-active.png",
       "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:congestion",
       "format": "wms",
       "custom-function": null
    }
-   
-]
+
+] 

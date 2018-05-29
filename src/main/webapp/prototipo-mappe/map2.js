@@ -137,6 +137,7 @@ async function map_start_promise()
             catch (e)
             {
                console.log(e)
+               // Raven.captureException(e)
                error_console.textContent = new Date().toLocaleString() + ': ' + e;
             }
             finally
@@ -162,7 +163,7 @@ async function map_start_promise()
    function startAutoRefresh()
    {
       let now_millis = new Date().getTime()
-      let next_time = 20000 - now_millis % 20000 
+      let next_time = 600000 - now_millis % 600000 
       setTimeout(async function()
       {
          let refresh_local_copy = autorefresh_functions.slice();
