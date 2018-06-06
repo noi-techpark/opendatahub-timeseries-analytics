@@ -59,10 +59,10 @@ async function map_start_promise()
       switch (format)
       {
          case 'integreen':
-            layer_display.querySelector('.icon').src = layer_info.icons[0]
+            layer_display.querySelector('.icon').src = 'layers-icons/' + layer_info.icons[0]
             break;
          default:
-            layer_display.querySelector('.icon').src = layer_info.icon
+            layer_display.querySelector('.icon').src = 'layers-icons/' + layer_info.icon
             break;
       }
              
@@ -257,8 +257,9 @@ async function map_start_promise()
                  anchorXUnits: 'fraction',
                  anchorYUnits: 'fraction',
                  opacity: 1,
-                 src: layer_info.icons[0],
+                 src:  'layers-icons/' + layer_info.icons[0],
                  scale: 0.5
+                 // size: [32,32]
                })
              });
              
@@ -268,7 +269,7 @@ async function map_start_promise()
                   anchorXUnits: 'fraction',
                   anchorYUnits: 'fraction',
                   opacity: 1,
-                  src: 'marker-shadow.png',
+                  src: 'layers-icons/' + 'marker-shadow.png',
                   scale: 1
                 })
               });
@@ -335,7 +336,7 @@ async function map_start_promise()
                               anchorXUnits: 'fraction',
                               anchorYUnits: 'fraction',
                               opacity: 1,
-                              src: cond[0],
+                              src: 'layers-icons/' + cond[0],
                               scale: 0.5
                             })
                           });
