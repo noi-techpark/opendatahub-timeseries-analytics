@@ -28,6 +28,7 @@
 
 let state = {
     active_tab: 0,
+    height: "400px",
     scale: {
         from:  1527112800000,
         to:    1527285600000
@@ -476,7 +477,7 @@ const init_tab_dataset = () => {
 // -----------------------------------------------------------------------------
 
 const refresh_permalink = () => {
-    qs("#gfx_perma").href = location.origin + location.pathname + location.port + "#" + encodeURI(JSON.stringify(state));
+    qs("#gfx_perma").href = location.origin + location.pathname + "#" + encodeURI(JSON.stringify(state));
 };
 
 const init_state_from_permalink = () => { 
@@ -498,6 +499,31 @@ const init_state_from_permalink = () => {
     }
 
 };
+
+
+// -----------------------------------------------------------------------------
+// --- SECTION_HEIGHT: stuff related to the plot height feature ----------------
+// -----------------------------------------------------------------------------
+
+const init_plot_height = () => {
+
+    qs("#gfx_plot").style.height = state.height;
+
+    Array.from(qsa("#gfx_hpx > option")).forEach(node => {
+        if (node.value === state.height) {
+            node.selected = true;
+        }
+    });
+
+    qs("#gfx_hpx").addEventListener("change", () => {
+        let v = qs("#gfx_hpx").value;
+        qs("#gfx_plot").style.height = v;
+        state.height = v;
+        plot();
+        refresh_permalink();
+    });
+};
+
 
 
 // -----------------------------------------------------------------------------
@@ -636,6 +662,7 @@ init_tabs();
 init_tab_range();
 init_tab_dataset();
 init_state_from_permalink();
+init_plot_height();
 show_legend();
 load_data();
 
