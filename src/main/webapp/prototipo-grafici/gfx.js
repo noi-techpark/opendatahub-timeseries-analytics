@@ -29,8 +29,8 @@
 let state = {
     active_tab: 0,
     scale: {
-        from:  1522010124044,
-        to:    1522096524044
+        from:  1527112800000,
+        to:    1527285600000
            },
     graphs: [
      {  "category":     "meteorology",
@@ -65,9 +65,9 @@ const T0 = Number(new Date());  // for debug timing
 // --- SECTION_UTIL: basic utility functions -----------------------------------
 // -----------------------------------------------------------------------------
 
+// just shortcuts
 const qs  = document.querySelector.bind(document);
 const qsa = document.querySelectorAll.bind(document);
-
 const get_selval = (element) => {
     if (element === null || element === undefined) {
         return undefined;
@@ -75,14 +75,43 @@ const get_selval = (element) => {
     return element.options[element.selectedIndex].value;
 };
 
+// debug log with timing info
 const debug_log = (msg) => {
     if (DEBUG) {
         console.log("gfx " + String(Number(new Date()) - T0) + ": " + msg);
     }
 };
 
-// we cycle through these colors for the graphs, as they're being added
+// CSV export
+const get_csv = (ix) => {
+    const pad0 = (instr) => {
+        let str = String(instr);
+        while (str.length < 2) {
+            str = "0" + str;
+        }
+        return str;
+    };
+    const date_to_str = (d) => {
+        return d.getFullYear()
+        + "-"
+        + pad0((d.getMonth() + 1))
+        + "-"
+        + pad0(d.getDate())
+        + " " 
+        + pad0(d.getHours())
+        + ":" 
+        + pad0(d.getMinutes())
+        + ":" 
+        + pad0(d.getSeconds());
+    };
+    if (statedata[ix] === undefined) {
+        return;
+    }
+    return "time stamp," + (state.graphs[ix].station_name + " " + state.graphs[ix].data_type + " " + state.graphs[ix].unit).replace(/,/g, ";") + "\n" + 
+    statedata[ix].map( el => date_to_str(new Date(el.timestamp)) + "," + el.value ).join("\n");
+};
 
+// we cycle through these colors for the graphs, as they're being added
 const colors = [
     "#CC3333",
     "#33CC33",
@@ -91,6 +120,7 @@ const colors = [
     "#CC33CC",
     "#33CCCC" ];
 let color_ix = 2;
+
 
 
 // -----------------------------------------------------------------------------
@@ -142,6 +172,7 @@ const show_legend = () => {
     html += "<td>data type</td>";
     html += "<td>period</td>";
     html += "<td>axes</td>";
+    html += "<td>CSV D/L</td>";
     html += "<td>remove</td>";
     html += "<td>data points</td>";
     html += "</tr>";
@@ -160,9 +191,10 @@ const show_legend = () => {
         } else {
             html += `<td><button class="gfx_nsel" id="gfx_ytoggle${ix}">&lt;</button><button class="gfx_sel" disabled>&gt;</button></td>`;
         }
-        html += `<td><button id="gfx_remove${ix}">remove</button></td>`;
+        html += `<td><button id="gfx_prepcsv${ix}">prepare CSV</button></td>`;
+        html += `<td><button id="gfx_remove${ix}">remove graph</button></td>`;
         if (statedata[ix] === undefined) {
-            html += '<td class="gfx_notice">not yet loaded...</td>';
+            html += '<td class="gfx_notice">loading in progress...</td>';
         } else {
             html += "<td>" + statedata[ix].length + "</td>";
         }
@@ -171,16 +203,9 @@ const show_legend = () => {
     });
     qs("#gfx_legend > table").innerHTML = html; 
 
-    // add remove and left/right yaxis toggle button listeners
+    // add listeners for buttons: left/right yaxis toggle, prepare CSV and remove graph
 
     state.graphs.forEach( (graph, ix) => {
-
-        qs("#gfx_remove" + ix).addEventListener("click", () => {
-            state.graphs.splice(ix, 1);    
-            statedata.splice(ix, 1);
-            show_legend();
-            plot();
-        });
 
         qs("#gfx_ytoggle" + ix).addEventListener("click", () => {
             if (state.graphs[ix].yaxis === 1) {
@@ -190,6 +215,19 @@ const show_legend = () => {
             }
             show_legend();
             plot();
+            refresh_permalink();
+        });
+
+        qs("#gfx_prepcsv" + ix).addEventListener("click", () => {
+            qs("#gfx_prepcsv" + ix).parentElement.innerHTML = "<a href=\"data:text/csv," + encodeURIComponent(get_csv(ix))+ "\" download>download.csv</a>"
+        });
+
+        qs("#gfx_remove" + ix).addEventListener("click", () => {
+            state.graphs.splice(ix, 1);    
+            statedata.splice(ix, 1);
+            show_legend();
+            plot();
+            refresh_permalink();
         });
 
     });
@@ -211,6 +249,7 @@ const init_tab_range = () => {
         show_legend();
         load_data(); 
         show_tab(0);
+        refresh_permalink();
     };
 
     // select date range
@@ -254,9 +293,6 @@ const init_tab_range = () => {
         jQuery("#gfx_todate"  ).datepicker("setDate", "0");
         refresh(); 
     });
-
-
-
 
     show_days();
 };
@@ -307,6 +343,7 @@ const init_tab_dataset = () => {
                 qs("#gfx_addset").style.display = "none";
                 break;
 
+            // TODO leggerlo da layers-config.json
             case "meteorology":
 
                 jQuery.getJSON(BACKEND_URL + "/MeteoFrontEnd/rest/get-station-details", (data) => {
@@ -438,8 +475,8 @@ const init_tab_dataset = () => {
 // --- SECTION_PERMALINK: stuff related to the permalink feature ---------------
 // -----------------------------------------------------------------------------
 
-const dump_state = () => {
-    console.log("#" + encodeURI(JSON.stringify(state)));
+const refresh_permalink = () => {
+    qs("#gfx_perma").href = location.origin + location.pathname + location.port + "#" + encodeURI(JSON.stringify(state));
 };
 
 const init_state_from_permalink = () => { 
@@ -498,14 +535,13 @@ const load_data = () => {
                     if (statedata.filter(el => el === undefined).length === 0) {
                         debug_log("load_data() -> all downloads ready");
                         plot();
+                        refresh_permalink();
                     }
                 });
                 break;
-
         }
         
     });
-
 
 };
 
@@ -604,5 +640,4 @@ show_legend();
 load_data();
 
 window.addEventListener("resize", plot );
-
 

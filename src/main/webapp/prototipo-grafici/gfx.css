@@ -128,7 +128,18 @@
 }
 
 .gfx_notice {
-    background-color: #FFFFAA;
+  animation: blinking 0.5s infinite;
+}
+@keyframes blinking {
+  0% {
+    background-color: #FFFFFF;
+  }
+  50% {
+    background-color: #FFFF77;
+  }
+  0% {
+    background-color: #FFFFFF;
+  }
 }
 
 
