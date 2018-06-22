@@ -53,6 +53,7 @@ let statedata = [];
 
 // our servlet: 
 const BACKEND_URL = "/analytics/data/integreen";
+const CONFIG_URL  = "/analytics/prototipo-mappe/layers-config.json";
 
 const DEBUG = false;  // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
@@ -327,6 +328,14 @@ const init_tab_dataset = () => {
     qs("#gfx_seldataset").style.display = "none";
     qs("#gfx_addset").style.display     = "none";
 
+
+    // TODO, should we get categories from servlet (layers-config.json)?
+    jQuery.getJSON(CONFIG_URL, (data) => {
+        data.forEach( cat => { 
+            console.log(cat.id + " -> " + cat.base_url + " " + cat.format);
+        }); 
+    });
+
     qs("#gfx_selcategory").addEventListener("change", (ev) => {
 
         let cat = get_selval(ev.target);
@@ -341,10 +350,9 @@ const init_tab_dataset = () => {
                 qs("#gfx_addset").style.display = "none";
                 break;
 
-            // TODO, get categories from servlet (layers-config.json)
-            case "meteorology":
+            default:
 
-                jQuery.getJSON(BACKEND_URL + "/MeteoFrontEnd/rest/get-station-details", (data) => {
+                jQuery.getJSON(BACKEND_URL + "/" + cat + "/rest/get-station-details", (data) => {
                     debug_log("got station details -> length = " + data.length);
                     let opt = `<option value="">select station...</option>`;
                     opt += data
@@ -583,9 +591,9 @@ const load_data = () => {
 
         switch (graph.category) {
 
-            case "meteorology":
+            default:
 
-                url += "/MeteoFrontEnd/rest/get-records-in-timeframe"; 
+                url += "/" + graph.category + "/rest/get-records-in-timeframe"; 
                 url += "?station=" + graph.station;
                 url += "&name="    + graph.data_type;
                 url += "&period="  + graph.period;

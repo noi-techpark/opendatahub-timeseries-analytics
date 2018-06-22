@@ -51,7 +51,7 @@
    {
       "id": "Vehicular Travel Time",
       "icons": ["xxx.png"],
-      "base_url": "../data/integreen/sensors/rest/",
+      "base_url": "../data/integreen/LinkFrontEnd/rest/",
       "format": "integreen",
       "projection": "xxx",
       "custom-function": null
@@ -61,7 +61,7 @@
    {
       "id": "Road Weather",
       "icons": ["pin-dx-street.png"],
-      "base_url": "../data/integreen/BluetoothFrontEnd/rest/",
+      "base_url": "../data/integreen/RWISFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null
@@ -91,7 +91,7 @@
    {
       "id": "E-Mobility",
       "icons": ["emarker_green.svg", ["emarker_red.svg", "number-available", 600, 0, 1], ["marker_orange.svg", "number-available", 600, 1, 2]],
-      "base_url": "../data/integreen/bikesharingFrontEnd/rest/",
+      "base_url": "../data/integreen/EChargingFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null
