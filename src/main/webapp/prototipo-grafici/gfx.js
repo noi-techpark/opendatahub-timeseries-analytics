@@ -48,8 +48,11 @@ let state = {
 
 let statedata = [];
 
-// TODO: use servlet instead of direct link
-const BACKEND_URL = "http://ipchannels.integreen-life.bz.it";
+// direct link (TODO: remove this)
+// const BACKEND_URL = "http://ipchannels.integreen-life.bz.it";
+
+// our servlet: 
+const BACKEND_URL = "/analytics/data/integreen";
 
 const DEBUG = false;  // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
