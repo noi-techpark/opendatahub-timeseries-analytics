@@ -12,15 +12,7 @@
 'use strict';
 
 
-/* 
-    for debugging reasons these todos will be done when all is ready:
-
-    - TODO: remove hard coded graphs in the initial state 
-    - TODO: wrap into an IIFE to avoid name space polution 
-    - TODO: set DEBUG to false
-
-*/
-
+(() => {
 
 // -----------------------------------------------------------------------------
 // --- SECTION_CONFIG: initial state and constants -----------------------------
@@ -30,35 +22,17 @@ let state = {
     active_tab: 0,
     height: "400px",
     scale: {
-        from:  1527112800000,
-        to:    1527285600000
+        from:  0,
+        to:    0
            },
-    graphs: [
-     {  "category":     "meteorology",
-        "station":      "23200MS",
-        "station_name": "Meran - Gratsch",
-        "data_type":    "air-temperature",
-        "unit":         "°C",
-        "period":       "600",
-        "yaxis":        1,
-        "color":        0 },
-
-     {  "category":     "meteorology",
-        "station":      "23200MS",
-        "station_name": "Meran - Gratsch",
-        "data_type":    "precipitation",
-        "unit":         "mm",
-        "period":       "300",
-        "yaxis":        2,
-        "color":        1 },
-    ]    
+    graphs: []
 };
 
-let statedata = [ undefined, undefined ];
+let statedata = [];
 
 const BACKEND_URL = "http://ipchannels.integreen-life.bz.it";
 
-const DEBUG = true;  // enable debug logging to the console
+const DEBUG = false;  // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
 
 
@@ -178,7 +152,7 @@ const show_legend = () => {
     html += "<td>data points</td>";
     html += "</tr>";
     if (state.graphs.length === 0) {
-        html += '<tr><td colspan="8">no data set selected<br>click on "add data set" to add a data set to the plot</td></tr>';
+        html += '<tr><td colspan="9">no data set selected<br>click on "add data set" to add a data set to the plot</td></tr>';
     }
     state.graphs.forEach( (graph, ix) => {
         html += "<tr>";
@@ -296,6 +270,7 @@ const init_tab_range = () => {
     });
 
     show_days();
+    refresh();
 };
 
 const show_days = () => {
@@ -668,3 +643,4 @@ load_data();
 
 window.addEventListener("resize", plot );
 
+})();
