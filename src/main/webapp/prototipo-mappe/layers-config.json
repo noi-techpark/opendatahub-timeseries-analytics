@@ -91,7 +91,7 @@
    {
       "id": "E-Mobility",
       "icons": ["emarker_green.svg", ["emarker_red.svg", "number-available", 600, 0, 1], ["marker_orange.svg", "number-available", 600, 1, 2]],
-      "base_url": "../data/integreen/EChargingFrontEnd/rest/",
+      "base_url": "../data/integreen/EchargingFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null
