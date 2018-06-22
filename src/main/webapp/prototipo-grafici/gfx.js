@@ -14,6 +14,23 @@
 
 (() => {
 
+/*
+    TOC
+    -----------------------------------------------------------------
+    SECTION_CONFIG:         initial state and constants
+    SECTION_UTIL:           basic utility functions
+    SECTION_TABS:           tabbed panels
+    SECTION_TAB_LEGEND:     tabbed panel -> draw legend
+    SECTION_TAB_RANGE:      tabbed panel -> select time range
+    SECTION_TAB_DATASET:    tabbed panel -> add data set
+    SECTION_PERMALINK:      stuff related to the permalink feature
+    SECTION_HEIGHT:         stuff related to the plot height feature
+    SECTION_AUTO_REFRESH:   stuff related to the auto refresh button
+    SECTION_LOAD:           load data sets
+    SECTION_PLOT:           plot data sets using flot
+    SECTION_INIT:           initialization
+*/
+
 // -----------------------------------------------------------------------------
 // --- SECTION_CONFIG: initial state and constants -----------------------------
 // -----------------------------------------------------------------------------
@@ -21,6 +38,7 @@
 let state = {
     active_tab: 0,
     height: "400px",
+    auto_refresh: false,
     scale: {
         from:  0,
         to:    0
@@ -30,6 +48,7 @@ let state = {
 
 let statedata = [];
 
+// TODO: use servlet instead of direct link
 const BACKEND_URL = "http://ipchannels.integreen-life.bz.it";
 
 const DEBUG = false;  // enable debug logging to the console
@@ -319,7 +338,7 @@ const init_tab_dataset = () => {
                 qs("#gfx_addset").style.display = "none";
                 break;
 
-            // TODO leggerlo da layers-config.json
+            // TODO, get categories from servlet (layers-config.json)
             case "meteorology":
 
                 jQuery.getJSON(BACKEND_URL + "/MeteoFrontEnd/rest/get-station-details", (data) => {
@@ -500,6 +519,45 @@ const init_plot_height = () => {
 };
 
 
+// -----------------------------------------------------------------------------
+// --- SECTION_AUTO_REFRESH: stuff related to the auto refresh button ----------
+// -----------------------------------------------------------------------------
+
+const LIVE_PERIOD = 300 * 1000;
+
+const init_auto_refresh = () => {
+    qs("#gfx_live").addEventListener("click", () => {
+        state.auto_refresh = !state.auto_refresh;
+        show_auto_refresh_button();
+    });
+    show_auto_refresh_button();
+    setTimeout(auto_refresh, LIVE_PERIOD);
+};
+
+const show_auto_refresh_button = () => {
+    if (state.auto_refresh) {
+        qs("#gfx_live").innerHTML = "auto refresh on";
+        qs("#gfx_live").classList.add("gfx_sel");
+        qs("#gfx_live").classList.remove("gfx_nsel");
+    } else {
+        qs("#gfx_live").innerHTML = "auto refresh off";
+        qs("#gfx_live").classList.add("gfx_nsel");
+        qs("#gfx_live").classList.remove("gfx_sel");
+    }
+};
+
+const auto_refresh = () => {
+    // auto_refresh only if auto_refresh is enabled and no download is being done right now
+    let todo_len = statedata.filter(el => el === undefined).length;
+    if (state.auto_refresh && todo_len === 0) {
+        debug_log("auto_refresh"); 
+        statedata.fill(undefined);
+        show_legend();
+        load_data();
+    }
+    setTimeout(auto_refresh, LIVE_PERIOD);
+};
+
 
 // -----------------------------------------------------------------------------
 // --- SECTION_LOAD: load data sets --------------------------------------------
@@ -638,6 +696,7 @@ init_tab_range();
 init_tab_dataset();
 init_state_from_permalink();
 init_plot_height();
+init_auto_refresh();
 show_legend();
 load_data();
 

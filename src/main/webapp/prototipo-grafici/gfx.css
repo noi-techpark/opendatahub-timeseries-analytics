@@ -130,6 +130,7 @@
 .gfx_notice {
   animation: blinking 0.5s infinite;
 }
+
 @keyframes blinking {
   0% {
     background-color: #FFFFFF;
