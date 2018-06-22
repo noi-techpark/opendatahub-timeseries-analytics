@@ -12,15 +12,24 @@
 'use strict';
 
 
-/* 
-    for debugging reasons these todos will be done when all is ready:
+(() => {
 
-    - TODO: remove hard coded graphs in the initial state 
-    - TODO: wrap into an IIFE to avoid name space polution 
-    - TODO: set DEBUG to false
-
+/*
+    TOC
+    -----------------------------------------------------------------
+    SECTION_CONFIG:         initial state and constants
+    SECTION_UTIL:           basic utility functions
+    SECTION_TABS:           tabbed panels
+    SECTION_TAB_LEGEND:     tabbed panel -> draw legend
+    SECTION_TAB_RANGE:      tabbed panel -> select time range
+    SECTION_TAB_DATASET:    tabbed panel -> add data set
+    SECTION_PERMALINK:      stuff related to the permalink feature
+    SECTION_HEIGHT:         stuff related to the plot height feature
+    SECTION_AUTO_REFRESH:   stuff related to the auto refresh button
+    SECTION_LOAD:           load data sets
+    SECTION_PLOT:           plot data sets using flot
+    SECTION_INIT:           initialization
 */
-
 
 // -----------------------------------------------------------------------------
 // --- SECTION_CONFIG: initial state and constants -----------------------------
@@ -28,36 +37,24 @@
 
 let state = {
     active_tab: 0,
+    height: "400px",
+    auto_refresh: false,
     scale: {
-        from:  1522010124044,
-        to:    1522096524044
+        from:  0,
+        to:    0
            },
-    graphs: [
-     {  "category":     "meteorology",
-        "station":      "23200MS",
-        "station_name": "Meran - Gratsch",
-        "data_type":    "air-temperature",
-        "unit":         "°C",
-        "period":       "600",
-        "yaxis":        1,
-        "color":        0 },
-
-     {  "category":     "meteorology",
-        "station":      "23200MS",
-        "station_name": "Meran - Gratsch",
-        "data_type":    "precipitation",
-        "unit":         "mm",
-        "period":       "300",
-        "yaxis":        2,
-        "color":        1 },
-    ]    
+    graphs: []
 };
 
-let statedata = [ undefined, undefined ];
+let statedata = [];
 
-const BACKEND_URL = "http://ipchannels.integreen-life.bz.it";
+// direct link (TODO: remove this)
+// const BACKEND_URL = "http://ipchannels.integreen-life.bz.it";
 
-const DEBUG = true;  // enable debug logging to the console
+// our servlet: 
+const BACKEND_URL = "/analytics/data/integreen";
+
+const DEBUG = false;  // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
 
 
@@ -65,9 +62,9 @@ const T0 = Number(new Date());  // for debug timing
 // --- SECTION_UTIL: basic utility functions -----------------------------------
 // -----------------------------------------------------------------------------
 
+// just shortcuts
 const qs  = document.querySelector.bind(document);
 const qsa = document.querySelectorAll.bind(document);
-
 const get_selval = (element) => {
     if (element === null || element === undefined) {
         return undefined;
@@ -75,14 +72,43 @@ const get_selval = (element) => {
     return element.options[element.selectedIndex].value;
 };
 
+// debug log with timing info
 const debug_log = (msg) => {
     if (DEBUG) {
         console.log("gfx " + String(Number(new Date()) - T0) + ": " + msg);
     }
 };
 
-// we cycle through these colors for the graphs, as they're being added
+// CSV export
+const get_csv = (ix) => {
+    const pad0 = (instr) => {
+        let str = String(instr);
+        while (str.length < 2) {
+            str = "0" + str;
+        }
+        return str;
+    };
+    const date_to_str = (d) => {
+        return d.getFullYear()
+        + "-"
+        + pad0((d.getMonth() + 1))
+        + "-"
+        + pad0(d.getDate())
+        + " " 
+        + pad0(d.getHours())
+        + ":" 
+        + pad0(d.getMinutes())
+        + ":" 
+        + pad0(d.getSeconds());
+    };
+    if (statedata[ix] === undefined) {
+        return;
+    }
+    return "time stamp," + (state.graphs[ix].station_name + " " + state.graphs[ix].data_type + " " + state.graphs[ix].unit).replace(/,/g, ";") + "\n" + 
+    statedata[ix].map( el => date_to_str(new Date(el.timestamp)) + "," + el.value ).join("\n");
+};
 
+// we cycle through these colors for the graphs, as they're being added
 const colors = [
     "#CC3333",
     "#33CC33",
@@ -91,6 +117,7 @@ const colors = [
     "#CC33CC",
     "#33CCCC" ];
 let color_ix = 2;
+
 
 
 // -----------------------------------------------------------------------------
@@ -142,11 +169,12 @@ const show_legend = () => {
     html += "<td>data type</td>";
     html += "<td>period</td>";
     html += "<td>axes</td>";
+    html += "<td>CSV D/L</td>";
     html += "<td>remove</td>";
     html += "<td>data points</td>";
     html += "</tr>";
     if (state.graphs.length === 0) {
-        html += '<tr><td colspan="8">no data set selected<br>click on "add data set" to add a data set to the plot</td></tr>';
+        html += '<tr><td colspan="9">no data set selected<br>click on "add data set" to add a data set to the plot</td></tr>';
     }
     state.graphs.forEach( (graph, ix) => {
         html += "<tr>";
@@ -160,9 +188,10 @@ const show_legend = () => {
         } else {
             html += `<td><button class="gfx_nsel" id="gfx_ytoggle${ix}">&lt;</button><button class="gfx_sel" disabled>&gt;</button></td>`;
         }
-        html += `<td><button id="gfx_remove${ix}">remove</button></td>`;
+        html += `<td><button id="gfx_prepcsv${ix}">prepare CSV</button></td>`;
+        html += `<td><button id="gfx_remove${ix}">remove graph</button></td>`;
         if (statedata[ix] === undefined) {
-            html += '<td class="gfx_notice">not yet loaded...</td>';
+            html += '<td class="gfx_notice">loading in progress...</td>';
         } else {
             html += "<td>" + statedata[ix].length + "</td>";
         }
@@ -171,16 +200,9 @@ const show_legend = () => {
     });
     qs("#gfx_legend > table").innerHTML = html; 
 
-    // add remove and left/right yaxis toggle button listeners
+    // add listeners for buttons: left/right yaxis toggle, prepare CSV and remove graph
 
     state.graphs.forEach( (graph, ix) => {
-
-        qs("#gfx_remove" + ix).addEventListener("click", () => {
-            state.graphs.splice(ix, 1);    
-            statedata.splice(ix, 1);
-            show_legend();
-            plot();
-        });
 
         qs("#gfx_ytoggle" + ix).addEventListener("click", () => {
             if (state.graphs[ix].yaxis === 1) {
@@ -190,6 +212,19 @@ const show_legend = () => {
             }
             show_legend();
             plot();
+            refresh_permalink();
+        });
+
+        qs("#gfx_prepcsv" + ix).addEventListener("click", () => {
+            qs("#gfx_prepcsv" + ix).parentElement.innerHTML = "<a href=\"data:text/csv," + encodeURIComponent(get_csv(ix))+ "\" download>download.csv</a>"
+        });
+
+        qs("#gfx_remove" + ix).addEventListener("click", () => {
+            state.graphs.splice(ix, 1);    
+            statedata.splice(ix, 1);
+            show_legend();
+            plot();
+            refresh_permalink();
         });
 
     });
@@ -211,6 +246,7 @@ const init_tab_range = () => {
         show_legend();
         load_data(); 
         show_tab(0);
+        refresh_permalink();
     };
 
     // select date range
@@ -255,10 +291,8 @@ const init_tab_range = () => {
         refresh(); 
     });
 
-
-
-
     show_days();
+    refresh();
 };
 
 const show_days = () => {
@@ -307,6 +341,7 @@ const init_tab_dataset = () => {
                 qs("#gfx_addset").style.display = "none";
                 break;
 
+            // TODO, get categories from servlet (layers-config.json)
             case "meteorology":
 
                 jQuery.getJSON(BACKEND_URL + "/MeteoFrontEnd/rest/get-station-details", (data) => {
@@ -438,8 +473,8 @@ const init_tab_dataset = () => {
 // --- SECTION_PERMALINK: stuff related to the permalink feature ---------------
 // -----------------------------------------------------------------------------
 
-const dump_state = () => {
-    console.log("#" + encodeURI(JSON.stringify(state)));
+const refresh_permalink = () => {
+    qs("#gfx_perma").href = location.origin + location.pathname + "#" + encodeURI(JSON.stringify(state));
 };
 
 const init_state_from_permalink = () => { 
@@ -460,6 +495,70 @@ const init_state_from_permalink = () => {
         }     
     }
 
+};
+
+
+// -----------------------------------------------------------------------------
+// --- SECTION_HEIGHT: stuff related to the plot height feature ----------------
+// -----------------------------------------------------------------------------
+
+const init_plot_height = () => {
+
+    qs("#gfx_plot").style.height = state.height;
+
+    Array.from(qsa("#gfx_hpx > option")).forEach(node => {
+        if (node.value === state.height) {
+            node.selected = true;
+        }
+    });
+
+    qs("#gfx_hpx").addEventListener("change", () => {
+        let v = qs("#gfx_hpx").value;
+        qs("#gfx_plot").style.height = v;
+        state.height = v;
+        plot();
+        refresh_permalink();
+    });
+};
+
+
+// -----------------------------------------------------------------------------
+// --- SECTION_AUTO_REFRESH: stuff related to the auto refresh button ----------
+// -----------------------------------------------------------------------------
+
+const LIVE_PERIOD = 300 * 1000;
+
+const init_auto_refresh = () => {
+    qs("#gfx_live").addEventListener("click", () => {
+        state.auto_refresh = !state.auto_refresh;
+        show_auto_refresh_button();
+    });
+    show_auto_refresh_button();
+    setTimeout(auto_refresh, LIVE_PERIOD);
+};
+
+const show_auto_refresh_button = () => {
+    if (state.auto_refresh) {
+        qs("#gfx_live").innerHTML = "auto refresh on";
+        qs("#gfx_live").classList.add("gfx_sel");
+        qs("#gfx_live").classList.remove("gfx_nsel");
+    } else {
+        qs("#gfx_live").innerHTML = "auto refresh off";
+        qs("#gfx_live").classList.add("gfx_nsel");
+        qs("#gfx_live").classList.remove("gfx_sel");
+    }
+};
+
+const auto_refresh = () => {
+    // auto_refresh only if auto_refresh is enabled and no download is being done right now
+    let todo_len = statedata.filter(el => el === undefined).length;
+    if (state.auto_refresh && todo_len === 0) {
+        debug_log("auto_refresh"); 
+        statedata.fill(undefined);
+        show_legend();
+        load_data();
+    }
+    setTimeout(auto_refresh, LIVE_PERIOD);
 };
 
 
@@ -498,14 +597,13 @@ const load_data = () => {
                     if (statedata.filter(el => el === undefined).length === 0) {
                         debug_log("load_data() -> all downloads ready");
                         plot();
+                        refresh_permalink();
                     }
                 });
                 break;
-
         }
         
     });
-
 
 };
 
@@ -600,9 +698,11 @@ init_tabs();
 init_tab_range();
 init_tab_dataset();
 init_state_from_permalink();
+init_plot_height();
+init_auto_refresh();
 show_legend();
 load_data();
 
 window.addEventListener("resize", plot );
 
-
+})();

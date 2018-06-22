@@ -51,16 +51,20 @@
 
           <div id="gfx_legend">
 
-            <p>currently selected data sets:</p>
+            <p>&rarr; currently selected data sets:</p>
 
             <table>
             </table>
+
+            <p>
+            <button id="gfx_live">auto refresh off</button>
+            </p>
 
           </div>
 
           <div id="gfx_time">
 
-              <p>select date range:</p>
+              <p>&rarr; select date range:</p>
 
               <input id="gfx_fromdate" type="text" size="12">
               to <input id="gfx_todate"   type="text" size="12">
@@ -69,7 +73,7 @@
 
               <button id="gfx_update_range">update plot</button>
 
-              <p>pick preset values:</p>
+              <p>&rarr; pick preset values:</p>
 
               <button id="gfx_range_today">today</button>
               <button id="gfx_range_ytoday">yesterday &amp; today</button>
@@ -80,7 +84,7 @@
 
           <div id="gfx_moredata">
 
-              <p>add a data set to the plot:</p>
+              <p>&rarr; add a data set to the plot:</p>
 
               <select id="gfx_selcategory">
                 <option value="">select category...</option>
@@ -105,9 +109,25 @@
 
           <div id="gfx_extras">
 
-              <p>WORK IN PROGRESS</p>
+              <p>&rarr; get a permanent link (warning: long) to the page with the current settings:<br><br>
+                 <a href="" id="gfx_perma">permalink</a> (right click to copy)
+              </p>
 
-              <p>permalink button, change height Y, live view on button, CSV dump</p>
+              <p>&rarr; select plot height:<br><br>
+                <select id="gfx_hpx">
+                    <option>200px</option>
+                    <option>300px</option>
+                    <option>400px</option>
+                    <option>500px</option>
+                    <option>600px</option>
+                    <option>700px</option>
+                    <option>800px</option>
+                    <option>900px</option>
+                    <option>1000px</option>
+                    <option>1100px</option>
+                    <option>1200px</option>
+                </select>
+              </p>
 
           </div>
 
