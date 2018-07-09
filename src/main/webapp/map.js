@@ -140,7 +140,7 @@ async function map_start_promise()
 				{
 					console.log(e)
 					// Raven.captureException(e)
-					error_console.textContent = new Date().toLocaleString() + ': ' + e;
+					error_console.textContent = format_time() + ': ' + e;
 				}
 				finally
 				{
@@ -420,5 +420,19 @@ async function map_start_promise()
 			}
 			xhttp.send();
 		})
+	}
+   // (european) date time string
+	function format_time()
+	{
+	    const pad0 = (instr) => {
+	        let str = String(instr);
+	        while (str.length < 2) {
+	            str = "0" + str;
+	        }
+	        return str;
+	    };
+	    let d = new Date();
+	    return pad0(d.getDate())  + "/" + pad0(d.getMonth() + 1) + "/" + pad0(d.getFullYear()) + " " +
+	           pad0(d.getHours()) + ":" + pad0(d.getMinutes())   + ":" + pad0(d.getSeconds());
 	}
 }
