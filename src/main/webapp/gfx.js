@@ -72,6 +72,20 @@ const get_selval = (element) => {
     return element.options[element.selectedIndex].value;
 };
 
+// (european) date time string
+const format_time = () => {
+    const pad0 = (instr) => {
+        let str = String(instr);
+        while (str.length < 2) {
+            str = "0" + str;
+        }
+        return str;
+    };
+    let d = new Date();
+    return pad0(d.getDate())  + "/" + pad0(d.getMonth() + 1) + "/" + pad0(d.getFullYear()) + " " +
+           pad0(d.getHours()) + ":" + pad0(d.getMinutes())   + ":" + pad0(d.getSeconds());
+};
+
 // debug log with timing info
 const debug_log = (msg) => {
     if (DEBUG) {
@@ -634,7 +648,7 @@ const load_data = () => {
                         // download failed
                         statedata[ix]           = [];
                         statedata_status[ix]    = data.status;
-                        qs("#gfx_error_log").textContent = "last error was: " + data.responseText;
+                        qs("#gfx_error_log").textContent = format_time() + " -> " + data.responseText;
                         show_legend();
                         if (statedata.filter(el => el === undefined).length === 0) {
                             debug_log("load_data() -> all downloads ready");
@@ -755,10 +769,10 @@ let conditionally_load_data = () => {
 };
 conditionally_load_data();
 
+// call plot() when the chart is resized and export plot() globally so
+// external UI elements can call it too when they need it
 window.addEventListener("resize", plot);
-
 window.bzanalytics_gfx_plot = plot;
 
-w
 
 })();
