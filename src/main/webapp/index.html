@@ -1,17 +1,35 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>prototipi</title>
-</head>
-<body>
+<html lang="en">
+  <head>
 
-    <p><a href="prototipo-mappe/map.html">prototipo mappe</a></p>
+    <title>bz analytics</title>
+    <meta charset="UTF-8"> 
 
-    <p>prototipo grafici:<br>
-        - <a href="prototipo-grafici/gfx.html">nessun dato selezionato</a> <br>
-        - <a href="prototipo-grafici/gfx.html#%7B%22active_tab%22:0,%22height%22:%22400px%22,%22auto_refresh%22:false,%22scale%22:%7B%22from%22:1525125600000,%22to%22:1525730400000%7D,%22graphs%22:%5B%7B%22category%22:%22MeteoFrontEnd%22,%22station%22:%2223200MS%22,%22station_name%22:%22Meran%20-%20Gratsch%22,%22data_type%22:%22air-temperature%22,%22unit%22:%22%C2%B0C%22,%22period%22:%22600%22,%22yaxis%22:1,%22color%22:0%7D,%7B%22category%22:%22MeteoFrontEnd%22,%22station%22:%2223200MS%22,%22station_name%22:%22Meran%20-%20Gratsch%22,%22data_type%22:%22precipitation%22,%22unit%22:%22mm%22,%22period%22:%22300%22,%22yaxis%22:2,%22color%22:1%7D%5D%7D">dati per Merano selezionati via permalink</a> <br>
-    </p>
+    <link rel="stylesheet" href="vendor/openlayers/4.6.4/ol.css">
+    <link rel="stylesheet" href="map.css">
+    <link rel="stylesheet" href="gfx.css">
+    <link rel="stylesheet" href="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.css">
 
-</body>
+    <script src="vendor/openlayers/4.6.4/ol.js"></script>
+    <script src="vendor/jquery/3.3.1/jquery.js"></script>
+    <script src="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.js"></script>
+    <script src="vendor/flot/0.8.3/jquery.flot.js"></script>
+    <script src="vendor/flot/0.8.3/jquery.flot.time.js"></script>
+    <script src="vendor/flot-axislabels/2.0.1/jquery.flot.axislabels.js"></script>
+    <script src="map.js"></script>
+    <script src="gfx.js" defer></script>
+
+  </head>
+
+  <body>
+
+    <div id="section_map">
+    </div>
+
+    <div id="section_gfx">
+    </div>
+
+  </body>
+
 </html>
+
