@@ -31,12 +31,13 @@
     </style>
   </head>
 
-  <body style="display:flex; flex-direction:column">
+  <body style="display:flex; flex-direction:column; overflow-y:scroll">
   
-    <div id="header" style="display:flex; flex-shrink:0">
-       <div style="flex-grow:1">logo</div>
-       <div id="tab_gfx" onclick="document.getElementById('section_gfx').style.display='block';document.getElementById('section_map').style.display='none'">gfx</div>
-       <div id="tab_map" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='flex';map.updateSize()">map</div>
+    <div id="header" style="display:flex; flex-shrink:0; background: url(bg-pattern.jpg) 0 0 repeat;">
+       <img src="logo.png">
+       <div style="flex-grow:1"></div>
+       <div id="tab_gfx" style="background-color:white; margin-right:4px" onclick="document.getElementById('section_gfx').style.display='block';document.getElementById('section_map').style.display='none'">gfx</div>
+       <div id="tab_map" style="background-color:white" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='flex';map.updateSize()">map</div>
     </div>
 
     <!-- *** MAPS ********************************************************************************* -->
@@ -193,7 +194,7 @@
 
     </div>
 
-    <div style="flex-shrink:0">FOOTER</div>
+    <div style="flex-shrink:0; background-color:#dddddd">(C) 2018 :::: ::: :::</div>
 
   </body>
 
