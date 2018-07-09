@@ -757,4 +757,8 @@ conditionally_load_data();
 
 window.addEventListener("resize", plot);
 
+window.bzanalytics_gfx_plot = plot;
+
+w
+
 })();
