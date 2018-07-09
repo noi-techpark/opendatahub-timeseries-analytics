@@ -48,13 +48,11 @@ let state = {
 
 let statedata = [];
 
-// direct link (TODO: remove this)
-// const BACKEND_URL = "http://ipchannels.integreen-life.bz.it";
+const CAT_CONFIG_URL = "layers-config.json";
 
-// our servlet: 
-const BACKEND_URL = "/analytics/data/integreen";
+let   CAT_BACKENDS = {};    // leave empty, automatic from config
 
-const DEBUG = false;  // enable debug logging to the console
+const DEBUG = false;            // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
 
 
@@ -327,13 +325,17 @@ const init_tab_dataset = () => {
     qs("#gfx_seldataset").style.display = "none";
     qs("#gfx_addset").style.display     = "none";
 
-
-    // TODO: initialize first select box using data from servlet 
-    /* jQuery.getJSON(SOME_URL, (data) => {
-        data.forEach( cat => { 
-            console.log(cat);
-        }); 
-    }); */
+    // initialize category select box ( gfx_selcategory ) and create global category -> backend URL hash
+    jQuery.getJSON(CAT_CONFIG_URL, (data) => {
+        let opt = `<option value="">select category...</option>`;
+        data
+            .filter( cat => cat.format === "integreen" )
+            .forEach( cat => { 
+                opt += `<option value="${cat.id}">&rarr; ${cat.id}</option>\n`;
+                CAT_BACKENDS[cat.id] = cat.base_url;
+            }); 
+        qs("#gfx_selcategory").innerHTML = opt;
+     });
 
     qs("#gfx_selcategory").addEventListener("change", (ev) => {
 
@@ -351,7 +353,7 @@ const init_tab_dataset = () => {
 
             default:
 
-                jQuery.getJSON(BACKEND_URL + "/" + cat + "/rest/get-station-details", (data) => {
+                jQuery.getJSON(CAT_BACKENDS[cat] + "get-station-details", (data) => {
                     debug_log("got station details -> length = " + data.length);
                     let opt = `<option value="">select station...</option>`;
                     opt += data
@@ -386,7 +388,7 @@ const init_tab_dataset = () => {
 
             default: 
 
-                jQuery.getJSON(BACKEND_URL + "/" + cat + "/rest/get-data-types?station=" + station, (data) => {
+                jQuery.getJSON(CAT_BACKENDS[cat] + "get-data-types?station=" + station, (data) => {
                     debug_log("got data types -> length = " + data.length);
                     let opt = `<option value="">select dataset...</option>`;
                     opt += data
@@ -587,13 +589,13 @@ const load_data = () => {
             return;
         }
 
-        let url = BACKEND_URL;
+        let url = "";
 
         switch (graph.category) {
 
             default:
 
-                url += "/" + graph.category + "/rest/get-records-in-timeframe"; 
+                url += CAT_BACKENDS[graph.category] + "get-records-in-timeframe"; 
                 url += "?station=" + graph.station;
                 url += "&name="    + graph.data_type;
                 url += "&period="  + graph.period;
@@ -709,8 +711,18 @@ init_state_from_permalink();
 init_plot_height();
 init_auto_refresh();
 show_legend();
-load_data();
 
-window.addEventListener("resize", plot );
+// the initial call to load_data() must wait for the category backend URLs
+// (loaded by init_tab_dataseti()) to be become avaliable
+let conditionally_load_data = () => {
+    if (Object.keys(CAT_BACKENDS).length === 0) {   
+        setTimeout(conditionally_load_data, 100);
+        return;
+    }
+    load_data();
+};
+conditionally_load_data();
+
+window.addEventListener("resize", plot);
 
 })();
