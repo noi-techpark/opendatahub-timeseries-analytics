@@ -53,7 +53,6 @@ let statedata = [];
 
 // our servlet: 
 const BACKEND_URL = "/analytics/data/integreen";
-const CONFIG_URL  = "/analytics/prototipo-mappe/layers-config.json";
 
 const DEBUG = false;  // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
@@ -329,12 +328,12 @@ const init_tab_dataset = () => {
     qs("#gfx_addset").style.display     = "none";
 
 
-    // TODO, should we get categories from servlet (layers-config.json)?
-    jQuery.getJSON(CONFIG_URL, (data) => {
+    // TODO: initialize first select box using data from servlet 
+    /* jQuery.getJSON(SOME_URL, (data) => {
         data.forEach( cat => { 
-            console.log(cat.id + " -> " + cat.base_url + " " + cat.format);
+            console.log(cat);
         }); 
-    });
+    }); */
 
     qs("#gfx_selcategory").addEventListener("change", (ev) => {
 
@@ -373,6 +372,7 @@ const init_tab_dataset = () => {
 
         let station = get_selval(ev.target);
         station = (station.split(";"))[0];
+        let cat = get_selval(qs("#gfx_selcategory"));
 
         debug_log("event: #gfx_selstation change fired with station = " + station);
 
@@ -386,7 +386,7 @@ const init_tab_dataset = () => {
 
             default: 
 
-                jQuery.getJSON(BACKEND_URL + "/MeteoFrontEnd/rest/get-data-types?station=" + station, (data) => {
+                jQuery.getJSON(BACKEND_URL + "/" + cat + "/rest/get-data-types?station=" + station, (data) => {
                     debug_log("got data types -> length = " + data.length);
                     let opt = `<option value="">select dataset...</option>`;
                     opt += data
