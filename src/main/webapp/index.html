@@ -31,20 +31,20 @@
     </style>
   </head>
 
-  <body>
+  <body style="display:flex; flex-direction:column">
   
-    <div id="header" style="display:flex;">
+    <div id="header" style="display:flex; flex-shrink:0">
        <div style="flex-grow:1">logo</div>
        <div id="tab_gfx" onclick="document.getElementById('section_gfx').style.display='block';document.getElementById('section_map').style.display='none'">gfx</div>
-       <div id="tab_map" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='block'">map</div>
+       <div id="tab_map" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='flex'">map</div>
     </div>
 
     <!-- *** MAPS ********************************************************************************* -->
-    <div id="section_map" style="margin:0px; display:flex; flex-direction:column">
+    <div id="section_map" style="display:flex; flex-direction:column; flex-grow:1; min-height:0px">
 
-    <div style="display:flex; flex-grow:1">
-
-        <div id="layers-container" class="layers">
+     <div style="display:flex; flex-grow:1; min-height:0px">
+     
+        <div id="layers-container" class="layers" style="overflow-y:scroll;">
             <div id="layer_template_id" class="layer_template">
                 <img class="icon" src=""></img>
                 <span class="label"></span>
@@ -55,16 +55,14 @@
             </div>
         </div>
         
-        <div style="background-color:#c7e0bd; position:relative; flex-grow:1 ">
+        <div style="background-color:#c7e0bd; position:relative; flex-grow:1; min-width:0px ">
            <div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
            <div id="map" style="width:100%; height:100%"></div>
         </div>
-        
-        
 
     </div>
 
-    <div id="error-console" style="height:1.5em; color:red; background-color:black"></div>
+    <div id="error-console" style="flex-shrink:0;color:red; background-color:black">Err</div>
 
     <div id="map-popup" style="display:none">
          
@@ -204,7 +202,7 @@
 
     </div>
 
-    <div>FOOTER</div>
+    <div style="flex-shrink:0">FOOTER</div>
 
   </body>
 

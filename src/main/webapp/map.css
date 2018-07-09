@@ -39,7 +39,7 @@ html, body
 
 .layers
 {
-   xwidth: 10em;
+   width: 13em;
    flex-shrink: 0;
 }
 
