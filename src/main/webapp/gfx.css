@@ -131,6 +131,15 @@
   animation: blinking 0.5s infinite;
 }
 
+.gfx_status_error {
+  background-color: #FF1111;
+  color: #FFFFFF;
+}
+
+#gfx_error_log {
+  color: #FF1111;
+}
+
 @keyframes blinking {
   0% {
     background-color: #FFFFFF;
