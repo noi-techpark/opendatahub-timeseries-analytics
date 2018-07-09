@@ -32,6 +32,8 @@ async function map_start_promise()
 			})
 		});
 	
+	window.map = map;
+	
 
 	let json = await fetchJson_promise('layers-config.json')
 	// console.log(json)
