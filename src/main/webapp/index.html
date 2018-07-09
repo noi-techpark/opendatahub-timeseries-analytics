@@ -36,8 +36,8 @@
     <div id="header" style="display:flex; flex-shrink:0; background: url(bg-pattern.jpg) 0 0 repeat;">
        <img src="logo.png">
        <div style="flex-grow:1"></div>
-       <div id="tab_gfx" style="background-color:white; margin-right:4px" onclick="document.getElementById('section_gfx').style.display='block';document.getElementById('section_map').style.display='none'">gfx</div>
-       <div id="tab_map" style="background-color:white" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='flex';map.updateSize()">map</div>
+       <div id="tab_gfx" style="background-color:white; margin-right:4px" onclick="document.getElementById('section_gfx').style.display='block';document.getElementById('section_map').style.display='none';bzanalytics_gfx_plot()">gfx</div>
+       <div id="tab_map" style="background-color:white" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='flex';bzanalytics_map.updateSize()">map</div>
     </div>
 
     <!-- *** MAPS ********************************************************************************* -->
