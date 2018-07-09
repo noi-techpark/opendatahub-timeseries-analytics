@@ -296,7 +296,7 @@ async function map_start_promise()
 					//	break;
 					
 					
-					progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + 'px'
+					progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
 					
 					var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
 					
