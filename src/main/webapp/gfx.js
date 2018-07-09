@@ -31,6 +31,7 @@
     SECTION_INIT:           initialization
 */
 
+
 // -----------------------------------------------------------------------------
 // --- SECTION_CONFIG: initial state and constants -----------------------------
 // -----------------------------------------------------------------------------
@@ -47,6 +48,7 @@ let state = {
 };
 
 let statedata = [];
+let statedata_status = [];
 
 const CAT_CONFIG_URL = "layers-config.json";
 
@@ -99,7 +101,7 @@ const get_csv = (ix) => {
         + ":" 
         + pad0(d.getSeconds());
     };
-    if (statedata[ix] === undefined) {
+    if (statedata[ix] === undefined || statedata_status[ix] !== 200) {
         return;
     }
     return "time stamp," + (state.graphs[ix].station_name + " " + state.graphs[ix].data_type + " " + state.graphs[ix].unit).replace(/,/g, ";") + "\n" + 
@@ -115,7 +117,6 @@ const colors = [
     "#CC33CC",
     "#33CCCC" ];
 let color_ix = 2;
-
 
 
 // -----------------------------------------------------------------------------
@@ -190,6 +191,8 @@ const show_legend = () => {
         html += `<td><button id="gfx_remove${ix}">remove graph</button></td>`;
         if (statedata[ix] === undefined) {
             html += '<td class="gfx_notice">loading in progress...</td>';
+        } else if (statedata[ix].length === 0 && statedata_status[ix] !== 200) {
+            html += '<td class="gfx_status_error">d/l failed (status ' + statedata_status[ix]+ ')</td>';
         } else {
             html += "<td>" + statedata[ix].length + "</td>";
         }
@@ -220,6 +223,7 @@ const show_legend = () => {
         qs("#gfx_remove" + ix).addEventListener("click", () => {
             state.graphs.splice(ix, 1);    
             statedata.splice(ix, 1);
+            statedata_status.splice(ix, 1);
             show_legend();
             plot();
             refresh_permalink();
@@ -241,6 +245,7 @@ const init_tab_range = () => {
         state.scale.to   = Number(jQuery("#gfx_todate"  ).datepicker( "getDate" ));
         show_days();
         statedata.fill(undefined); 
+        statedata_status.fill(undefined); 
         show_legend();
         load_data(); 
         show_tab(0);
@@ -311,8 +316,6 @@ const show_days = () => {
     }
     qs("#gfx_days").innerHTML = "&nbsp;" + diff + " days " + invalid + "&nbsp;";
 };
-
-
 
 
 // -----------------------------------------------------------------------------
@@ -463,6 +466,7 @@ const init_tab_dataset = () => {
         } else {
             state.graphs.push(obj);
             statedata.push(undefined);
+            statedata_status.push(undefined);
             debug_log("added graph: " + JSON.stringify(obj));
             show_legend();
             load_data();
@@ -499,7 +503,8 @@ const init_state_from_permalink = () => {
         try { 
             state = JSON.parse(decodeURI(hash));
             statedata = [];
-            state.graphs.forEach( () => statedata.push(undefined) );
+            statedata_status = [];
+            state.graphs.forEach( () => { statedata.push(undefined); statedata_status.push(undefined) } );
         } catch (e) {
             debug_log("permalink: cannot parse state from location.hash - ignored");
         }     
@@ -565,6 +570,7 @@ const auto_refresh = () => {
     if (state.auto_refresh && todo_len === 0) {
         debug_log("auto_refresh"); 
         statedata.fill(undefined);
+        statedata_status.fill(undefined);
         show_legend();
         load_data();
     }
@@ -601,6 +607,7 @@ const load_data = () => {
                 url += "&period="  + graph.period;
                 url += "&from="    + state.scale.from;
                 url += "&to="      + state.scale.to;
+                /*
                 jQuery.getJSON(url, data => { 
                     statedata[ix] = data;
                     show_legend();
@@ -610,6 +617,31 @@ const load_data = () => {
                         refresh_permalink();
                     }
                 });
+                */
+                jQuery.getJSON(url)
+                    .done(data => { 
+                        // download succeeded
+                        statedata[ix]           = data;
+                        statedata_status[ix]    = 200;
+                        show_legend();
+                        if (statedata.filter(el => el === undefined).length === 0) {
+                            debug_log("load_data() -> all downloads ready");
+                            plot();
+                            refresh_permalink();
+                        }
+                    })
+                    .fail( data => {
+                        // download failed
+                        statedata[ix]           = [];
+                        statedata_status[ix]    = data.status;
+                        qs("#gfx_error_log").textContent = "last error was: " + data.responseText;
+                        show_legend();
+                        if (statedata.filter(el => el === undefined).length === 0) {
+                            debug_log("load_data() -> all downloads ready");
+                            plot();
+                            refresh_permalink();
+                        }
+                    });
                 break;
         }
         
@@ -713,7 +745,7 @@ init_auto_refresh();
 show_legend();
 
 // the initial call to load_data() must wait for the category backend URLs
-// (loaded by init_tab_dataseti()) to be become avaliable
+// (loaded by init_tab_dataseti()) to become available:
 let conditionally_load_data = () => {
     if (Object.keys(CAT_BACKENDS).length === 0) {   
         setTimeout(conditionally_load_data, 100);
