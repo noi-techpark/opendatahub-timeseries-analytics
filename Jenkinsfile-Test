@@ -16,5 +16,10 @@ pipeline {
 				sh 'cp -f target/analytics.war /var/builds/test-server/'
 			}
 		}
+		stage('Deploy') {
+            		steps{
+		                sh 'mvn tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
+            		}
+	        }
 	}
 }
