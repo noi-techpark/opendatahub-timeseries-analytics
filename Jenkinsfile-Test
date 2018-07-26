@@ -1,5 +1,8 @@
 pipeline {
 	agent any
+	environment{
+	        TESTSERVER_TOMCAT_ENDPOINT=credentials('testserver-tomcat8-url')
+	}
 	stages {
 		stage('Test') {
 			steps {

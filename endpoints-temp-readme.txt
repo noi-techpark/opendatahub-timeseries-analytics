@@ -64,3 +64,23 @@ esterno (nuovo)
 
 http://localhost:8888/data/integreen/ da li in poi uguale: MeteoFrontEnd/rest/get-records-in-timeframe? ...
 
+-------------------------------
+
+sequenza per la lettura dei dati integreen:
+
+lista stazioni, tipi di dato fornito dalla stazione e valore per quella stazione / tipo
+
+dubbi: get-records seconds cosa sono?
+
+http://ipchannels.integreen-life.bz.it/MeteoFrontEnd/rest/get-station-details
+http://ipchannels.integreen-life.bz.it/MeteoFrontEnd/rest/get-data-types?station=65350MS
+http://ipchannels.integreen-life.bz.it/MeteoFrontEnd/rest/get-records?station=83200MS&name=atmospheric-pressure-reduced&seconds=10000
+http://ipchannels.integreen-life.bz.it/MeteoFrontEnd/rest/get-records?station=83200MS&name=sunshine-duration&seconds=10000
+
+
+http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details
+http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-data-types?station=siemens
+http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-records?station=siemens&name=Bluetooth%20Count%20record&seconds=18000
+
+
+http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-station-details/../get-data-types?station=siemens

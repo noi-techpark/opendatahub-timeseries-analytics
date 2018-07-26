@@ -1,0 +1,109 @@
+html, body
+{
+   height:100%;
+}
+
+#map-popup
+{
+   display:inline-block;
+}
+
+#map-popup-box
+{
+   background-color: white;
+   padding:6px;
+   border-radius: 6px;
+   min-width: 4em;
+   overflow: hidden;
+}
+
+#map-popup-close
+{
+   float:right;
+}
+
+#map-popup-arrow
+{
+   margin-left:50%;
+}
+
+#map-popup-arrow > div
+{
+   margin-left:-10px;
+   border-left:10px solid transparent;
+   border-right:10px solid transparent;
+   border-top:16px solid white;
+   width:0px;
+   height:0px;
+}
+
+.layers
+{
+   width: 13em;
+   flex-shrink: 0;
+}
+
+.layers > *
+{
+   height: 2em;
+   line-height: 2em;
+   border-bottom: 1px dotted gray;
+   padding: 4px;
+   cursor: pointer;
+   xoverflow: hidden;
+   white-space: nowrap;
+}
+
+
+.layers > *.selected
+{
+   background-color: #d2d246
+}
+
+
+.layers > * > img
+{
+   vertical-align:middle;
+   height:2em;
+   margin-right:4px;
+}
+
+@keyframes example {
+    0%   {transform: rotate(0deg);}
+    100% {transform: rotate(360deg);}
+}
+
+.layers .spinner.loading
+{
+   animation: example 2s linear infinite;
+   visibility: visible;
+}
+
+.layers .spinner
+{
+   visibility: hidden
+}
+
+.layer_template .error
+{
+   visibility: hidden;
+   color:red;
+   font-weight: bold;
+}
+
+.layer_template.selected .error.show
+{
+   
+}
+
+.layer_template .progressbar_container
+{
+   
+}
+
+.layer_template .progressbar_container .progressbar_line
+{
+   height: 4px;
+   width: 0%;
+   background-color: red;
+}
