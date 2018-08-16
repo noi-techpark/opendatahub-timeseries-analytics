@@ -121,16 +121,16 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 			responseError(resp, 504, "Timeout"); // gateway timeout
 			return;
 		}
-			
+		
 		// As last check
-		if (httpCode != 200 || !contentType.startsWith("application/json"))
+		if (httpCode != 200 || contentType == null || !contentType.startsWith("application/json"))
 		{
 			responseError(resp, 502, "Upstream status: " + httpCode + "\nContentType: " + contentType); // bad gateway
 			return;
 		}
 
 		// TODO: check if is always json!
-		resp.setContentType(conn.getContentType());
+		resp.setContentType(contentType);
 		resp.getOutputStream().write(responseData);
 		
 		
