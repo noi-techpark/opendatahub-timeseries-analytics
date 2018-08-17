@@ -98,6 +98,11 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		URL serviceUrl = new URL(newUrlTxt);
 		HttpURLConnection conn = (HttpURLConnection) serviceUrl.openConnection();
 		
+		String accessToken = (String)req.getSession().getAttribute("accessToken");
+		
+		if ( accessToken != null)
+		   conn.addRequestProperty("Authorization", "Bearer " + accessToken);
+
 		conn.setConnectTimeout(15000);
 		conn.setReadTimeout(30000);
 		
@@ -148,7 +153,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		resp.getOutputStream().write(("Error: " + code + (msg == null ? "" : "\n" + msg)).getBytes(StandardCharsets.US_ASCII));
 	}
 	
-	private static byte[] readRequestData(InputStream io) throws IOException
+	static byte[] readRequestData(InputStream io) throws IOException
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		

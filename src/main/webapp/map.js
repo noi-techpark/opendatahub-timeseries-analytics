@@ -45,6 +45,8 @@ async function map_start_promise()
 	
 	setupFeatureClickPopup()
 	
+	setupLoginForm()
+	
 	//////////////////////////////////////////////////////
 	// Functions
 	//////////////////////////////////////////////////////
@@ -434,5 +436,28 @@ async function map_start_promise()
 	    let d = new Date();
 	    return pad0(d.getDate())  + "/" + pad0(d.getMonth() + 1) + "/" + pad0(d.getFullYear()) + " " +
 	           pad0(d.getHours()) + ":" + pad0(d.getMinutes())   + ":" + pad0(d.getSeconds());
+	}
+	
+	function setupLoginForm()
+	{
+		console.log('login form')
+		var form = document.getElementById('loginform');
+		var loginuser = document.getElementById('loginuser')
+		var loginpass = document.getElementById('loginpass')
+		form.addEventListener('submit', async function(e)
+		{
+			e.preventDefault()
+			console.log(loginuser.value)
+			console.log(loginpass.value)
+			try
+			{
+			   var resp = await fetchJson_promise('login?user=' + encodeURIComponent(loginuser.value) + '&pass=' + encodeURIComponent(loginpass.value))
+			   form.style.visibility = 'hidden'
+			}
+			catch (e)
+			{
+				alert('Not autorized!')
+			}
+		})
 	}
 }

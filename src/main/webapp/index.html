@@ -36,6 +36,13 @@
     <div id="header" style="display:flex; flex-shrink:0; background: url(bg-pattern.jpg) 0 0 repeat;">
        <img src="logo.png">
        <div style="flex-grow:1"></div>
+       <div style="padding-top:1px; padding-right:8px">
+          <form id="loginform">
+             <input id="loginuser" placeholder="username">
+             <input id="loginpass" placeholder="password" type="password">
+             <input type="submit" value="login">
+          </form>
+       </div>
        <div id="tab_gfx" style="background-color:white; margin-right:4px" onclick="document.getElementById('section_gfx').style.display='block';document.getElementById('section_map').style.display='none';bzanalytics_gfx_plot()">gfx</div>
        <div id="tab_map" style="background-color:white" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='flex';bzanalytics_map.updateSize()">map</div>
     </div>
