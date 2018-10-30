@@ -3,7 +3,6 @@
 /.classpath
 /.settings/
 /target/
-/tmp
 
 # d@vide.bz: ignora mio file con appunti e todo
 /note.txt
