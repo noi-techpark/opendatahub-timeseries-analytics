@@ -1,28 +1,30 @@
 pipeline {
-	agent any
-	environment{
-	        TESTSERVER_TOMCAT_ENDPOINT=credentials('testserver-tomcat8-url')
-	}
-	stages {
-		stage('Test') {
-			steps {
-				sh 'mvn clean test'
-			}
-		}
-		stage('Build'){
-			steps{
-				sh 'mvn clean package'
-			}
-		}
-		stage('Archive'){
-			steps{
-				sh 'cp -f target/analytics.war /var/builds/test-server/'
-			}
-		}
-		stage('Deploy') {
-            		steps{
-		                sh 'mvn tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
-            		}
-	        }
-	}
+    agent {
+        dockerfile {
+            filename 'docker/dockerfile'
+            additionalBuildArgs  '--build-arg JENKINS_USER_ID=`id -u jenkins` --build-arg JENKINS_GROUP_ID=`id -g jenkins`'
+        }
+    }
+
+    environment{
+        TESTSERVER_TOMCAT_ENDPOINT=credentials('testserver-tomcat8-url')
+    }
+
+    stages {
+        stage('Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh 'mvn tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
+            }
+        }
+    }
 }
