@@ -1,6 +1,11 @@
 #!/bin/bash
 
 mkdir -p ~/.m2
-echo "<settings><localRepository>$PWD/docker/tmp/.m2</localRepository></settings>" > ~/.m2/settings.xml
+cat << EOF
+<settings>
+    <localRepository>$PWD/docker/tmp/.m2</localRepository>
+    <servers></servers>
+</settings>
+EOF > ~/.m2/settings.xml
 
 /bin/bash -c "$@"

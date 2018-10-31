@@ -8,9 +8,15 @@ pipeline {
 
     environment{
         TESTSERVER_TOMCAT_ENDPOINT=credentials('testserver-tomcat8-url')
+        TESTSERVER_TOMCAT_CREDENTIALS=crednetials('testserver-tomcat8-credentials')
     }
 
     stages {
+        stage('Configure') {
+            steps {
+                sh "sed -i -e 's/\(\w*<servers>\)\(<\/servers>$\)/\1'$TESTSERVER_TOMCAT_CREDENTIALS'\2/g' ~/.m2/settings.xml"
+            }
+        }
         stage('Test') {
             steps {
                 sh 'mvn clean test'
