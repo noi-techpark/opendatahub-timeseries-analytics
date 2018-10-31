@@ -8,7 +8,7 @@ pipeline {
 
     environment{
         TESTSERVER_TOMCAT_ENDPOINT=credentials('testserver-tomcat8-url')
-        TESTSERVER_TOMCAT_CREDENTIALS=crednetials('testserver-tomcat8-credentials')
+        TESTSERVER_TOMCAT_CREDENTIALS=credentials('testserver-tomcat8-credentials')
     }
 
     stages {
