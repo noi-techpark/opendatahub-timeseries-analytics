@@ -33,7 +33,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'mvn tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer -X'
+                sh 'mvn tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
             }
         }
     }
