@@ -15,6 +15,7 @@ pipeline {
         stage('Configure') {
             steps {
                 sh 'sed -i -e \'s/\\(\\w*<servers>\\)\\(<\\/servers>$\\)/\\1\'$TESTSERVER_TOMCAT_CREDENTIALS\'\\2/g\' ~/.m2/settings.xml'
+                sh 'cp ~/.m2/settings.xml ./settings.xml'
             }
         }
         stage('Test') {
