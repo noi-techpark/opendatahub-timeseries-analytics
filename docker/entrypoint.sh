@@ -1,11 +1,13 @@
 #!/bin/bash
 
 mkdir -p ~/.m2
-cat << EOF
+
+cat > ~/.m2/settings.xml << EOF
 <settings>
     <localRepository>$PWD/docker/tmp/.m2</localRepository>
     <servers></servers>
 </settings>
-EOF > ~/.m2/settings.xml
+EOF
 
 /bin/bash -c "$@"
+
