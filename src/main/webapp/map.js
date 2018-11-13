@@ -214,6 +214,7 @@ async function map_start_promise()
 				var coords = features[0].getGeometry().getCoordinates();
 				// var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
 				var integreen_data = features[0].getProperties()['integreen_data'];
+				let layer_info = features[0].getProperties()['layer_info'];
 				popup_title.textContent	= integreen_data['name'];
 				popup_content.textContent = '' 
 				for (var name in integreen_data) 
@@ -229,6 +230,7 @@ async function map_start_promise()
 				row.textContent = '---'
 				popup_content.appendChild(row)
 				
+				/*
 				var data_types = integreen_data['data_types']
 				for (var dt = 0; dt < data_types.length; dt++)
 				{
@@ -238,8 +240,30 @@ async function map_start_promise()
 					row.textContent = value_struct['value'] + ' ' + data_type_struct[0] + ' [' + data_type_struct[3] + ']' + ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
 					popup_content.appendChild(row)
 				}
+				*/
+				
+				let valuesDiv = document.createElement('div')
+				valuesDiv.textContent = 'loading ...'
+				popup_content.appendChild(valuesDiv)
 				
 				popup_overlay.setPosition(coords);
+				
+				let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + integreen_data['id'])
+				
+				for (var dt = 0; dt < json_datatypes.length; dt++)
+				{
+					console.log(json_datatypes[dt])
+					let value_struct = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + integreen_data['id']
+																									+ '&type=' + json_datatypes[dt][0]
+																									+ '&period=' + json_datatypes[dt][3])
+					console.log(value_struct)
+					if (dt == 0)
+						valuesDiv.textContent = ''
+					let row = document.createElement('div')
+					row.textContent = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']' + ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
+					valuesDiv.appendChild(row)
+				}
+				
 			}
 			else
 			{
@@ -305,9 +329,11 @@ async function map_start_promise()
 					var featurething = new ol.Feature({
 						// name: "Thing",
 						geometry : thing,
-						integreen_data: json_stations[i]
+						integreen_data: json_stations[i],
+						'layer_info': layer_info
 					});
 					
+					/*
 					// Carica i data types e gli ultimi valori
 					let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + json_stations[i].id)
 					
@@ -349,7 +375,46 @@ async function map_start_promise()
 						}
 						
 					}
+					*/
+
+					var icona = layer_info.icons[0];
+
+					for (var ic = 1; ic < layer_info.icons.length; ic++)
+					{
+						try
+						{
+							var cond = layer_info.icons[ic]
+							let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id
+																	+ '&type=' + cond[1]
+																	+ '&period=' + cond[2]);
+							console.log(json_value)
+							var valore_attuale = json_value.value;
+							if (cond[3] <= valore_attuale && valore_attuale < cond[4])
+							{
+								icona = cond[0]
+								break;
+							}
+						}
+						catch (e)
+						{
+							// TODO: visualizzare icona di errore!
+							console.log(e)
+						}
+					}
 					
+					var iconStyle = new ol.style.Style({
+						image: new ol.style.Icon({
+							anchor: [0.5, 1.0],
+							anchorXUnits: 'fraction',
+							anchorYUnits: 'fraction',
+							opacity: 1,
+							src: 'layers-icons/' + icona,
+							scale: 0.5
+						})
+					});
+					
+					featurething.setStyle([shadowStyle, iconStyle])
+				
 					sourcevector.addFeature(featurething);
 				}
 				
