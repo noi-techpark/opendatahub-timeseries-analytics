@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="map.css">
     <link rel="stylesheet" href="gfx.css">
     <link rel="stylesheet" href="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.css">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
 
     <script src="vendor/openlayers/4.6.4/ol.js"></script>
     <script src="vendor/jquery/3.3.1/jquery.js"></script>
@@ -33,18 +34,19 @@
 
   <body style="display:flex; flex-direction:column; overflow-y:scroll">
   
-    <div id="header" style="display:flex; flex-shrink:0; background: url(bg-pattern.jpg) 0 0 repeat;">
-       <img src="logo.png">
-       <div style="flex-grow:1"></div>
-       <div style="padding-top:1px; padding-right:8px">
+    <div id="header" style="display:flex; flex-shrink:0;">
+       <img id="logo" src="logo.png">
+       <div style="flex-grow:1; display: flex;">
+       		<div class="header_text" id="map_overview" onClick="showMapOverview()">MAP OVERVIEW</div>
+       		<div class="header_text" id="headline" onClick="showHeadline()">HEADLINE</div>
+       </div>
+       <div style="padding-top:19px; padding-right:8px">
           <form id="loginform">
-             <input id="loginuser" placeholder="username">
-             <input id="loginpass" placeholder="password" type="password">
-             <input type="submit" value="login">
+             <input id="loginuser" class="login_element" placeholder="username">
+             <input id="loginpass" class="login_element" placeholder="password" type="password">
+             <input id="login_button" type="submit" value="LOGIN">
           </form>
        </div>
-       <div id="tab_gfx" style="background-color:white; margin-right:4px" onclick="document.getElementById('section_gfx').style.display='block';document.getElementById('section_map').style.display='none';bzanalytics_gfx_plot()">gfx</div>
-       <div id="tab_map" style="background-color:white" onclick="document.getElementById('section_gfx').style.display='none';document.getElementById('section_map').style.display='flex';bzanalytics_map.updateSize()">map</div>
     </div>
 
     <!-- *** MAPS ********************************************************************************* -->
@@ -64,8 +66,18 @@
         </div>
         
         <div style="background-color:#c7e0bd; position:relative; flex-grow:1; min-width:0px ">
+           <!-- 
            <div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
+            -->
            <div id="map" style="width:100%; height:100%"></div>
+        </div>
+        
+        <div id="details-container" style="overflow-y:scroll;">
+        	<div id="details-close">X</div>
+         	<div id="details-title">title</div>
+         	<hr id="details-line">
+         	<div id="details-content"></div>
+         	
         </div>
 
     </div>

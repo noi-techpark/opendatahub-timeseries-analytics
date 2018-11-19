@@ -63,10 +63,10 @@ async function map_start_promise()
 		switch (format)
 		{
 			case 'integreen':
-				layer_display.querySelector('.icon').src = 'layers-icons/' + layer_info.icons[0]
+				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icons[0]
 				break;
 			default:
-				layer_display.querySelector('.icon').src = 'layers-icons/' + layer_info.icon
+				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icon
 				break;
 		}
 				
@@ -188,10 +188,24 @@ async function map_start_promise()
 		var popup_close = document.getElementById('map-popup-close');
 		var popup_content = document.getElementById('map-popup-content');
 		var popup_title = document.getElementById('map-popup-title');
+		
+		var details_close = document.getElementById('details-close');
+		var details_content = document.getElementById('details-content');
+		var details_title = document.getElementById('details-title');
+		var details_container = document.getElementById('details-container');
+		details_container.style.display = "none";
 
 		popup_close.addEventListener('click', function()
 		{
 			popup_overlay.setPosition() // nascondi il popup passando una posizione undefined
+		})
+		
+		details_close.addEventListener('click', function()
+		{
+			details_content.textContent  = '';
+			details_title.textContent = '';
+			details_container.style.display = "none";
+			map.updateSize();
 		})
 
 		var popup_overlay = new ol.Overlay({
@@ -211,24 +225,46 @@ async function map_start_promise()
 			console.log(features)
 			if (features)
 			{
+
+				details_container.style.display = 'block';
+				map.updateSize();
 				var coords = features[0].getGeometry().getCoordinates();
 				// var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
-				var integreen_data = features[0].getProperties()['integreen_data'];
-				let layer_info = features[0].getProperties()['layer_info'];
-				popup_title.textContent	= integreen_data['name'];
-				popup_content.textContent = '' 
+				var integreen_data = features[0].get("features")[0].getProperties()['integreen_data'];
+				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
+				//popup_title.textContent	= integreen_data['name'];
+				//popup_content.textContent = '' 
+				
+				details_title.textContent = integreen_data['name'];
+				details_content.textContent = ''
+					
 				for (var name in integreen_data) 
 				{
+					
 					if (integreen_data.hasOwnProperty(name) && ['_t', 'data_types'].indexOf(name) < 0) 
 					{
 						var row = document.createElement('div')
-						row.textContent = name + ': ' + integreen_data[name]
-						popup_content.appendChild(row)
+						row.style = "display:flex;"
+						var nameDiv = document.createElement('div')
+						nameDiv.textContent = name
+						nameDiv.className = "details-name"
+						row.appendChild(nameDiv);
+						var valueDiv = document.createElement('div')
+						valueDiv.textContent = integreen_data[name]
+						valueDiv.className = "details-value"
+						row.appendChild(valueDiv);
+						
+						//popup_content.appendChild(row)
+						
+						details_content.appendChild(row)
 					}
 				}
 				var row = document.createElement('div')
 				row.textContent = '---'
-				popup_content.appendChild(row)
+				//popup_content.appendChild(row)
+				
+				details_content.appendChild(row)
+			
 				
 				/*
 				var data_types = integreen_data['data_types']
@@ -244,9 +280,11 @@ async function map_start_promise()
 				
 				let valuesDiv = document.createElement('div')
 				valuesDiv.textContent = 'loading ...'
-				popup_content.appendChild(valuesDiv)
+				//popup_content.appendChild(valuesDiv)
 				
-				popup_overlay.setPosition(coords);
+				details_content.appendChild(valuesDiv)
+				
+				//popup_overlay.setPosition(coords);
 				
 				let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + integreen_data['id'])
 				
@@ -279,15 +317,17 @@ async function map_start_promise()
 		{
 			try
 			{
+				
+				
 				var iconStyle = new ol.style.Style({
 					image: new ol.style.Icon({
 					anchor: [0.5, 1.0],
 					anchorXUnits: 'fraction',
 					anchorYUnits: 'fraction',
 					opacity: 1,
-					src:  'layers-icons/' + layer_info.icons[0],
-					scale: 0.5
-					// size: [32,32]
+					src:  'icons/02_Icons_map/' + layer_info.icons[0],
+					scale: 0.8
+				    //size: [32,32]
 					})
 				});
 				
@@ -303,6 +343,8 @@ async function map_start_promise()
 				});
 				
 				var sourcevector = new ol.source.Vector({});
+				
+				
 				
 				let layer = new ol.layer.Vector({
 					title : 'meteoLayer',
@@ -408,7 +450,7 @@ async function map_start_promise()
 							anchorXUnits: 'fraction',
 							anchorYUnits: 'fraction',
 							opacity: 1,
-							src: 'layers-icons/' + icona,
+							src: 'icons/02_Icons_map/' + icona,
 							scale: 0.5
 						})
 					});
@@ -418,7 +460,12 @@ async function map_start_promise()
 					sourcevector.addFeature(featurething);
 				}
 				
-				layer.setSource(sourcevector)
+				var clusterSource = new ol.source.Cluster({
+			        distance: 40,
+			        source: sourcevector
+			      });
+				
+				layer.setSource(clusterSource)
 				progressbar_line.style.width = '0px'
 				ok(layer)
 			}
@@ -525,4 +572,24 @@ async function map_start_promise()
 			}
 		})
 	}
+}
+
+
+function showMapOverview()
+{
+	document.getElementById('section_gfx').style.display='none';
+	document.getElementById('section_map').style.display='flex';
+	bzanalytics_map.updateSize();
+	document.getElementById('headline').style.color='#919499';
+	document.getElementById('map_overview').style.color='#FFFFFF';
+}
+
+
+function showHeadline()
+{
+	document.getElementById('section_gfx').style.display='block';
+	document.getElementById('section_map').style.display='none';
+	bzanalytics_gfx_plot();	
+	document.getElementById('headline').style.color='#919499';
+	document.getElementById('map_overview').style.color='#919499';
 }

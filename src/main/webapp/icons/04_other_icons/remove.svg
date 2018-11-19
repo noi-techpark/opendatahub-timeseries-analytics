@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.962 11.963">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #d32b2b;
+      }
+    </style>
+  </defs>
+  <g id="cross-remove-sign_1_" data-name="cross-remove-sign (1)" transform="translate(-0.001)">
+    <path id="Pfad_40" data-name="Pfad 40" class="cls-1" d="M7.834,5.981,11.89,1.925a.249.249,0,0,0,0-.353l-1.5-1.5a.249.249,0,0,0-.353,0L5.982,4.13,1.926.073a.257.257,0,0,0-.353,0l-1.5,1.5a.249.249,0,0,0,0,.353L4.131,5.981.074,10.038a.249.249,0,0,0,0,.353l1.5,1.5a.249.249,0,0,0,.353,0L5.982,7.833l4.057,4.057a.249.249,0,0,0,.353,0l1.5-1.5a.249.249,0,0,0,0-.353Z" transform="translate(0)"/>
+  </g>
+</svg>

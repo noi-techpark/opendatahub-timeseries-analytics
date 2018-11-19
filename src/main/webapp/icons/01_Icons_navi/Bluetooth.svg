@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 85.277 85.277">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #2c70b9;
+      }
+
+      .cls-2 {
+        fill: #fff;
+      }
+    </style>
+  </defs>
+  <g id="Gruppe_184" data-name="Gruppe 184" transform="translate(-245 -135)">
+    <circle id="Ellipse_25" data-name="Ellipse 25" class="cls-1" cx="42.639" cy="42.639" r="42.639" transform="translate(245 135)"/>
+    <g id="Gruppe_40" data-name="Gruppe 40" transform="translate(264.428 154.428)">
+      <g id="bluetooth" transform="translate(0 0)">
+        <path id="Pfad_3" data-name="Pfad 3" class="cls-2" d="M271,122.633l5.211-5.211L271,112.211Zm0,0" transform="translate(-246.206 -102.025)"/>
+        <path id="Pfad_4" data-name="Pfad 4" class="cls-2" d="M271,302.633l5.211-5.211L271,292.211Zm0,0" transform="translate(-246.206 -265.686)"/>
+        <path id="Pfad_5" data-name="Pfad 5" class="cls-1" d="M23.566,0A23.566,23.566,0,1,0,47.133,23.566,23.658,23.658,0,0,0,23.566,0Z" transform="translate(0)"/>
+      </g>
+      <g id="bluetooth-2" data-name="bluetooth" transform="translate(0 0)">
+        <path id="Pfad_3-2" data-name="Pfad 3" class="cls-2" d="M271,122.633l5.211-5.211L271,112.211Zm0,0" transform="translate(-246.206 -102.025)"/>
+        <path id="Pfad_4-2" data-name="Pfad 4" class="cls-2" d="M271,302.633l5.211-5.211L271,292.211Zm0,0" transform="translate(-246.206 -265.686)"/>
+        <path id="Pfad_5-2" data-name="Pfad 5" class="cls-2" d="M23.566,0A23.566,23.566,0,1,0,47.133,23.566,23.658,23.658,0,0,0,23.566,0Zm9.261,30.875a1.38,1.38,0,0,1,0,1.953l-8.285,8.285a1.381,1.381,0,0,1-2.357-.976V27.708l-5.8,7.733a1.38,1.38,0,0,1-2.209-1.656l7.664-10.219L14.177,13.347a1.38,1.38,0,0,1,2.209-1.656l5.8,7.733V7a1.381,1.381,0,0,1,2.357-.976L32.828,14.3a1.38,1.38,0,0,1,0,1.953l-7.309,7.309Zm0,0" transform="translate(0)"/>
+      </g>
+    </g>
+  </g>
+</svg>

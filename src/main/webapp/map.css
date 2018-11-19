@@ -39,7 +39,7 @@ html, body
 
 .layers
 {
-   width: 13em;
+   width: 326px;
    flex-shrink: 0;
 }
 
@@ -48,16 +48,21 @@ html, body
    height: 2em;
    line-height: 2em;
    border-bottom: 1px dotted gray;
-   padding: 4px;
+   padding: 20px;
    cursor: pointer;
    xoverflow: hidden;
    white-space: nowrap;
+   background-color: #454955;
+   color: #FFFFFF;
+   font-family: 'Roboto', sans-serif;
+   font-weight: 400;
+   font-size: 18px;
 }
 
 
 .layers > *.selected
 {
-   background-color: #d2d246
+   background-color: #3d4049;
 }
 
 
@@ -89,6 +94,7 @@ html, body
    visibility: hidden;
    color:red;
    font-weight: bold;
+   padding: 10px;
 }
 
 .layer_template.selected .error.show
@@ -106,4 +112,110 @@ html, body
    height: 4px;
    width: 0%;
    background-color: red;
+}
+
+
+
+#details-container
+{
+   width: 406px;
+   flex-shrink: 0;
+   padding: 10px;
+   background-color: #f8f8f8;
+}
+
+#details-title
+{
+	font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 26px;
+    margin-top: 34px;
+    margin-left: 43px;
+    margin-bottom: 23px;
+    color: #4D4D4D;
+}
+
+#details-content
+{
+	font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    margin-top: 40px;
+    margin-left: 43px;
+    color: #383737
+}
+
+#details-close
+{
+	display: flex;
+	position: absolute;
+	margin-top: 74px;
+	z-index: 10;
+	margin-left: -25px;
+	height: 30px;
+  	width: 30px;
+  	background-color: #BFBFBF;
+  	border-radius: 50%;
+  	align-items: center;
+	justify-content: center;
+	font-family: sans-serif;
+    font-weight: 700;
+    color: #FFFFFF;
+}
+
+#details-line
+{
+	margin-left: 30px;
+	margin-rigt: 30px;
+	color: #BFBFBF;
+}
+
+#header
+{
+	height: 74px;
+	background: #282C39;
+}
+
+#logo
+{
+	height: 34px;
+	margin-left: 45px;
+	margin-top: 21px;
+	margin-right: 113px;
+}
+
+.header_text
+{
+	margin-left: 45px;
+	margin-top: 26px;
+	color: #FFFFFF;
+	font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+}
+
+.login_element
+{
+	font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #94A9BD;
+    background: #454956;
+    padding: 7px;
+    padding-left: 17px;
+    width: 200px;
+    border: 0px;
+    border-radius: 3px;
+    margin-left: 15px;
+  
+}
+
+#login_button
+{
+	height: 33px;
+	background: #282C39;
+	border-color: #FFFFFF;
+	border-radius: 3px;
+	color: #FFFFFF;
+	margin-left: 30px;
+	margin-right: 36px;
+	width: 118px;
 }
