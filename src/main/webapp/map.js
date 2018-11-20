@@ -15,6 +15,9 @@ async function map_start_promise()
 	layers_container.removeChild(layer_template)
 	
 	
+	let selectedFeature = null;
+	
+	
 	let map = new ol.Map({
 			target : 'map',
 			layers : [ new ol.layer.Tile({
@@ -174,7 +177,7 @@ async function map_start_promise()
 			console.log('refresh automatico1 ' + autorefresh_functions.length)
 			for (let i = 0; i < refresh_local_copy.length; i++)
 			{
-				console.log(i)
+				// console.log(i)
 				refresh_local_copy[i]()
 			}
 			console.log('refresh automatico2')
@@ -205,6 +208,9 @@ async function map_start_promise()
 			details_content.textContent  = '';
 			details_title.textContent = '';
 			details_container.style.display = "none";
+			if (selectedFeature != null)
+				selectedFeature.changed();
+			selectedFeature = null;
 			map.updateSize();
 		})
 
@@ -222,7 +228,7 @@ async function map_start_promise()
 		map.on('click', async function(e)
 		{
 			var features = map.getFeaturesAtPixel(e.pixel);
-			console.log(features)
+			// console.log(features)
 			if (features)
 			{
 				// clustered icon? simply zoom!
@@ -236,6 +242,11 @@ async function map_start_promise()
                     map.getView().setZoom(nextZoom)
 					return;
 				}
+				
+				if (selectedFeature != null)
+					selectedFeature.changed();
+				selectedFeature = features[0].get("features")[0];
+				selectedFeature.changed();
 				
 				details_container.style.display = 'block';
 				map.updateSize();
@@ -302,11 +313,11 @@ async function map_start_promise()
 				
 				for (var dt = 0; dt < json_datatypes.length; dt++)
 				{
-					console.log(json_datatypes[dt])
+					// console.log(json_datatypes[dt])
 					let value_struct = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + integreen_data['id']
 																									+ '&type=' + json_datatypes[dt][0]
 																									+ '&period=' + json_datatypes[dt][3])
-					console.log(value_struct)
+					// console.log(value_struct)
 					if (dt == 0)
 						valuesDiv.textContent = ''
 					let row = document.createElement('div')
@@ -353,10 +364,21 @@ async function map_start_promise()
 					})
 				});
 				
+				var selectedStyle = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [850, 2100],
+						anchorXUnits: 'pixels',
+						anchorYUnits: 'pixels',
+						opacity: 1,
+						src: 'icons/selected.png',
+						scale: 0.03
+					})
+				});
+				
 				var sourcevector = new ol.source.Vector({});
 
 				var clusterSource = new ol.source.Cluster({
-			        distance: 40,
+			        distance: 80,
 			        source: sourcevector
 			    });
 				
@@ -372,7 +394,14 @@ async function map_start_promise()
 				    	let iconStyle = features[0].get('iconStyle');
 				    	let valueStyle = features[0].get('valueStyle');
 				    	if (features.length == 1)
-				    	   return ([iconStyle, valueStyle])
+				        {
+				    		console.log(selectedFeature)
+				    		console.log(features[0])
+				    	   if (selectedFeature != null && selectedFeature === features[0])
+				    	      return [iconStyle, valueStyle, selectedStyle]
+				    	   else
+				    	      return ([iconStyle, valueStyle])
+				        }
 				    	else 
 				    	   return ([iconStyle, cluserStyle])
 				    }
@@ -409,7 +438,7 @@ async function map_start_promise()
 							let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id
 																	+ '&type=' + cond[1]
 																	+ '&period=' + cond[2]);
-							console.log(json_value)
+							// console.log(json_value)
 							var valore_attuale = json_value.value;
 							if (cond[3] <= valore_attuale && valore_attuale < cond[4])
 							{
