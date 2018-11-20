@@ -1,7 +1,7 @@
 [
    {
       "id": "Weather",
-      "icons": ["Weather.svg", ["Weather.svg", "Bluetooth Count record", 21600, 100, 250], ["Weather.svg", "Bluetooth Count record", 21600, 0, 100]],
+      "icons": ["Weather.svg"],
       "base_url" : "data/integreen/MeteoFrontEnd/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",

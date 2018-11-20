@@ -225,11 +225,23 @@ async function map_start_promise()
 			console.log(features)
 			if (features)
 			{
-
+				// clustered icon? simply zoom!
+				if (features[0].get("features").length > 1)
+				{
+					let currZoom = map.getView().getZoom();
+                    let nextZoom = currZoom + 1;
+                    let nextResolution = map.getView().getResolutionForZoom(nextZoom)
+                    let newcenter = map.getView().calculateCenterZoom(nextResolution, features[0].getGeometry().getCoordinates());
+                    map.getView().setCenter(newcenter)
+                    map.getView().setZoom(nextZoom)
+					return;
+				}
+				
 				details_container.style.display = 'block';
 				map.updateSize();
 				var coords = features[0].getGeometry().getCoordinates();
 				// var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
+				
 				var integreen_data = features[0].get("features")[0].getProperties()['integreen_data'];
 				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
 				//popup_title.textContent	= integreen_data['name'];
@@ -318,7 +330,6 @@ async function map_start_promise()
 			try
 			{
 				
-				
 				var iconStyle = new ol.style.Style({
 					image: new ol.style.Icon({
 					anchor: [0.5, 1.0],
@@ -326,43 +337,53 @@ async function map_start_promise()
 					anchorYUnits: 'fraction',
 					opacity: 1,
 					src:  'icons/02_Icons_map/' + layer_info.icons[0],
-					scale: 0.8
+					scale: 0.6
 				    //size: [32,32]
 					})
 				});
 				
-				var shadowStyle = new ol.style.Style({
+				var cluserStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [0.3, 1.0],
-						anchorXUnits: 'fraction',
-						anchorYUnits: 'fraction',
+						anchor: [-50, +320],
+						anchorXUnits: 'pixels',
+						anchorYUnits: 'pixels',
 						opacity: 1,
-						src: 'layers-icons/' + 'marker-shadow.png',
-						scale: 1
+						src: 'icons/value-circle/cluster.svg',
+						scale: 0.20
 					})
 				});
 				
 				var sourcevector = new ol.source.Vector({});
-				
-				
+
+				var clusterSource = new ol.source.Cluster({
+			        distance: 40,
+			        source: sourcevector
+			    });
 				
 				let layer = new ol.layer.Vector({
-					title : 'meteoLayer',
 					visible : true,
-					source : sourcevector,
-					style : [shadowStyle, iconStyle]
+					source : clusterSource,
+					style: function(list)
+				    {
+				    	console.log('cluster style')
+				    	console.log(arguments)
+				    	let features = list.get('features')
+				    	console.log(features.length)
+				    	let iconStyle = features[0].get('iconStyle');
+				    	let valueStyle = features[0].get('valueStyle');
+				    	if (features.length == 1)
+				    	   return ([iconStyle, valueStyle])
+				    	else 
+				    	   return ([iconStyle, cluserStyle])
+				    }
 				})
 				
-				map.addLayer(layer)
+			    map.addLayer(layer)
 				
 				let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
 				
 				for (var i = 0; i < json_stations.length; i++)
 				{
-					// RIMUOVERE DOPO I TEST!!!
-					// if (i >= 10)
-					//	break;
-					
 					
 					progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
 					
@@ -374,55 +395,14 @@ async function map_start_promise()
 						integreen_data: json_stations[i],
 						'layer_info': layer_info
 					});
-					
-					/*
-					// Carica i data types e gli ultimi valori
-					let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + json_stations[i].id)
-					
-					// Arricchisci il json della stazione con i dati dei datatype ricevuti con la seconda chiamata
-					json_stations[i]['data_types'] = json_datatypes
-					
-					for (var dt = 0; dt < json_datatypes.length; dt++)
-					{
-						let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id 
-																										+ '&type=' + json_datatypes[dt][0]
-																										+ '&period=' + json_datatypes[dt][3])
-						let struct = {}
-						struct['data_type'] = json_datatypes[dt]
-						struct['newest_record'] = json_value
-						json_datatypes[dt] = struct
-						
-						// eventualmente personalizza l'icona in base ai valori
-						for (var ic = 1; ic < layer_info.icons.length; ic++)
-						{
-							var cond = layer_info.icons[ic]
-							if (cond[1] == struct['data_type'][0] // tipo di misura esempio: "Bluetooth Count record"
-								&& cond[2] == struct['data_type'][3] // intervallo di misura: 21600
-								&& cond[3] <= struct['newest_record']['value'] // minimo
-								&& cond[4] >  struct['newest_record']['value'] // massimo escluso
-							)
-							{
-								var iconStyle = new ol.style.Style({
-									image: new ol.style.Icon({
-										anchor: [0.5, 1.0],
-										anchorXUnits: 'fraction',
-										anchorYUnits: 'fraction',
-										opacity: 1,
-										src: 'layers-icons/' + cond[0],
-										scale: 0.5
-									})
-								});
-								featurething.setStyle([shadowStyle, iconStyle])
-							}
-						}
-						
-					}
-					*/
 
-					var icona = layer_info.icons[0];
+					var icona = 'transparent.svg';
 
+					
 					for (var ic = 1; ic < layer_info.icons.length; ic++)
 					{
+						if (ic == 1)
+							icona = 'green.svg'
 						try
 						{
 							var cond = layer_info.icons[ic]
@@ -433,7 +413,10 @@ async function map_start_promise()
 							var valore_attuale = json_value.value;
 							if (cond[3] <= valore_attuale && valore_attuale < cond[4])
 							{
-								icona = cond[0]
+							    if (ic == 1 && layer_info.icons.length == 3)
+									icona = 'yellow.svg';
+								else
+									icona = 'red.svg';
 								break;
 							}
 						}
@@ -444,28 +427,30 @@ async function map_start_promise()
 						}
 					}
 					
-					var iconStyle = new ol.style.Style({
+					
+					var valueStyle = new ol.style.Style({
 						image: new ol.style.Icon({
-							anchor: [0.5, 1.0],
-							anchorXUnits: 'fraction',
-							anchorYUnits: 'fraction',
+							anchor: [-50, +320],
+							anchorXUnits: 'pixels',
+							anchorYUnits: 'pixels',
 							opacity: 1,
-							src: 'icons/02_Icons_map/' + icona,
-							scale: 0.5
+							src: 'icons/value-circle/' + icona,
+							scale: 0.20
 						})
 					});
 					
-					featurething.setStyle([shadowStyle, iconStyle])
+					// featurething.setStyle([iconStyle, valueStyle])
+					
+					featurething.setProperties({'iconStyle': iconStyle, 'valueStyle': valueStyle})
 				
 					sourcevector.addFeature(featurething);
 				}
 				
-				var clusterSource = new ol.source.Cluster({
-			        distance: 40,
-			        source: sourcevector
-			      });
 				
-				layer.setSource(clusterSource)
+				
+			    
+				
+
 				progressbar_line.style.width = '0px'
 				ok(layer)
 			}
