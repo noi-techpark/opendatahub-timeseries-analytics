@@ -411,7 +411,7 @@ async function map_start_promise()
 							var valore_attuale = json_value.value;
 							if (cond[3] <= valore_attuale && valore_attuale < cond[4])
 							{
-							    if (ic == 1 && layer_info.icons.length == 3)
+							    if (ic == 2 && layer_info.icons.length == 3)
 									icona = 'yellow.svg';
 								else
 									icona = 'red.svg';
