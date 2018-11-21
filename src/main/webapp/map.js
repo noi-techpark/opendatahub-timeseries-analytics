@@ -369,12 +369,12 @@ async function map_start_promise()
 				    	if (features.length == 1)
 				        {
 				    		if (selectedFeature != null && selectedFeature === features[0])
-				    	      return [iconStyle, valueStyle, selectedStyle]
+				    	      return [iconStyle, valueStyle] /* , selectedStyle */
 				    	   else
-				    	      return ([iconStyle, valueStyle])
+				    	      return [iconStyle, valueStyle]
 				        }
 				    	else 
-				    	   return ([iconStyle, cluserStyle])
+				    	   return [iconStyle, cluserStyle]
 				    }
 				})
 				
