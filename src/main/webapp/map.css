@@ -47,7 +47,6 @@ html, body
 {
    height: 2em;
    line-height: 2em;
-   border-bottom: 1px dotted gray;
    padding: 20px;
    cursor: pointer;
    xoverflow: hidden;
@@ -58,6 +57,7 @@ html, body
    font-weight: 400;
    font-size: 18px;
 }
+
 
 
 .layers > *.selected
@@ -122,6 +122,8 @@ html, body
    flex-shrink: 0;
    padding: 10px;
    background-color: #f8f8f8;
+   /*position: fixed;
+   right:0px;*/
 }
 
 #details-title
@@ -160,13 +162,17 @@ html, body
 	font-family: sans-serif;
     font-weight: 700;
     color: #FFFFFF;
+    cursor: pointer
 }
 
 #details-line
 {
 	margin-left: 30px;
 	margin-rigt: 30px;
-	color: #BFBFBF;
+	border: none;
+	background-color: #abb1b7;
+	height: 1px;
+	
 }
 
 #header
@@ -190,6 +196,7 @@ html, body
 	color: #FFFFFF;
 	font-family: 'Roboto', sans-serif;
     font-weight: 400;
+    cursor: pointer;
 }
 
 .login_element
@@ -219,3 +226,35 @@ html, body
 	margin-right: 36px;
 	width: 118px;
 }
+
+
+.details-name
+{
+	font-weight: 400;
+	color: #898989;
+	margin-top: 11px;
+	width: 150px;
+	min-width: 150px;
+}
+
+.details-value
+{
+	
+	margin-left: 10px;
+	margin-top: 11px;
+}
+
+.details-valueItem1
+{
+	margin-top: 30px;
+	font-size: 16px;
+}
+
+.details-valueItem2
+{
+	margin-top: 5px;
+	color: #898989;
+	font-size: 16px;
+	margin-bottom: 10px;
+}
+

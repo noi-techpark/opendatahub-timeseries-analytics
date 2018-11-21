@@ -39,7 +39,6 @@ async function map_start_promise()
 	
 
 	let json = await fetchJson_promise('layers-config.json')
-	// console.log(json)
 	
 	for (var layer_info of json)
 	{
@@ -56,7 +55,6 @@ async function map_start_promise()
 	
 	async function setupLayer_promise(layer_info)
 	{
-		// console.log(layer_info)
 		let layer_display = layer_template.cloneNode(true)
 		layer_display.querySelector('.label').textContent = layer_info.id
 		layers_container.appendChild(layer_display)
@@ -86,14 +84,12 @@ async function map_start_promise()
 			// refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
 			if (!layer_selected || layer_loading)
 			{
-				console.log('caso che non dovrebbe succedere 1!');
 				return;
 			}
 			await toggle_layer_function()
 			
 			if (layer_selected)
 			{
-				console.log('caso che non dovrebbe succedere 2!');
 				return;
 			}
 			
@@ -143,18 +139,14 @@ async function map_start_promise()
 				}
 				catch (e)
 				{
-					console.log(e)
-					// Raven.captureException(e)
 					error_console.textContent = format_time() + ': ' + e;
 				}
 				finally
 				{
-					// spegnere progress di caricamento
 					
 					layer_loading = false;
 					spinner.classList.remove('loading')
 					
-					// aggiungi al timer di aggiornamento automatico!
 					autorefresh_functions.push(refresh_function)
 				}
 				
@@ -174,13 +166,10 @@ async function map_start_promise()
 		setTimeout(async function()
 		{
 			let refresh_local_copy = autorefresh_functions.slice();
-			console.log('refresh automatico1 ' + autorefresh_functions.length)
 			for (let i = 0; i < refresh_local_copy.length; i++)
 			{
-				// console.log(i)
 				refresh_local_copy[i]()
 			}
-			console.log('refresh automatico2')
 			startAutoRefresh()
 		}, next_time)
 	}
@@ -200,7 +189,7 @@ async function map_start_promise()
 
 		popup_close.addEventListener('click', function()
 		{
-			popup_overlay.setPosition() // nascondi il popup passando una posizione undefined
+			popup_overlay.setPosition()
 		})
 		
 		details_close.addEventListener('click', function()
@@ -221,14 +210,11 @@ async function map_start_promise()
 		})
 		map.addOverlay(popup_overlay);
 		
-		// attiva la visualizzazione del popup nascosto durante il caricamento
-		// a questo punto openlayer lo ha già nascosto
 		popup_element.style.display = 'block'
 			
 		map.on('click', async function(e)
 		{
 			var features = map.getFeaturesAtPixel(e.pixel);
-			// console.log(features)
 			if (features)
 			{
 				// clustered icon? simply zoom!
@@ -251,15 +237,14 @@ async function map_start_promise()
 				details_container.style.display = 'block';
 				map.updateSize();
 				var coords = features[0].getGeometry().getCoordinates();
-				// var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
 				
 				var integreen_data = features[0].get("features")[0].getProperties()['integreen_data'];
 				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
-				//popup_title.textContent	= integreen_data['name'];
-				//popup_content.textContent = '' 
+				let color = features[0].get("features")[0].getProperties()['color'];
 				
 				details_title.textContent = integreen_data['name'];
 				details_content.textContent = ''
+				let index = 0;
 					
 				for (var name in integreen_data) 
 				{
@@ -267,68 +252,60 @@ async function map_start_promise()
 					if (integreen_data.hasOwnProperty(name) && ['_t', 'data_types'].indexOf(name) < 0) 
 					{
 						var row = document.createElement('div')
+						row.className = "valuesDiv"
 						row.style = "display:flex;"
 						var nameDiv = document.createElement('div')
-						nameDiv.textContent = name
+						nameDiv.textContent = name.toUpperCase();
 						nameDiv.className = "details-name"
 						row.appendChild(nameDiv);
 						var valueDiv = document.createElement('div')
-						valueDiv.textContent = integreen_data[name]
+						var valueText = integreen_data[name]+ "";
+						valueDiv.textContent = valueText.toUpperCase();
 						valueDiv.className = "details-value"
 						row.appendChild(valueDiv);
 						
-						//popup_content.appendChild(row)
+						if(index == 0){
+							nameDiv.style = "color: " + color + "; font-size: 20px; font-weight: 500; margin-bottom: 20px; padding-top: 5px;";
+							valueDiv.style = "background-color: " + color + "; color: #FFFFFF; font-size: 18px; font-weight: 500;margin-bottom: 20px; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; border-radius: 5px;";
+						}
 						
 						details_content.appendChild(row)
+						index++;
 					}
 				}
-				var row = document.createElement('div')
-				row.textContent = '---'
-				//popup_content.appendChild(row)
+							
 				
-				details_content.appendChild(row)
-			
 				
-				/*
-				var data_types = integreen_data['data_types']
-				for (var dt = 0; dt < data_types.length; dt++)
-				{
-					var row = document.createElement('div')
-					var value_struct = data_types[dt]['newest_record']
-					var data_type_struct = data_types[dt]['data_type']
-					row.textContent = value_struct['value'] + ' ' + data_type_struct[0] + ' [' + data_type_struct[3] + ']' + ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
-					popup_content.appendChild(row)
-				}
-				*/
 				
 				let valuesDiv = document.createElement('div')
 				valuesDiv.textContent = 'loading ...'
-				//popup_content.appendChild(valuesDiv)
 				
 				details_content.appendChild(valuesDiv)
-				
-				//popup_overlay.setPosition(coords);
 				
 				let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + integreen_data['id'])
 				
 				for (var dt = 0; dt < json_datatypes.length; dt++)
 				{
-					// console.log(json_datatypes[dt])
 					let value_struct = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + integreen_data['id']
 																									+ '&type=' + json_datatypes[dt][0]
 																									+ '&period=' + json_datatypes[dt][3])
-					// console.log(value_struct)
 					if (dt == 0)
 						valuesDiv.textContent = ''
 					let row = document.createElement('div')
-					row.textContent = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']' + ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
+					let rowText = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']'
+					row.textContent =  rowText.toUpperCase()
+					row.className = "details-valueItem1"
 					valuesDiv.appendChild(row)
+					let row2 = document.createElement('div')
+					row2.textContent = ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
+					row2.className = "details-valueItem2"
+					valuesDiv.appendChild(row2)
 				}
 				
 			}
 			else
 			{
-				popup_overlay.setPosition() // nascondi il popup passando una posizione undefined
+				popup_overlay.setPosition()
 			}
 		});
 				
@@ -349,7 +326,6 @@ async function map_start_promise()
 					opacity: 1,
 					src:  'icons/02_Icons_map/' + layer_info.icons[0],
 					scale: 0.6
-				    //size: [32,32]
 					})
 				});
 				
@@ -387,17 +363,12 @@ async function map_start_promise()
 					source : clusterSource,
 					style: function(list)
 				    {
-				    	console.log('cluster style')
-				    	console.log(arguments)
 				    	let features = list.get('features')
-				    	console.log(features.length)
 				    	let iconStyle = features[0].get('iconStyle');
 				    	let valueStyle = features[0].get('valueStyle');
 				    	if (features.length == 1)
 				        {
-				    		console.log(selectedFeature)
-				    		console.log(features[0])
-				    	   if (selectedFeature != null && selectedFeature === features[0])
+				    		if (selectedFeature != null && selectedFeature === features[0])
 				    	      return [iconStyle, valueStyle, selectedStyle]
 				    	   else
 				    	      return ([iconStyle, valueStyle])
@@ -419,7 +390,6 @@ async function map_start_promise()
 					var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
 					
 					var featurething = new ol.Feature({
-						// name: "Thing",
 						geometry : thing,
 						integreen_data: json_stations[i],
 						'layer_info': layer_info
@@ -438,7 +408,6 @@ async function map_start_promise()
 							let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id
 																	+ '&type=' + cond[1]
 																	+ '&period=' + cond[2]);
-							// console.log(json_value)
 							var valore_attuale = json_value.value;
 							if (cond[3] <= valore_attuale && valore_attuale < cond[4])
 							{
@@ -451,7 +420,6 @@ async function map_start_promise()
 						}
 						catch (e)
 						{
-							// TODO: visualizzare icona di errore!
 							console.log(e)
 						}
 					}
@@ -468,9 +436,7 @@ async function map_start_promise()
 						})
 					});
 					
-					// featurething.setStyle([iconStyle, valueStyle])
-					
-					featurething.setProperties({'iconStyle': iconStyle, 'valueStyle': valueStyle})
+					featurething.setProperties({'iconStyle': iconStyle, 'valueStyle': valueStyle, 'color': layer_info.color})
 				
 					sourcevector.addFeature(featurething);
 				}
@@ -485,7 +451,6 @@ async function map_start_promise()
 			}
 			catch(e)
 			{
-				console.log(e)
 				fail(e)
 			}
 		})
@@ -501,12 +466,7 @@ async function map_start_promise()
 				serverType: 'geoserver'
 			})
 			
-			/*
-			sourcetile.on('tileloadstart', function(event) {
-				console.log('immagini wms caricate!') 
-			})
-			*/
-			
+					
 			var layer = new ol.layer.Tile({
 				source: sourcetile
 			})
@@ -541,7 +501,6 @@ async function map_start_promise()
 						}
 						else
 						{
-							console.log(xhttp.status)
 							fail(url + ': ' + xhttp.status)
 						}
 				}
@@ -566,15 +525,12 @@ async function map_start_promise()
 	
 	function setupLoginForm()
 	{
-		console.log('login form')
 		var form = document.getElementById('loginform');
 		var loginuser = document.getElementById('loginuser')
 		var loginpass = document.getElementById('loginpass')
 		form.addEventListener('submit', async function(e)
 		{
 			e.preventDefault()
-			console.log(loginuser.value)
-			console.log(loginpass.value)
 			try
 			{
 			   var resp = await fetchJson_promise('login?user=' + encodeURIComponent(loginuser.value) + '&pass=' + encodeURIComponent(loginpass.value))

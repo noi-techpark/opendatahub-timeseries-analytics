@@ -5,7 +5,8 @@
       "base_url" : "data/integreen/MeteoFrontEnd/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#EAC324"
    }
    ,
 
@@ -15,26 +16,29 @@
       "base_url" : "data/integreen/EnvironmentFrontEnd/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#94A9BD"
    }
    ,
 
   {
       "id": "Parking",
-      "icons": ["Parking.svg", ["Parking.svg", "free", 300, 0, 30]],
+      "icons": ["Parking.svg", ["Pin_red.svg", "free", 300, 0, 30]],
       "base_url" : "data/integreen/parkingFrontEnd/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#7FCBFA"
    }
    ,
    {
       "id": "Bluetooth",
-      "icons": ["Bluetooth.svg", ["Bluetooth.svg", "Bluetooth Count record", 21600, 100, 250], ["Bluetooth.svg", "Bluetooth Count record", 21600, 0, 100]],
+      "icons": ["Bluetooth.svg", ["bluetooth-icon2.png", "Bluetooth Count record", 21600, 100, 250], ["Bluetooth.svg", "Bluetooth Count record", 21600, 0, 100]],
       "base_url": "data/integreen/BluetoothFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#2C70B9"
    }
    ,
 
@@ -44,7 +48,8 @@
       "base_url": "data/integreen/sensors/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#996CBF"
    }
    ,
 
@@ -54,7 +59,8 @@
       "base_url": "data/integreen/LinkFrontEnd/rest/",
       "format": "integreen",
       "projection": "xxx",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#E09011"
    }
    ,
 
@@ -64,37 +70,41 @@
       "base_url": "data/integreen/RWISFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#896b3a"
    }
    ,
 
    {
       "id": "Car Sharing",
-      "icons": ["Car_sharing.svg", ["Car_sharing.svg", "number-available", 600, 0, 1], ["Car_sharing.svg", "number-available", 600, 1, 2]],
+      "icons": ["Car_sharing.svg", ["carmarker_red.svg", "number-available", 600, 0, 1], ["Car_sharing.svg", "number-available", 600, 1, 2]],
       "base_url": "data/integreen/carsharingFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#930044"
    }
    ,
 
    {
       "id": "Bike Sharing",
-      "icons": ["Bike_sharing.svg", ["Bike_sharing.svg", "number-available", 600, 0, 1], ["Bike_sharing.svg", "number-available", 600, 1, 5]],
+      "icons": ["Bike_sharing.svg", ["bikemarker_red.svg", "number-available", 600, 0, 1], ["Bike_sharing.svg", "number-available", 600, 1, 5]],
       "base_url": "data/integreen/bikesharingFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#E09011"
    }
    ,
 
    {
       "id": "E-Mobility",
-      "icons": ["E-Mobility.svg", ["E-Mobility.svg", "number-available", 600, 0, 1], ["E-Mobility.svg", "number-available", 600, 1, 2]],
+      "icons": ["E-Mobility.svg", ["emarker_red.svg", "number-available", 600, 0, 1], ["E-Mobility.svg", "number-available", 600, 1, 2]],
       "base_url": "data/integreen/EchargingFrontEnd/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#477632"
    }
    ,
 
@@ -103,7 +113,8 @@
       "icon": "PM10.svg",
       "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:pollution_pm10",
       "format": "wms",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#186900"
    }
    ,
 
@@ -112,7 +123,8 @@
       "icon": "Journey_time.svg",
       "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:congestion",
       "format": "wms",
-      "custom-function": null
+      "custom-function": null,
+      "color": "#C44921"
    }
 
 ] 
