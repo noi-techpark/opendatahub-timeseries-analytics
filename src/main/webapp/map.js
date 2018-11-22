@@ -139,6 +139,7 @@ async function map_start_promise()
 				}
 				catch (e)
 				{
+					console.log(e)
 					error_console.textContent = format_time() + ': ' + e;
 				}
 				finally
@@ -279,27 +280,34 @@ async function map_start_promise()
 				
 				let valuesDiv = document.createElement('div')
 				valuesDiv.textContent = 'loading ...'
-				
 				details_content.appendChild(valuesDiv)
 				
-				let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + integreen_data['id'])
-				
-				for (var dt = 0; dt < json_datatypes.length; dt++)
+				try
+				{					
+					let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + integreen_data['id'])
+					
+					for (var dt = 0; dt < json_datatypes.length; dt++)
+					{
+						let value_struct = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + integreen_data['id']
+																										+ '&type=' + json_datatypes[dt][0]
+																										+ '&period=' + json_datatypes[dt][3])
+						if (dt == 0)
+							valuesDiv.textContent = ''
+						let row = document.createElement('div')
+						let rowText = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']'
+						row.textContent =  rowText.toUpperCase()
+						row.className = "details-valueItem1"
+						valuesDiv.appendChild(row)
+						let row2 = document.createElement('div')
+						row2.textContent = ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
+						row2.className = "details-valueItem2"
+						valuesDiv.appendChild(row2)
+					}
+				}
+				catch (e)
 				{
-					let value_struct = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + integreen_data['id']
-																									+ '&type=' + json_datatypes[dt][0]
-																									+ '&period=' + json_datatypes[dt][3])
-					if (dt == 0)
-						valuesDiv.textContent = ''
-					let row = document.createElement('div')
-					let rowText = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']'
-					row.textContent =  rowText.toUpperCase()
-					row.className = "details-valueItem1"
-					valuesDiv.appendChild(row)
-					let row2 = document.createElement('div')
-					row2.textContent = ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
-					row2.className = "details-valueItem2"
-					valuesDiv.appendChild(row2)
+					console.log(e)
+					valuesDiv.textContent = 'Error! Not authorized?';
 				}
 				
 			}
@@ -528,19 +536,40 @@ async function map_start_promise()
 		var form = document.getElementById('loginform');
 		var loginuser = document.getElementById('loginuser')
 		var loginpass = document.getElementById('loginpass')
+		
+		let logout = document.getElementById('logout');
+		let logoutuser = document.getElementById('logoutuser');
+		let logout_button = document.getElementById('logout_button');
+		
 		form.addEventListener('submit', async function(e)
 		{
 			e.preventDefault()
 			try
 			{
 			   var resp = await fetchJson_promise('login?user=' + encodeURIComponent(loginuser.value) + '&pass=' + encodeURIComponent(loginpass.value))
-			   form.style.visibility = 'hidden'
+			   form.style.display = 'none'
+			   logout.style.display = 'flex';
+			   logoutuser.textContent = loginuser.value
 			}
 			catch (e)
 			{
 				alert('Not autorized!')
 			}
 		})
+		logout_button.addEventListener('click', async function(e)
+		{
+			try
+			{
+			   var resp = await fetchJson_promise('logout');
+			   form.style.display = 'block';
+			   logout.style.display = 'none';
+			}
+			catch (e)
+			{
+				alert('Logout error!')
+			}
+		})
+		
 	}
 }
 
