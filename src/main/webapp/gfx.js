@@ -19,9 +19,9 @@
     -----------------------------------------------------------------
     SECTION_CONFIG:         initial state and constants
     SECTION_UTIL:           basic utility functions
+    SECTION_RANGE:          select time range
     SECTION_TABS:           tabbed panels
     SECTION_TAB_LEGEND:     tabbed panel -> draw legend
-    SECTION_TAB_RANGE:      tabbed panel -> select time range
     SECTION_TAB_DATASET:    tabbed panel -> add data set
     SECTION_PERMALINK:      stuff related to the permalink feature
     SECTION_HEIGHT:         stuff related to the plot height feature
@@ -134,125 +134,10 @@ let color_ix = 2;
 
 
 // -----------------------------------------------------------------------------
-// --- SECTION_TABS: tabbed panels ---------------------------------------------
+// --- SECTION_RANGE: select time range ----------------------------------------
 // -----------------------------------------------------------------------------
 
-const show_tab = ix => {
-
-    let tabs = Array.from(qsa(".gfx_tab"));
-    tabs.forEach( el => el.classList.remove("gfx_tab_active") );
-    tabs[ix].classList.add("gfx_tab_active");
-
-    let panels = Array.from(qsa("#gfx_tabbed_panels > div"));
-    panels.forEach( el => el.style.display = "none" );
-    panels[ix].style.display = "block";
-
-    state.active_tab = ix;
-
-};
-
-const init_tabs = () => {
-
-    let tab_links = Array.from(qsa(".gfx_tab > a"));
-    tab_links.forEach( (el, ix) => {
-        el.addEventListener("click", (ev) => {
-            show_tab(ix);
-            ev.preventDefault();
-        }); 
-    });
-
-    show_tab(state.active_tab);
-
-};
-
-
-// -----------------------------------------------------------------------------
-// --- SECTION_TAB_LEGEND: tabbed panel -> draw legend -------------------------
-// -----------------------------------------------------------------------------
-
-const show_legend = () => {
-
-    // build the legend table
-
-    let html = "";
-    html += "<tr>";
-    html += "<td>color</td>";
-    html += "<td>category</td>";
-    html += "<td>station</td>";
-    html += "<td>data type</td>";
-    html += "<td>period</td>";
-    html += "<td>axes</td>";
-    html += "<td>CSV D/L</td>";
-    html += "<td>remove</td>";
-    html += "<td>data points</td>";
-    html += "</tr>";
-    if (state.graphs.length === 0) {
-        html += '<tr><td colspan="9">no data set selected<br>click on "add data set" to add a data set to the plot</td></tr>';
-    }
-    state.graphs.forEach( (graph, ix) => {
-        html += "<tr>";
-        html += '<td style="color: ' + colors[graph.color] + '"><b>color</b></td>';
-        html += "<td>" + graph.category + "</td>";
-        html += "<td>" + graph.station_name + " (" + graph.station + ")</td>";
-        html += "<td>" + graph.data_type + " [" + graph.unit + "]</td>";
-        html += "<td>" + graph.period + "s</td>";
-        if (graph.yaxis === 1) {
-            html += `<td><button class="gfx_sel" disabled>&lt;</button><button class="gfx_nsel" id="gfx_ytoggle${ix}">&gt;</button></td>`;
-        } else {
-            html += `<td><button class="gfx_nsel" id="gfx_ytoggle${ix}">&lt;</button><button class="gfx_sel" disabled>&gt;</button></td>`;
-        }
-        html += `<td><button id="gfx_prepcsv${ix}">prepare CSV</button></td>`;
-        html += `<td><button id="gfx_remove${ix}">remove graph</button></td>`;
-        if (statedata[ix] === undefined) {
-            html += '<td class="gfx_notice">loading in progress...</td>';
-        } else if (statedata[ix].length === 0 && statedata_status[ix] !== 200) {
-            html += '<td class="gfx_status_error">d/l failed (status ' + statedata_status[ix]+ ')</td>';
-        } else {
-            html += "<td>" + statedata[ix].length + "</td>";
-        }
-        html += "</tr>";
-
-    });
-    qs("#gfx_legend > table").innerHTML = html; 
-
-    // add listeners for buttons: left/right yaxis toggle, prepare CSV and remove graph
-
-    state.graphs.forEach( (graph, ix) => {
-
-        qs("#gfx_ytoggle" + ix).addEventListener("click", () => {
-            if (state.graphs[ix].yaxis === 1) {
-                state.graphs[ix].yaxis = 2;
-            } else {
-                state.graphs[ix].yaxis = 1;
-            }
-            show_legend();
-            plot();
-            refresh_permalink();
-        });
-
-        qs("#gfx_prepcsv" + ix).addEventListener("click", () => {
-            qs("#gfx_prepcsv" + ix).parentElement.innerHTML = "<a href=\"data:text/csv," + encodeURIComponent(get_csv(ix))+ "\" download>download.csv</a>"
-        });
-
-        qs("#gfx_remove" + ix).addEventListener("click", () => {
-            state.graphs.splice(ix, 1);    
-            statedata.splice(ix, 1);
-            statedata_status.splice(ix, 1);
-            show_legend();
-            plot();
-            refresh_permalink();
-        });
-
-    });
-
-};
-
-
-// -----------------------------------------------------------------------------
-// --- SECTION_TAB_RANGE: tabbed panel -> select time range --------------------
-// -----------------------------------------------------------------------------
-
-const init_tab_range = () => {
+const init_range = () => {
 
     const refresh = () => {
         state.scale.from = Number(jQuery("#gfx_fromdate").datepicker( "getDate" ));
@@ -320,7 +205,7 @@ const show_days = () => {
         qs("#gfx_todate"  ).style.backgroundColor = "#FFBBAA";
         qs("#gfx_update_range" ).style.textDecoration = "line-through";
         qs("#gfx_update_range" ).disabled = true;
-        invalid = "(<b>invalid</b>, range must be between 1 and 366 days)"
+        invalid = " - <b>invalid</b>, range must be between 1 and 366 days"
     } else {
         qs("#gfx_fromdate").style.backgroundColor = "#FFFFFF";
         qs("#gfx_todate"  ).style.backgroundColor = "#FFFFFF";
@@ -328,8 +213,124 @@ const show_days = () => {
         qs("#gfx_update_range" ).disabled = false;
         invalid = "";
     }
-    qs("#gfx_days").innerHTML = "&nbsp;" + diff + " days " + invalid + "&nbsp;";
+    qs("#gfx_days").innerHTML = "&nbsp;<span class=\"gfx_hi\">" + diff + " days</span>" + invalid + "&nbsp;";
 };
+
+
+// -----------------------------------------------------------------------------
+// --- SECTION_TABS: tabbed panels ---------------------------------------------
+// -----------------------------------------------------------------------------
+
+const show_tab = ix => {
+
+    let tabs = Array.from(qsa(".gfx_tab"));
+    tabs.forEach( el => el.classList.remove("gfx_tab_active") );
+    tabs[ix].classList.add("gfx_tab_active");
+
+    let panels = Array.from(qsa("#gfx_tabbed_panels > div"));
+    panels.forEach( el => el.style.display = "none" );
+    panels[ix].style.display = "block";
+
+    state.active_tab = ix;
+
+};
+
+const init_tabs = () => {
+
+    let tab_links = Array.from(qsa(".gfx_tab > a"));
+    tab_links.forEach( (el, ix) => {
+        el.addEventListener("click", (ev) => {
+            show_tab(ix);
+            ev.preventDefault();
+        }); 
+    });
+
+    show_tab(state.active_tab);
+
+};
+
+
+// -----------------------------------------------------------------------------
+// --- SECTION_TAB_LEGEND: tabbed panel -> draw legend -------------------------
+// -----------------------------------------------------------------------------
+
+const show_legend = () => {
+
+    // build the legend table
+
+    let html = "";
+    html += "<tr>";
+    html += "<td>COLOR</td>";
+    html += "<td>CATEGORY</td>";
+    html += "<td>STATION</td>";
+    html += "<td>DATA TYPE</td>";
+    html += "<td>PERIOD</td>";
+    html += "<td>DATA POINTS</td>";
+    html += "<td>Y-AXIS</td>";
+    html += "<td>CSV D/L</td>";
+    html += "<td>REMOVE</td>";
+    html += "</tr>";
+    if (state.graphs.length === 0) {
+        html += '<tr><td colspan="9">no dataset selected</td></tr>';
+    }
+    state.graphs.forEach( (graph, ix) => {
+        html += "<tr>";
+        html += '<td style="text-align: center"><div style="display: inline-block; width: 20px; height: 9px; background-color: ' + colors[graph.color] + '"></div></td>';
+        html += "<td>" + graph.category + "</td>";
+        html += "<td>" + graph.station_name + " (" + graph.station + ")</td>";
+        html += "<td>" + graph.data_type + " [" + graph.unit + "]</td>";
+        html += "<td>" + graph.period + "s</td>";
+        if (statedata[ix] === undefined) {
+            html += '<td class="gfx_notice">loading&hellip;</td>';
+        } else if (statedata[ix].length === 0 && statedata_status[ix] !== 200) {
+            html += '<td class="gfx_status_error">d/l failed (status ' + statedata_status[ix]+ ')</td>';
+        } else {
+            html += "<td>" + statedata[ix].length + "</td>";
+        }
+        if (graph.yaxis === 1) {
+            html += `<td><button class="gfx_sel" disabled>&lt;</button>&nbsp;<button class="gfx_nsel" id="gfx_ytoggle${ix}">&gt;</button></td>`;
+        } else {
+            html += `<td><button class="gfx_nsel" id="gfx_ytoggle${ix}">&lt;</button>&nbsp;<button class="gfx_sel" disabled>&gt;</button></td>`;
+        }
+        html += `<td><button id="gfx_prepcsv${ix}">prepare CSV</button></td>`;
+        html += `<td><input style="width: 10px;" type="image" id="gfx_remove${ix}" src="icons/04_other_icons/remove.svg" alt="remove"></td>`;
+        html += "</tr>";
+
+    });
+    qs("#gfx_legend > table").innerHTML = html; 
+
+    // add listeners for buttons: left/right yaxis toggle, prepare CSV and remove graph
+
+    state.graphs.forEach( (graph, ix) => {
+
+        qs("#gfx_ytoggle" + ix).addEventListener("click", () => {
+            if (state.graphs[ix].yaxis === 1) {
+                state.graphs[ix].yaxis = 2;
+            } else {
+                state.graphs[ix].yaxis = 1;
+            }
+            show_legend();
+            plot();
+            refresh_permalink();
+        });
+
+        qs("#gfx_prepcsv" + ix).addEventListener("click", () => {
+            qs("#gfx_prepcsv" + ix).parentElement.innerHTML = "<a href=\"data:text/csv," + encodeURIComponent(get_csv(ix))+ "\" download>download.csv</a>"
+        });
+
+        qs("#gfx_remove" + ix).addEventListener("click", () => {
+            state.graphs.splice(ix, 1);    
+            statedata.splice(ix, 1);
+            statedata_status.splice(ix, 1);
+            show_legend();
+            plot();
+            refresh_permalink();
+        });
+
+    });
+
+};
+
 
 
 // -----------------------------------------------------------------------------
@@ -344,7 +345,7 @@ const init_tab_dataset = () => {
 
     // initialize category select box ( gfx_selcategory ) and create global category -> backend URL hash
     jQuery.getJSON(CAT_CONFIG_URL, (data) => {
-        let opt = `<option value="">select category...</option>`;
+        let opt = `<option value="">Select category...</option>`;
         data
             .filter( cat => cat.format === "integreen" )
             .forEach( cat => { 
@@ -372,7 +373,7 @@ const init_tab_dataset = () => {
 
                 jQuery.getJSON(CAT_BACKENDS[cat] + "get-station-details", (data) => {
                     debug_log("got station details -> length = " + data.length);
-                    let opt = `<option value="">select station...</option>`;
+                    let opt = `<option value="">Select station...</option>`;
                     opt += data
                             .sort( (a, b) => a.name > b.name? 1: -1 )
                             .map( station => `<option value="${station.id};${station.name};">&rarr; ${station.name}</option>` )
@@ -407,7 +408,7 @@ const init_tab_dataset = () => {
 
                 jQuery.getJSON(CAT_BACKENDS[cat] + "get-data-types?station=" + station, (data) => {
                     debug_log("got data types -> length = " + data.length);
-                    let opt = `<option value="">select dataset...</option>`;
+                    let opt = `<option value="">Select dataset...</option>`;
                     opt += data
                             .sort( (a, b) => a[0] > b[0]? 1: -1 )
                             .map( type => `<option value="${type[0]};${type[1]};${type[3]}">&rarr; ${type[0]} [${type[1]}] (${type[3]}s)</option>` )
@@ -751,7 +752,7 @@ let plot = ()  => {
 // -----------------------------------------------------------------------------
 
 init_tabs();
-init_tab_range();
+init_range();
 init_tab_dataset();
 init_state_from_permalink();
 init_plot_height();
@@ -759,7 +760,7 @@ init_auto_refresh();
 show_legend();
 
 // the initial call to load_data() must wait for the category backend URLs
-// (loaded by init_tab_dataseti()) to become available:
+// (loaded by init_tab_dataset()) to become available:
 let conditionally_load_data = () => {
     if (Object.keys(CAT_BACKENDS).length === 0) {   
         setTimeout(conditionally_load_data, 100);
@@ -769,10 +770,8 @@ let conditionally_load_data = () => {
 };
 conditionally_load_data();
 
-// call plot() when the chart is resized and export plot() globally so
-// external UI elements can call it too when they need it
+// call plot() when the chart is resized
 window.addEventListener("resize", plot);
-window.bzanalytics_gfx_plot = plot;
 
 
 })();
