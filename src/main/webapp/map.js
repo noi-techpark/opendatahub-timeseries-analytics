@@ -77,7 +77,6 @@ async function map_start_promise()
 		
 		var layer = null;
 		
-		let spinner = layer_display.querySelector('.spinner')
 		
 		let refresh_function = async function()
 		{
@@ -117,7 +116,6 @@ async function map_start_promise()
 				// crea layer
 				// mostrare progress di caricamento
 				layer_loading = true;
-				spinner.classList.add('loading')
 				layer_selected = true;
 				layer_display.classList.add('selected')
 				
@@ -126,7 +124,7 @@ async function map_start_promise()
 					switch (format)
 					{
 						case 'integreen':
-							layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
+							layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.circle'), layer_display.querySelector('.percentage'))
 							break;
 						case 'wms':
 							layer = await loadWMSLayer(layer_info)
@@ -146,7 +144,6 @@ async function map_start_promise()
 				{
 					
 					layer_loading = false;
-					spinner.classList.remove('loading')
 					
 					autorefresh_functions.push(refresh_function)
 				}
@@ -155,7 +152,6 @@ async function map_start_promise()
 	}
 		
 		layer_display.addEventListener('click', toggle_layer_function)
-		spinner.addEventListener('click', refresh_function)
 			
 	}
 	
@@ -319,7 +315,7 @@ async function map_start_promise()
 				
 	}
 	
-	async function loadIntegreenLayer(layer_info, progressbar_line)
+	async function loadIntegreenLayer(layer_info, progressbar_line, percentage)
 	{
 		return new Promise(async function(ok,fail)
 		{
@@ -389,11 +385,15 @@ async function map_start_promise()
 			    map.addLayer(layer)
 				
 				let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
+				progressbar_line.style.display = "block";
+				percentage.style.display = "block";
 				
 				for (var i = 0; i < json_stations.length; i++)
 				{
 					
-					progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
+					//progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
+					progressbar_line.style.strokeDasharray = ((i+1)*100/json_stations.length) + ', 100';
+					percentage.textContent = Math.round((i+1)*100/json_stations.length) + "%";
 					
 					var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
 					
@@ -455,6 +455,8 @@ async function map_start_promise()
 				
 
 				progressbar_line.style.width = '0px'
+				progressbar_line.style.display = "none";
+				percentage.style.display = "none";
 				ok(layer)
 			}
 			catch(e)

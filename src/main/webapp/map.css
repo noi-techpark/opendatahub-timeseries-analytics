@@ -107,11 +107,10 @@ html, body
    
 }
 
-.layer_template .progressbar_container .progressbar_line
+.layer_template 
 {
-   height: 4px;
-   width: 0%;
-   background-color: red;
+   display: flex;
+   flex-direction: row;
 }
 
 
@@ -258,3 +257,36 @@ html, body
 	margin-bottom: 10px;
 }
 
+
+
+
+.circular-chart {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+}
+
+
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+  stroke-dasharray: 0, 100;
+  stroke: #578ce8;
+  display: none;
+}
+
+
+
+.percentage {
+  fill: #666;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 200;
+  font-size: 0.5em;
+  text-anchor: middle;
+  display: none;
+  stroke: #578ce8;
+}
