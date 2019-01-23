@@ -586,11 +586,10 @@ function showMapOverview()
 }
 
 
-function showHeadline()
+function showCharts()
 {
 	document.getElementById('section_gfx').style.display='block';
 	document.getElementById('section_map').style.display='none';
-	bzanalytics_gfx_plot();	
-	document.getElementById('headline').style.color='#919499';
+	document.getElementById('headline').style.color='#FFFFFF';
 	document.getElementById('map_overview').style.color='#919499';
 }

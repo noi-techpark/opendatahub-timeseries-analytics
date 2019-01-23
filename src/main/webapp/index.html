@@ -23,6 +23,7 @@
     <style>
        body {
           margin: 0px;
+          background-color: #f5f7f4;
        } 
        #header > div
        {
@@ -32,13 +33,13 @@
     </style>
   </head>
 
-  <body style="display:flex; flex-direction:column; overflow-y:scroll">
+  <body style="display:flex; flex-direction:column; overflow-y:scroll;">
   
     <div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
        <img id="logo" src="logo.png">
        <div style="flex-grow:1; display: flex; flex-shrink:0; flex-wrap: nowrap">
        		<div class="header_text" id="map_overview" onClick="showMapOverview()">MAP OVERVIEW</div>
-       		<div class="header_text" id="headline" onClick="showHeadline()">HEADLINE</div>
+       		<div class="header_text" id="headline"     onClick="showCharts()" style="color: #FFFFFF;">CHARTS</div>
        </div>
        <div style="padding-top:19px; padding-right:8px display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden;">
           <form id="loginform">
@@ -57,7 +58,7 @@
     <!-- *** MAPS ********************************************************************************* -->
     <div id="section_map" style="display:none; flex-direction:column; flex-grow:1; min-height:0px">
 
-     <div style="display:flex; flex-grow:1; min-height:0px">
+      <div style="display:flex; flex-grow:1; min-height:0px">
      
         <div id="layers-container" class="layers" style="overflow-y:scroll;">
             <div id="layer_template_id" class="layer_template">
@@ -87,38 +88,73 @@
          	<div id="details-title">title</div>
          	<hr id="details-line">
          	<div id="details-content"></div>
-         	
         </div>
 
-    </div>
-
-    <div id="error-console" style="height:1.5em; flex-shrink:0;color:red; background-color:black"></div>
-
-    <div id="map-popup" style="display:none">
-         
-         <div id="map-popup-box"><div id="map-popup-close">X</div>
-         <div id="map-popup-title">title</div>
-         <div id="map-popup-content">content</div>
-         </div>
-         <div id="map-popup-arrow"><div></div></div>
       </div>
-    <script type="text/javascript">
-       map_start_promise()
-    </script>
+
+      <div id="error-console" style="height:1.5em; flex-shrink:0;color:red; background-color:black"></div>
+
+      <div id="map-popup" style="display:none">
+         
+        <div id="map-popup-box">
+          <div id="map-popup-close">X</div>
+          <div id="map-popup-title">title</div>
+          <div id="map-popup-content">content</div>
+        </div>
+
+        <div id="map-popup-arrow"><div></div></div>
+
+      </div>
+
+      <script type="text/javascript">
+        map_start_promise()
+      </script>
+
+      <div style="flex-shrink:0; background-color:#dddddd">(C) 2018 :::: ::: :::</div>
 
     </div>
 
     <!-- *** GFX (CHARTS) ************************************************************************* -->
 
-    <div id="section_gfx" style="; display:block">
+    <div id="section_gfx" style="display:block;">
 
     <div id="gfx">
 
-      <!-- top panel with graph -->
+    <!-- x-axis (time) range selection -->
+
+      <div id="gfx_time">
+
+          <div style="width: 400px; float:left;">
+          <p>PICK PRESET VALUES</p>
+          <button id="gfx_range_today">Today</button>
+          <button id="gfx_range_ytoday">Yesterday &amp; today</button>
+          <button id="gfx_range_week">One week</button>
+          <button id="gfx_range_month">One month</button>
+          </div>
+
+          <div style="width: 310px; float:left;">
+          <p>OR SELECT A CUSTOM DATE RANGE</p>
+          <input id="gfx_fromdate" type="text" size="12">
+          <img src="icons//04_other_icons/arrow-forward.svg" alt="to" style="width: 10px; margin-left: 10px; margin-right: 10px">
+          <input id="gfx_todate"   type="text" size="12">
+          (<span id="gfx_days"></span>)
+          </div>
+
+          <div style="width: 210px; float: left;">
+          <p>AND UPDATE THE PLOT</p>
+          <button id="gfx_update_range">Update</button>
+          </div>
+
+          <div style="float:clear;">
+          </div>
+
+      </div>
+
+      <!-- chart -->
 
       <div id="gfx_plot">
           <div id="gfx_flot"></div>
-          <div id="gfx_wait"><br><br><br>empty plot</div>
+          <div id="gfx_wait"><br><br><br>no dataset selected</div>
       </div>
 
       <!-- spacer -->
@@ -128,7 +164,7 @@
       <!-- tabs -->
 
       <div id="gfx_tabs">
-          <span class="gfx_tab"><a href="">legend</a></span><span class="gfx_tab"><a href="">select time range</a></span><span class="gfx_tab"><a href="">add data set</a></span><span class="gfx_tab"><a href="">extras</a></span>
+          <span class="gfx_tab"><a href="">Legend</a></span><span class="gfx_tab"><a href="">Extras</a></span>
       </div>
 
       <!-- tabbed panels -->
@@ -137,7 +173,39 @@
 
           <div id="gfx_legend">
 
-            <p>&rarr; currently selected data sets:</p>
+            <div id="gfx_moredata">
+
+              <p>ADD A DATASET TO THE CHART</p>
+
+              <table>
+              <tr>
+              <td>
+              <!-- <div style="width: 170px; float:left;"> -->
+              <select id="gfx_selcategory">
+              </select>
+              </td>
+
+              <td>
+              <!-- <div style="width: 420px; float:left;"> -->
+              <select id="gfx_selstation">
+              </select>
+              </td>
+
+              <td>
+              <!-- <div style="width: 340px; float:left;"> -->
+              <select id="gfx_seldataset">
+              </select>
+              </td>
+
+              <td>
+              <!-- <div style="width: 50px; float:left;"> -->
+              <button id="gfx_addset">Add</button>
+              </td>
+
+              </tr>
+              </table>
+
+            </div>
 
             <table>
             </table>
@@ -150,56 +218,9 @@
 
           </div>
 
-          <div id="gfx_time">
-
-              <p>&rarr; select date range:</p>
-
-              <input id="gfx_fromdate" type="text" size="12">
-              to <input id="gfx_todate"   type="text" size="12">
-              &rarr; <span id="gfx_days"></span>
-              <br><br>
-
-              <button id="gfx_update_range">update plot</button>
-
-              <p>&rarr; pick preset values:</p>
-
-              <button id="gfx_range_today">today</button>
-              <button id="gfx_range_ytoday">yesterday &amp; today</button>
-              <button id="gfx_range_week">one week</button>
-              <button id="gfx_range_month">one month</button>
-
-          </div>
-
-          <div id="gfx_moredata">
-
-              <p>&rarr; add a data set to the plot:</p>
-
-              <select id="gfx_selcategory">
-              </select>
-
-              <br><br>
-
-              <select id="gfx_selstation">
-              </select>
-
-              <br><br>
-
-              <select id="gfx_seldataset">
-              </select>
-
-              <br><br>
-
-              <button id="gfx_addset">add selected data set</button>
-
-          </div>
-
           <div id="gfx_extras">
 
-              <p>&rarr; get a permanent link (warning: long) to the page with the current settings:<br><br>
-                 <a href="" id="gfx_perma">permalink</a> (right click to copy)
-              </p>
-
-              <p>&rarr; select plot height:<br><br>
+              <p>SELECT PLOT HEIGHT<br><br>
                 <select id="gfx_hpx">
                     <option>200px</option>
                     <option>300px</option>
@@ -215,15 +236,18 @@
                 </select>
               </p>
 
+              <p>PERMANENT LINK<br><br>
+                 <a href="" id="gfx_perma">permanent link to copy (warning: long)</a>
+              </p>
+
           </div>
 
       </div>
 
     </div>
 
-    </div>
 
-    <div style="flex-shrink:0; background-color:#dddddd">(C) 2018 :::: ::: :::</div>
+    </div>
 
   </body>
 
