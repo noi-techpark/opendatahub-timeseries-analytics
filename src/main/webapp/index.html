@@ -34,13 +34,13 @@
 
   <body style="display:flex; flex-direction:column; overflow-y:scroll">
   
-    <div id="header" style="display:flex; flex-shrink:0;">
+    <div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
        <img id="logo" src="logo.png">
-       <div style="flex-grow:1; display: flex;">
+       <div style="flex-grow:1; display: flex; flex-shrink:0; flex-wrap: nowrap">
        		<div class="header_text" id="map_overview" onClick="showMapOverview()">MAP OVERVIEW</div>
        		<div class="header_text" id="headline" onClick="showHeadline()">HEADLINE</div>
        </div>
-       <div style="padding-top:19px; padding-right:8px">
+       <div style="padding-top:19px; padding-right:8px display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden;">
           <form id="loginform">
              <input id="loginuser" class="login_element" placeholder="username">
              <input id="loginpass" class="login_element" placeholder="password" type="password">

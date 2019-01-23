@@ -346,12 +346,12 @@ async function map_start_promise()
 				
 				var selectedStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [850, 2100],
-						anchorXUnits: 'pixels',
-						anchorYUnits: 'pixels',
+						anchor: [0.5, 0.85],
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'fraction',
 						opacity: 1,
-						src: 'icons/selected.png',
-						scale: 0.03
+						src: 'icons/Schatten.svg',
+						scale: 0.6
 					})
 				});
 				
@@ -373,7 +373,7 @@ async function map_start_promise()
 				    	if (features.length == 1)
 				        {
 				    		if (selectedFeature != null && selectedFeature === features[0])
-				    	      return [iconStyle, valueStyle] /* , selectedStyle */
+				    	      return [selectedStyle, iconStyle, valueStyle]
 				    	   else
 				    	      return [iconStyle, valueStyle]
 				        }
