@@ -39,7 +39,7 @@ html, body
 
 .layers
 {
-   width: 13em;
+   width: 326px;
    flex-shrink: 0;
 }
 
@@ -47,17 +47,22 @@ html, body
 {
    height: 2em;
    line-height: 2em;
-   border-bottom: 1px dotted gray;
-   padding: 4px;
+   padding: 20px;
    cursor: pointer;
    xoverflow: hidden;
    white-space: nowrap;
+   background-color: #454955;
+   color: #FFFFFF;
+   font-family: 'Roboto', sans-serif;
+   font-weight: 400;
+   font-size: 18px;
 }
+
 
 
 .layers > *.selected
 {
-   background-color: #d2d246
+   background-color: #3d4049;
 }
 
 
@@ -89,6 +94,7 @@ html, body
    visibility: hidden;
    color:red;
    font-weight: bold;
+   padding: 10px;
 }
 
 .layer_template.selected .error.show
@@ -101,9 +107,187 @@ html, body
    
 }
 
-.layer_template .progressbar_container .progressbar_line
+.layer_template 
 {
-   height: 4px;
-   width: 0%;
-   background-color: red;
+   display: flex;
+   flex-direction: row;
+}
+
+
+
+#details-container
+{
+   width: 406px;
+   flex-shrink: 0;
+   padding: 10px;
+   background-color: #f8f8f8;
+   /*position: fixed;
+   right:0px;*/
+}
+
+#details-title
+{
+	font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 26px;
+    margin-top: 34px;
+    margin-left: 43px;
+    margin-bottom: 23px;
+    color: #4D4D4D;
+}
+
+#details-content
+{
+	font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    margin-top: 40px;
+    margin-left: 43px;
+    color: #383737
+}
+
+#details-close
+{
+	display: flex;
+	position: absolute;
+	margin-top: 74px;
+	z-index: 10;
+	margin-left: -25px;
+	height: 30px;
+  	width: 30px;
+  	background-color: #BFBFBF;
+  	border-radius: 50%;
+  	align-items: center;
+	justify-content: center;
+	font-family: sans-serif;
+    font-weight: 700;
+    color: #FFFFFF;
+    cursor: pointer
+}
+
+#details-line
+{
+	margin-left: 30px;
+	margin-rigt: 30px;
+	border: none;
+	background-color: #abb1b7;
+	height: 1px;
+	
+}
+
+#header
+{
+	height: 74px;
+	background: #282C39;
+}
+
+#logo
+{
+	height: 34px;
+	margin-left: 45px;
+	margin-top: 21px;
+	margin-right: 113px;
+}
+
+.header_text
+{
+	margin-left: 45px;
+	margin-top: 26px;
+	color: #FFFFFF;
+	font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    cursor: pointer;
+    color: #919499;
+}
+
+.login_element
+{
+	font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    color: #94A9BD;
+    background: #454956;
+    padding: 7px;
+    padding-left: 17px;
+    width: 200px;
+    border: 0px;
+    border-radius: 3px;
+    margin-left: 15px;
+  
+}
+
+.loginout_button
+{
+	height: 33px;
+	background: #282C39;
+	border-color: #FFFFFF;
+	border-radius: 3px;
+	color: #FFFFFF;
+	margin-left: 30px;
+	margin-right: 36px;
+	width: 118px;
+}
+
+
+.details-name
+{
+	font-weight: 400;
+	color: #898989;
+	margin-top: 11px;
+	width: 150px;
+	min-width: 150px;
+}
+
+.details-value
+{
+	
+	margin-left: 10px;
+	margin-top: 11px;
+}
+
+.details-valueItem1
+{
+	margin-top: 30px;
+	font-size: 16px;
+}
+
+.details-valueItem2
+{
+	margin-top: 5px;
+	color: #898989;
+	font-size: 16px;
+	margin-bottom: 10px;
+}
+
+
+
+
+.circular-chart {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+}
+
+
+
+.circle {
+  fill: none;
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  animation: progress 1s ease-out forwards;
+  stroke-dasharray: 0, 100;
+  stroke: #578ce8;
+  display: none;
+}
+
+
+
+.percentage {
+  fill: #666;
+  font-family: 'Roboto', sans-serif;
+  font-weight: 200;
+  font-size: 0.5em;
+  text-anchor: middle;
+  display: none;
+  stroke: #578ce8;
 }

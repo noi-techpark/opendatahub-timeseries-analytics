@@ -23,17 +23,17 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'mvn clean test'
+                sh 'mvn -B clean test'
             }
         }
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn -B clean package'
             }
         }
         stage('Deploy') {
             steps {
-                sh 'mvn tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
+                sh 'mvn -B tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
             }
         }
     }

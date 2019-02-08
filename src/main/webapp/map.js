@@ -15,6 +15,9 @@ async function map_start_promise()
 	layers_container.removeChild(layer_template)
 	
 	
+	let selectedFeature = null;
+	
+	
 	let map = new ol.Map({
 			target : 'map',
 			layers : [ new ol.layer.Tile({
@@ -36,7 +39,6 @@ async function map_start_promise()
 	
 
 	let json = await fetchJson_promise('layers-config.json')
-	// console.log(json)
 	
 	for (var layer_info of json)
 	{
@@ -53,7 +55,6 @@ async function map_start_promise()
 	
 	async function setupLayer_promise(layer_info)
 	{
-		// console.log(layer_info)
 		let layer_display = layer_template.cloneNode(true)
 		layer_display.querySelector('.label').textContent = layer_info.id
 		layers_container.appendChild(layer_display)
@@ -63,10 +64,10 @@ async function map_start_promise()
 		switch (format)
 		{
 			case 'integreen':
-				layer_display.querySelector('.icon').src = 'layers-icons/' + layer_info.icons[0]
+				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icons[0]
 				break;
 			default:
-				layer_display.querySelector('.icon').src = 'layers-icons/' + layer_info.icon
+				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icon
 				break;
 		}
 				
@@ -76,21 +77,18 @@ async function map_start_promise()
 		
 		var layer = null;
 		
-		let spinner = layer_display.querySelector('.spinner')
 		
 		let refresh_function = async function()
 		{
 			// refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
 			if (!layer_selected || layer_loading)
 			{
-				console.log('caso che non dovrebbe succedere 1!');
 				return;
 			}
 			await toggle_layer_function()
 			
 			if (layer_selected)
 			{
-				console.log('caso che non dovrebbe succedere 2!');
 				return;
 			}
 			
@@ -118,7 +116,6 @@ async function map_start_promise()
 				// crea layer
 				// mostrare progress di caricamento
 				layer_loading = true;
-				spinner.classList.add('loading')
 				layer_selected = true;
 				layer_display.classList.add('selected')
 				
@@ -127,7 +124,7 @@ async function map_start_promise()
 					switch (format)
 					{
 						case 'integreen':
-							layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.progressbar_line'))
+							layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.circle'), layer_display.querySelector('.percentage'))
 							break;
 						case 'wms':
 							layer = await loadWMSLayer(layer_info)
@@ -141,17 +138,13 @@ async function map_start_promise()
 				catch (e)
 				{
 					console.log(e)
-					// Raven.captureException(e)
 					error_console.textContent = format_time() + ': ' + e;
 				}
 				finally
 				{
-					// spegnere progress di caricamento
 					
 					layer_loading = false;
-					spinner.classList.remove('loading')
 					
-					// aggiungi al timer di aggiornamento automatico!
 					autorefresh_functions.push(refresh_function)
 				}
 				
@@ -159,7 +152,6 @@ async function map_start_promise()
 	}
 		
 		layer_display.addEventListener('click', toggle_layer_function)
-		spinner.addEventListener('click', refresh_function)
 			
 	}
 	
@@ -171,13 +163,10 @@ async function map_start_promise()
 		setTimeout(async function()
 		{
 			let refresh_local_copy = autorefresh_functions.slice();
-			console.log('refresh automatico1 ' + autorefresh_functions.length)
 			for (let i = 0; i < refresh_local_copy.length; i++)
 			{
-				console.log(i)
 				refresh_local_copy[i]()
 			}
-			console.log('refresh automatico2')
 			startAutoRefresh()
 		}, next_time)
 	}
@@ -188,10 +177,27 @@ async function map_start_promise()
 		var popup_close = document.getElementById('map-popup-close');
 		var popup_content = document.getElementById('map-popup-content');
 		var popup_title = document.getElementById('map-popup-title');
+		
+		var details_close = document.getElementById('details-close');
+		var details_content = document.getElementById('details-content');
+		var details_title = document.getElementById('details-title');
+		var details_container = document.getElementById('details-container');
+		details_container.style.display = "none";
 
 		popup_close.addEventListener('click', function()
 		{
-			popup_overlay.setPosition() // nascondi il popup passando una posizione undefined
+			popup_overlay.setPosition()
+		})
+		
+		details_close.addEventListener('click', function()
+		{
+			details_content.textContent  = '';
+			details_title.textContent = '';
+			details_container.style.display = "none";
+			if (selectedFeature != null)
+				selectedFeature.changed();
+			selectedFeature = null;
+			map.updateSize();
 		})
 
 		var popup_overlay = new ol.Overlay({
@@ -201,230 +207,260 @@ async function map_start_promise()
 		})
 		map.addOverlay(popup_overlay);
 		
-		// attiva la visualizzazione del popup nascosto durante il caricamento
-		// a questo punto openlayer lo ha già nascosto
 		popup_element.style.display = 'block'
 			
 		map.on('click', async function(e)
 		{
 			var features = map.getFeaturesAtPixel(e.pixel);
-			console.log(features)
 			if (features)
 			{
+				// clustered icon? simply zoom!
+				if (features[0].get("features").length > 1)
+				{
+					let currZoom = map.getView().getZoom();
+                    let nextZoom = currZoom + 1;
+                    let nextResolution = map.getView().getResolutionForZoom(nextZoom)
+                    let newcenter = map.getView().calculateCenterZoom(nextResolution, features[0].getGeometry().getCoordinates());
+                    map.getView().setCenter(newcenter)
+                    map.getView().setZoom(nextZoom)
+					return;
+				}
+				
+				if (selectedFeature != null)
+					selectedFeature.changed();
+				selectedFeature = features[0].get("features")[0];
+				selectedFeature.changed();
+				
+				details_container.style.display = 'block';
+				map.updateSize();
 				var coords = features[0].getGeometry().getCoordinates();
-				// var hdms = coordinate.toStringHDMS(proj.toLonLat(coords));
-				var integreen_data = features[0].getProperties()['integreen_data'];
-				let layer_info = features[0].getProperties()['layer_info'];
-				popup_title.textContent	= integreen_data['name'];
-				popup_content.textContent = '' 
+				
+				var integreen_data = features[0].get("features")[0].getProperties()['integreen_data'];
+				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
+				let color = features[0].get("features")[0].getProperties()['color'];
+				
+				details_title.textContent = integreen_data['name'];
+				details_content.textContent = ''
+				let index = 0;
+					
 				for (var name in integreen_data) 
 				{
+					
 					if (integreen_data.hasOwnProperty(name) && ['_t', 'data_types'].indexOf(name) < 0) 
 					{
 						var row = document.createElement('div')
-						row.textContent = name + ': ' + integreen_data[name]
-						popup_content.appendChild(row)
+						row.className = "valuesDiv"
+						row.style = "display:flex;"
+						var nameDiv = document.createElement('div')
+						nameDiv.textContent = name.toUpperCase();
+						nameDiv.className = "details-name"
+						row.appendChild(nameDiv);
+						var valueDiv = document.createElement('div')
+						var valueText = integreen_data[name]+ "";
+						valueDiv.textContent = valueText.toUpperCase();
+						valueDiv.className = "details-value"
+						row.appendChild(valueDiv);
+						
+						if(index == 0){
+							nameDiv.style = "color: " + color + "; font-size: 20px; font-weight: 500; margin-bottom: 20px; padding-top: 5px;";
+							valueDiv.style = "background-color: " + color + "; color: #FFFFFF; font-size: 18px; font-weight: 500;margin-bottom: 20px; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; border-radius: 5px;";
+						}
+						
+						details_content.appendChild(row)
+						index++;
 					}
 				}
-				var row = document.createElement('div')
-				row.textContent = '---'
-				popup_content.appendChild(row)
+							
 				
-				/*
-				var data_types = integreen_data['data_types']
-				for (var dt = 0; dt < data_types.length; dt++)
-				{
-					var row = document.createElement('div')
-					var value_struct = data_types[dt]['newest_record']
-					var data_type_struct = data_types[dt]['data_type']
-					row.textContent = value_struct['value'] + ' ' + data_type_struct[0] + ' [' + data_type_struct[3] + ']' + ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
-					popup_content.appendChild(row)
-				}
-				*/
+				
 				
 				let valuesDiv = document.createElement('div')
 				valuesDiv.textContent = 'loading ...'
-				popup_content.appendChild(valuesDiv)
+				details_content.appendChild(valuesDiv)
 				
-				popup_overlay.setPosition(coords);
-				
-				let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + integreen_data['id'])
-				
-				for (var dt = 0; dt < json_datatypes.length; dt++)
+				try
+				{					
+					let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + integreen_data['id'])
+					
+					for (var dt = 0; dt < json_datatypes.length; dt++)
+					{
+						let value_struct = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + integreen_data['id']
+																										+ '&type=' + json_datatypes[dt][0]
+																										+ '&period=' + json_datatypes[dt][3])
+						if (dt == 0)
+							valuesDiv.textContent = ''
+						let row = document.createElement('div')
+						let rowText = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']'
+						row.textContent =  rowText.toUpperCase()
+						row.className = "details-valueItem1"
+						valuesDiv.appendChild(row)
+						let row2 = document.createElement('div')
+						row2.textContent = ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
+						row2.className = "details-valueItem2"
+						valuesDiv.appendChild(row2)
+					}
+				}
+				catch (e)
 				{
-					console.log(json_datatypes[dt])
-					let value_struct = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + integreen_data['id']
-																									+ '&type=' + json_datatypes[dt][0]
-																									+ '&period=' + json_datatypes[dt][3])
-					console.log(value_struct)
-					if (dt == 0)
-						valuesDiv.textContent = ''
-					let row = document.createElement('div')
-					row.textContent = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']' + ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
-					valuesDiv.appendChild(row)
+					console.log(e)
+					valuesDiv.textContent = 'Error! Not authorized?';
 				}
 				
 			}
 			else
 			{
-				popup_overlay.setPosition() // nascondi il popup passando una posizione undefined
+				popup_overlay.setPosition()
 			}
 		});
 				
 	}
 	
-	async function loadIntegreenLayer(layer_info, progressbar_line)
+	async function loadIntegreenLayer(layer_info, progressbar_line, percentage)
 	{
 		return new Promise(async function(ok,fail)
 		{
 			try
 			{
+				
 				var iconStyle = new ol.style.Style({
 					image: new ol.style.Icon({
 					anchor: [0.5, 1.0],
 					anchorXUnits: 'fraction',
 					anchorYUnits: 'fraction',
 					opacity: 1,
-					src:  'layers-icons/' + layer_info.icons[0],
-					scale: 0.5
-					// size: [32,32]
+					src:  'icons/02_Icons_map/' + layer_info.icons[0],
+					scale: 0.6
 					})
 				});
 				
-				var shadowStyle = new ol.style.Style({
+				var cluserStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [0.3, 1.0],
+						anchor: [-50, +320],
+						anchorXUnits: 'pixels',
+						anchorYUnits: 'pixels',
+						opacity: 1,
+						src: 'icons/value-circle/cluster.svg',
+						scale: 0.20
+					})
+				});
+				
+				var selectedStyle = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, 0.85],
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'fraction',
 						opacity: 1,
-						src: 'layers-icons/' + 'marker-shadow.png',
-						scale: 1
+						src: 'icons/Schatten.svg',
+						scale: 0.6
 					})
 				});
 				
 				var sourcevector = new ol.source.Vector({});
+
+				var clusterSource = new ol.source.Cluster({
+			        distance: 80,
+			        source: sourcevector
+			    });
 				
 				let layer = new ol.layer.Vector({
-					title : 'meteoLayer',
 					visible : true,
-					source : sourcevector,
-					style : [shadowStyle, iconStyle]
+					source : clusterSource,
+					style: function(list)
+				    {
+				    	let features = list.get('features')
+				    	let iconStyle = features[0].get('iconStyle');
+				    	let valueStyle = features[0].get('valueStyle');
+				    	if (features.length == 1)
+				        {
+				    		if (selectedFeature != null && selectedFeature === features[0])
+				    	      return [selectedStyle, iconStyle, valueStyle]
+				    	   else
+				    	      return [iconStyle, valueStyle]
+				        }
+				    	else 
+				    	   return [iconStyle, cluserStyle]
+				    }
 				})
 				
-				map.addLayer(layer)
+			    map.addLayer(layer)
 				
 				let json_stations = await fetchJson_promise(layer_info.base_url + 'get-station-details')
+				progressbar_line.style.display = "block";
+				percentage.style.display = "block";
 				
 				for (var i = 0; i < json_stations.length; i++)
 				{
-					// RIMUOVERE DOPO I TEST!!!
-					// if (i >= 10)
-					//	break;
 					
-					
-					progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
+					//progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
+					progressbar_line.style.strokeDasharray = ((i+1)*100/json_stations.length) + ', 100';
+					percentage.textContent = Math.round((i+1)*100/json_stations.length) + "%";
 					
 					var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
 					
 					var featurething = new ol.Feature({
-						// name: "Thing",
 						geometry : thing,
 						integreen_data: json_stations[i],
 						'layer_info': layer_info
 					});
-					
-					/*
-					// Carica i data types e gli ultimi valori
-					let json_datatypes = await fetchJson_promise(layer_info.base_url + 'get-data-types?station=' + json_stations[i].id)
-					
-					// Arricchisci il json della stazione con i dati dei datatype ricevuti con la seconda chiamata
-					json_stations[i]['data_types'] = json_datatypes
-					
-					for (var dt = 0; dt < json_datatypes.length; dt++)
-					{
-						let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id 
-																										+ '&type=' + json_datatypes[dt][0]
-																										+ '&period=' + json_datatypes[dt][3])
-						let struct = {}
-						struct['data_type'] = json_datatypes[dt]
-						struct['newest_record'] = json_value
-						json_datatypes[dt] = struct
-						
-						// eventualmente personalizza l'icona in base ai valori
-						for (var ic = 1; ic < layer_info.icons.length; ic++)
-						{
-							var cond = layer_info.icons[ic]
-							if (cond[1] == struct['data_type'][0] // tipo di misura esempio: "Bluetooth Count record"
-								&& cond[2] == struct['data_type'][3] // intervallo di misura: 21600
-								&& cond[3] <= struct['newest_record']['value'] // minimo
-								&& cond[4] >  struct['newest_record']['value'] // massimo escluso
-							)
-							{
-								var iconStyle = new ol.style.Style({
-									image: new ol.style.Icon({
-										anchor: [0.5, 1.0],
-										anchorXUnits: 'fraction',
-										anchorYUnits: 'fraction',
-										opacity: 1,
-										src: 'layers-icons/' + cond[0],
-										scale: 0.5
-									})
-								});
-								featurething.setStyle([shadowStyle, iconStyle])
-							}
-						}
-						
-					}
-					*/
 
-					var icona = layer_info.icons[0];
+					var icona = 'transparent.svg';
 
+					
 					for (var ic = 1; ic < layer_info.icons.length; ic++)
 					{
+						if (ic == 1)
+							icona = 'green.svg'
 						try
 						{
 							var cond = layer_info.icons[ic]
 							let json_value = await fetchJson_promise(layer_info.base_url + 'get-newest-record?station=' + json_stations[i].id
 																	+ '&type=' + cond[1]
 																	+ '&period=' + cond[2]);
-							console.log(json_value)
 							var valore_attuale = json_value.value;
 							if (cond[3] <= valore_attuale && valore_attuale < cond[4])
 							{
-								icona = cond[0]
+							    if (ic == 2 && layer_info.icons.length == 3)
+									icona = 'yellow.svg';
+								else
+									icona = 'red.svg';
 								break;
 							}
 						}
 						catch (e)
 						{
-							// TODO: visualizzare icona di errore!
 							console.log(e)
 						}
 					}
 					
-					var iconStyle = new ol.style.Style({
+					
+					var valueStyle = new ol.style.Style({
 						image: new ol.style.Icon({
-							anchor: [0.5, 1.0],
-							anchorXUnits: 'fraction',
-							anchorYUnits: 'fraction',
+							anchor: [-50, +320],
+							anchorXUnits: 'pixels',
+							anchorYUnits: 'pixels',
 							opacity: 1,
-							src: 'layers-icons/' + icona,
-							scale: 0.5
+							src: 'icons/value-circle/' + icona,
+							scale: 0.20
 						})
 					});
 					
-					featurething.setStyle([shadowStyle, iconStyle])
+					featurething.setProperties({'iconStyle': iconStyle, 'valueStyle': valueStyle, 'color': layer_info.color})
 				
 					sourcevector.addFeature(featurething);
 				}
 				
-				layer.setSource(sourcevector)
+				
+				
+			    
+				
+
 				progressbar_line.style.width = '0px'
+				progressbar_line.style.display = "none";
+				percentage.style.display = "none";
 				ok(layer)
 			}
 			catch(e)
 			{
-				console.log(e)
 				fail(e)
 			}
 		})
@@ -440,12 +476,7 @@ async function map_start_promise()
 				serverType: 'geoserver'
 			})
 			
-			/*
-			sourcetile.on('tileloadstart', function(event) {
-				console.log('immagini wms caricate!') 
-			})
-			*/
-			
+					
 			var layer = new ol.layer.Tile({
 				source: sourcetile
 			})
@@ -480,7 +511,6 @@ async function map_start_promise()
 						}
 						else
 						{
-							console.log(xhttp.status)
 							fail(url + ': ' + xhttp.status)
 						}
 				}
@@ -505,24 +535,61 @@ async function map_start_promise()
 	
 	function setupLoginForm()
 	{
-		console.log('login form')
 		var form = document.getElementById('loginform');
 		var loginuser = document.getElementById('loginuser')
 		var loginpass = document.getElementById('loginpass')
+		
+		let logout = document.getElementById('logout');
+		let logoutuser = document.getElementById('logoutuser');
+		let logout_button = document.getElementById('logout_button');
+		
 		form.addEventListener('submit', async function(e)
 		{
 			e.preventDefault()
-			console.log(loginuser.value)
-			console.log(loginpass.value)
 			try
 			{
 			   var resp = await fetchJson_promise('login?user=' + encodeURIComponent(loginuser.value) + '&pass=' + encodeURIComponent(loginpass.value))
-			   form.style.visibility = 'hidden'
+			   form.style.display = 'none'
+			   logout.style.display = 'flex';
+			   logoutuser.textContent = loginuser.value
 			}
 			catch (e)
 			{
 				alert('Not autorized!')
 			}
 		})
+		logout_button.addEventListener('click', async function(e)
+		{
+			try
+			{
+			   var resp = await fetchJson_promise('logout');
+			   form.style.display = 'block';
+			   logout.style.display = 'none';
+			}
+			catch (e)
+			{
+				alert('Logout error!')
+			}
+		})
+		
 	}
+}
+
+
+function showMapOverview()
+{
+	document.getElementById('section_gfx').style.display='none';
+	document.getElementById('section_map').style.display='flex';
+	bzanalytics_map.updateSize();
+	document.getElementById('headline').style.color='#919499';
+	document.getElementById('map_overview').style.color='#FFFFFF';
+}
+
+
+function showCharts()
+{
+	document.getElementById('section_gfx').style.display='block';
+	document.getElementById('section_map').style.display='none';
+	document.getElementById('headline').style.color='#FFFFFF';
+	document.getElementById('map_overview').style.color='#919499';
 }
