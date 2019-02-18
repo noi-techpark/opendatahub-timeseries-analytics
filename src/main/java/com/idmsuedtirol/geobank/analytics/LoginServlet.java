@@ -1,18 +1,10 @@
 package com.idmsuedtirol.geobank.analytics;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -22,13 +14,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
 
 public class LoginServlet extends HttpServlet {
-	
+
+	private static final long serialVersionUID = -5294182643959014529L;
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 	}
@@ -39,22 +32,22 @@ public class LoginServlet extends HttpServlet {
 		String pass = req.getParameter("pass");
 		System.out.println(user);
 		System.out.println(pass);
-		
+
 		// http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token?user=a&pw=a
 		URL serviceUrl = new URL("http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token?user=" + URLEncoder.encode(user, StandardCharsets.UTF_8.name()) + "&pw=" + URLEncoder.encode(pass, StandardCharsets.UTF_8.name()));
 
 		HttpURLConnection conn = (HttpURLConnection) serviceUrl.openConnection();
 		conn.setConnectTimeout(15000);
 		conn.setReadTimeout(30000);
-		
+
 		ObjectMapper om = new ObjectMapper();
 		ObjectNode jsonResp = om.createObjectNode();
-		
+
 		int httpCode = conn.getResponseCode();
 		if (httpCode == 200)
 		{
 			byte[] data = GeobankAnalyticsServlet.readRequestData(conn.getInputStream());
-			
+
 			JsonNode tree = om.readTree(data);
 			ObjectNode root = (ObjectNode)tree;
 			JsonNode accessTokenNode = root.get("accessToken");
@@ -73,7 +66,7 @@ public class LoginServlet extends HttpServlet {
 		resp.setContentType("application/json");
 		resp.setStatus(401);
 	}
-	
+
 	private static void responseError(HttpServletResponse resp, int code) throws IOException
 	{
 		responseError(resp, code, null);
@@ -85,6 +78,6 @@ public class LoginServlet extends HttpServlet {
 		resp.setStatus(code);
 		resp.getOutputStream().write(("Error: " + code + (msg == null ? "" : "\n" + msg)).getBytes(StandardCharsets.US_ASCII));
 	}
-	
+
 
 }
