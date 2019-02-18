@@ -79,9 +79,6 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		String serviceName = serviceMatcher.group(1);
 		String servicePath = serviceMatcher.group(2);
 
-		System.out.println(serviceName);
-		System.out.println(servicePath);
-
 		// if the service name is not found, return 404
 		String serviceUrlTxt = path2url.get(serviceName);
 		if (serviceUrlTxt == null)
@@ -94,7 +91,6 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 
 		// TODO: match servicePath against a whitelist
 		String newUrlTxt = serviceUrlTxt + servicePath + "?" + urlParameters;
-		System.out.println(newUrlTxt);
 
 		URL serviceUrl = new URL(newUrlTxt);
 		HttpURLConnection conn = (HttpURLConnection) serviceUrl.openConnection();
@@ -102,7 +98,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		String accessToken = (String)req.getSession().getAttribute("accessToken");
 
 		if ( accessToken != null)
-		   conn.addRequestProperty("Authorization", "Bearer " + accessToken);
+			conn.addRequestProperty("Authorization", "Bearer " + accessToken);
 
 		conn.setConnectTimeout(15000);
 		conn.setReadTimeout(30000);
@@ -118,7 +114,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 			// read input stream only with status 200
 			// reading with status != 200 can throw other exceptions
 			if (httpCode == 200)
-				 responseData = readRequestData(conn.getInputStream());
+				responseData = readRequestData(conn.getInputStream());
 
 			conn.disconnect();
 		}

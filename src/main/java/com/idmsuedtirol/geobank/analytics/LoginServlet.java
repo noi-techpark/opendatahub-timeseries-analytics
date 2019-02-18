@@ -30,8 +30,6 @@ public class LoginServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String user = req.getParameter("user");
 		String pass = req.getParameter("pass");
-		System.out.println(user);
-		System.out.println(pass);
 
 		// http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token?user=a&pw=a
 		URL serviceUrl = new URL("http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token?user=" + URLEncoder.encode(user, StandardCharsets.UTF_8.name()) + "&pw=" + URLEncoder.encode(pass, StandardCharsets.UTF_8.name()));
@@ -54,7 +52,6 @@ public class LoginServlet extends HttpServlet {
 			if (accessTokenNode != null)
 			{
 				String accessToken = accessTokenNode.get("token").asText();
-				System.out.println(accessToken);
 				req.getSession().setAttribute("accessToken", accessToken);
 				jsonResp.set("message", jsonResp.textNode("ok"));
 				resp.setStatus(200);
