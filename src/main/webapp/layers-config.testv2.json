@@ -100,7 +100,7 @@
    {
       "id": "E-Mobility",
       "icons": ["E-Mobility.svg", ["emarker_red.svg", "number-available", 600, 0, 1], ["E-Mobility.svg", "number-available", 600, 1, 2]],
-      "base_url": "data/integreen/echarging2/rest/",
+      "base_url": "data/integreen/emobility2/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null,
