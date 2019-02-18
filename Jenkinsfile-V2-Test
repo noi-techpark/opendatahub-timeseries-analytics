@@ -39,7 +39,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'mvn -B tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
+                sh 'mvn -B tomcat:redeploy -Dmaven.tomcat.path=/analytics2 -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
             }
         }
     }
