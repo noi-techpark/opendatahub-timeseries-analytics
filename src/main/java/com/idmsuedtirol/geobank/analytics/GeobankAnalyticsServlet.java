@@ -8,7 +8,6 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,23 +24,25 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /*
    Url esempi:
-   
+
    http://ipchannels.integreen-life.bz.it/parkingFrontEnd/rest/get-stations
    http://ipchannels.integreen-life.bz.it/BluetoothFrontEnd/rest/get-stations
-   
+
    http://localhost:8888/data/integreen/BluetoothFrontEnd/rest/get-stations
-   
+
    Status 422: se i parametri non validano
    Status 404: se l'url non è tra quelle previste
    Status 504: gateway timeout se non ho ottenuto risposta in tempo
    Status 502: bad gateway l'altro non risponde con un 200 (mettere nel testo il status originale)
  */
 public class GeobankAnalyticsServlet extends HttpServlet {
-	
+
+	private static final long serialVersionUID = -5920499466614372803L;
+
 	HashMap<String, String> path2url = new HashMap<String, String>();
-	
+
 	Pattern firstSubfolder;
-	
+
 	@Override
 	public void init(ServletConfig config) throws ServletException {
 		try {
@@ -74,13 +75,13 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 			responseError(resp, 404);
 			return;
 		}
-			
+
 		String serviceName = serviceMatcher.group(1);
 		String servicePath = serviceMatcher.group(2);
-		
+
 		System.out.println(serviceName);
 		System.out.println(servicePath);
-		
+
 		// if the service name is not found, return 404
 		String serviceUrlTxt = path2url.get(serviceName);
 		if (serviceUrlTxt == null)
@@ -88,28 +89,28 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 			responseError(resp, 404);
 			return;
 		}
-		
+
 		// TODO: add some headers about browser caching?
-		
+
 		// TODO: match servicePath against a whitelist
 		String newUrlTxt = serviceUrlTxt + servicePath + "?" + urlParameters;
 		System.out.println(newUrlTxt);
-		
+
 		URL serviceUrl = new URL(newUrlTxt);
 		HttpURLConnection conn = (HttpURLConnection) serviceUrl.openConnection();
-		
+
 		String accessToken = (String)req.getSession().getAttribute("accessToken");
-		
+
 		if ( accessToken != null)
 		   conn.addRequestProperty("Authorization", "Bearer " + accessToken);
 
 		conn.setConnectTimeout(15000);
 		conn.setReadTimeout(30000);
-		
+
 		int httpCode;
 		byte[] responseData = new byte[0];
 		String contentType;
-		
+
 		try
 		{
 			httpCode = conn.getResponseCode();
@@ -118,7 +119,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 			// reading with status != 200 can throw other exceptions
 			if (httpCode == 200)
 				 responseData = readRequestData(conn.getInputStream());
-			
+
 			conn.disconnect();
 		}
 		catch (SocketTimeoutException timeout)
@@ -126,7 +127,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 			responseError(resp, 504, "Timeout"); // gateway timeout
 			return;
 		}
-		
+
 		// As last check
 		if (httpCode != 200 || contentType == null || !contentType.startsWith("application/json"))
 		{
@@ -137,10 +138,10 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		// TODO: check if is always json!
 		resp.setContentType(contentType);
 		resp.getOutputStream().write(responseData);
-		
-		
+
+
 	}
-	
+
 	private static void responseError(HttpServletResponse resp, int code) throws IOException
 	{
 		responseError(resp, code, null);
@@ -152,14 +153,14 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		resp.setStatus(code);
 		resp.getOutputStream().write(("Error: " + code + (msg == null ? "" : "\n" + msg)).getBytes(StandardCharsets.US_ASCII));
 	}
-	
+
 	static byte[] readRequestData(InputStream io) throws IOException
 	{
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
+
 		byte[] buf = new byte[300000];
 		int len;
-		
+
 		while ((len = io.read(buf)) > 0)
 		{
 			baos.write(buf,0,len);
