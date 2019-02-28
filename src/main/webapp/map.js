@@ -518,6 +518,33 @@ async function map_start_promise()
 			xhttp.send();
 		})
 	}
+	
+	function fetchJsonLogin_promise(url, params)
+	{
+		return new Promise(function(success, fail)
+		{
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("POST", url , true);
+			xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+			xhttp.onreadystatechange = function(readystatechange)
+			{
+				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
+				{
+						if (xhttp.status == 200)
+						{
+							var data = JSON.parse(xhttp.responseText)
+							success(data)
+						}
+						else
+						{
+							fail(url + ': ' + xhttp.status)
+						}
+				}
+			}
+			xhttp.send(params);
+		})
+	}
    // (european) date time string
 	function format_time()
 	{
@@ -548,7 +575,7 @@ async function map_start_promise()
 			e.preventDefault()
 			try
 			{
-			   var resp = await fetchJson_promise('login?user=' + encodeURIComponent(loginuser.value) + '&pass=' + encodeURIComponent(loginpass.value))
+			   var resp = await fetchJsonLogin_promise('login','user=' + encodeURIComponent(loginuser.value) + '&pass=' + encodeURIComponent(loginpass.value))
 			   form.style.display = 'none'
 			   logout.style.display = 'flex';
 			   logoutuser.textContent = loginuser.value

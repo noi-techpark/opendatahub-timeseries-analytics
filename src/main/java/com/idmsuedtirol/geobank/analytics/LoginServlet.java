@@ -27,11 +27,45 @@ public class LoginServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String user = req.getParameter("user");
 		String pass = req.getParameter("pass");
 
 		// http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token?user=a&pw=a
+		/*URL serviceUrl = new URL("http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token");
+
+		HttpURLConnection conn = (HttpURLConnection) serviceUrl.openConnection();
+		conn.setConnectTimeout(15000);
+		conn.setReadTimeout(30000);
+		conn.setRequestMethod("POST");
+		conn.setDoOutput(true);
+		conn.getOutputStream().write(("user=" + URLEncoder.encode(user, StandardCharsets.UTF_8.name()) + "&pw=" + URLEncoder.encode(pass, StandardCharsets.UTF_8.name())).getBytes());
+		
+		ObjectMapper om = new ObjectMapper();
+		ObjectNode jsonResp = om.createObjectNode();
+
+		int httpCode = conn.getResponseCode();
+		if (httpCode == 200)
+		{
+			byte[] data = GeobankAnalyticsServlet.readRequestData(conn.getInputStream());
+
+			JsonNode tree = om.readTree(data);
+			ObjectNode root = (ObjectNode)tree;
+			JsonNode accessTokenNode = root.get("accessToken");
+			if (accessTokenNode != null)
+			{
+				String accessToken = accessTokenNode.get("token").asText();
+				req.getSession().setAttribute("accessToken", accessToken);
+				jsonResp.set("message", jsonResp.textNode("ok"));
+				resp.setStatus(200);
+				resp.setContentType("application/json");
+				resp.getWriter().write(jsonResp.toString());
+				return;
+			}
+		}
+		resp.setContentType("application/json");
+		resp.setStatus(401);*/
+		
 		URL serviceUrl = new URL("http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token?user=" + URLEncoder.encode(user, StandardCharsets.UTF_8.name()) + "&pw=" + URLEncoder.encode(pass, StandardCharsets.UTF_8.name()));
 
 		HttpURLConnection conn = (HttpURLConnection) serviceUrl.openConnection();
