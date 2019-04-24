@@ -1,5 +1,6 @@
 package com.idmsuedtirol.geobank.analytics;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 
@@ -21,9 +23,30 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class LoginServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -5294182643959014529L;
+	private String host = "https://ipchannels.integreen-life.bz.it/";
+	private String loginEndpoint = "/environment/rest/refresh-token";
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
+		try {
+			String configFileName = config.getServletContext().getRealPath("/WEB-INF/config.json");
+			ObjectMapper jsonmapper = new ObjectMapper();
+			ObjectNode configData = (ObjectNode) jsonmapper.readTree(new File(configFileName));
+			ArrayNode endpoints = (ArrayNode) configData.get("endpoints");
+			for (int e = 0; e < endpoints.size(); e++)
+			{
+				ObjectNode endpoint = (ObjectNode) endpoints.get(e);
+				String url = endpoint.get("url").asText();
+				if (url!= null && !url.isEmpty())
+					host = url;
+				String loginPath = endpoint.get("loginPath").asText();
+				if (loginPath!= null && !loginPath.isEmpty())
+					loginEndpoint=loginPath;
+
+			}
+		} catch (Exception exxx) {
+			throw new ServletException(exxx);
+		}
 	}
 
 	@Override
@@ -40,7 +63,7 @@ public class LoginServlet extends HttpServlet {
 		conn.setRequestMethod("POST");
 		conn.setDoOutput(true);
 		conn.getOutputStream().write(("user=" + URLEncoder.encode(user, StandardCharsets.UTF_8.name()) + "&pw=" + URLEncoder.encode(pass, StandardCharsets.UTF_8.name())).getBytes());
-		
+
 		ObjectMapper om = new ObjectMapper();
 		ObjectNode jsonResp = om.createObjectNode();
 
@@ -65,8 +88,9 @@ public class LoginServlet extends HttpServlet {
 		}
 		resp.setContentType("application/json");
 		resp.setStatus(401);*/
-		
-		URL serviceUrl = new URL("http://ipchannels.integreen-life.bz.it/environment/rest/refresh-token?user=" + URLEncoder.encode(user, StandardCharsets.UTF_8.name()) + "&pw=" + URLEncoder.encode(pass, StandardCharsets.UTF_8.name()));
+
+
+		URL serviceUrl = new URL(host+loginEndpoint +"?user=" +URLEncoder.encode(user, StandardCharsets.UTF_8.name()) + "&pw=" + URLEncoder.encode(pass, StandardCharsets.UTF_8.name()));
 
 		HttpURLConnection conn = (HttpURLConnection) serviceUrl.openConnection();
 		conn.setConnectTimeout(15000);
