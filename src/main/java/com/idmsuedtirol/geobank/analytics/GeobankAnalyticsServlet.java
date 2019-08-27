@@ -127,7 +127,7 @@ public class GeobankAnalyticsServlet extends HttpServlet {
 		// As last check
 		if (httpCode != 200 || contentType == null || !contentType.startsWith("application/json"))
 		{
-			responseError(resp, 502, "Upstream status: " + httpCode + "\nContentType: " + contentType + "\nUpstream url: " + newUrlTxt); // bad gateway
+			responseError(resp, 502, "Upstream status: " + httpCode + "\nContentType: " + contentType); // bad gateway
 			return;
 		}
 
