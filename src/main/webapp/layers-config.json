@@ -108,6 +108,16 @@
    }
    ,
 
+   {
+      "id": "A22-VMS",
+      "icons": ["A22VMS.svg"],
+      "base_url" : "data/integreen/vms/rest/",
+      "projection": "EPSG:4326",
+      "format": "integreen",
+      "custom-function": null,
+      "color": "#C44921"
+   }
+,
 {
       "id": "pm10",
       "icon": "PM10.svg",
