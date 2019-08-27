@@ -17,7 +17,6 @@ async function map_start_promise()
 	
 	let selectedFeature = null;
 	
-	let overlapping_points = {};
 	
 	let map = new ol.Map({
 			target : 'map',
@@ -359,7 +358,7 @@ async function map_start_promise()
 				var sourcevector = new ol.source.Vector({});
 
 				var clusterSource = new ol.source.Cluster({
-			        distance: 60,
+			        distance: 80,
 			        source: sourcevector
 			    });
 				
@@ -396,29 +395,8 @@ async function map_start_promise()
 					progressbar_line.style.strokeDasharray = ((i+1)*100/json_stations.length) + ', 100';
 					percentage.textContent = Math.round((i+1)*100/json_stations.length) + "%";
 					
-					let lat = json_stations[i].latitude;
-					let lon = json_stations[i].longitude;
+					var thing = new ol.geom.Point(ol.proj.transform([json_stations[i].longitude, json_stations[i].latitude], layer_info.projection, 'EPSG:3857'));
 					
-					let key = layer_info.id + lat + '-' + lon;
-					
-					let maxcount = 50;
-					
-					while (overlapping_points[key] == '')
-					{
-						lon += 0.0001;
-						key = layer_info.id + lat + '-' + lon;
-						maxcount--;
-						if (maxcount <= 0)
-							break;
-					}
-					
-					overlapping_points[key] = '';
-					
-					var thing = new ol.geom.Point(ol.proj.transform([lon, lat], layer_info.projection, 'EPSG:3857'));
-					
-					// 2019-08-27 d@vide.bz: temporary hack to avoid overlapping markers
-					// thing.translate(Math.floor(Math.random() * 10),Math.floor(Math.random() * 10));
-
 					var featurething = new ol.Feature({
 						geometry : thing,
 						integreen_data: json_stations[i],
