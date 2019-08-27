@@ -235,6 +235,9 @@ html, body
 	margin-top: 11px;
 	width: 150px;
 	min-width: 150px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	
 }
 
 .details-value
