@@ -2,7 +2,7 @@
    {
       "id": "Weather",
       "icons": ["Weather.svg"],
-      "base_url" : "data/integreen/MeteoFrontEnd/rest/",
+      "base_url" : "data/integreen/meteorology2/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",
       "custom-function": null,
@@ -13,7 +13,7 @@
    {
       "id": "Air Quality",
       "icons": ["Air_quality.svg"],
-      "base_url" : "data/integreen/EnvironmentFrontEnd/rest/",
+      "base_url" : "data/integreen/environment2/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",
       "custom-function": null,
@@ -24,7 +24,7 @@
   {
       "id": "Parking",
       "icons": ["Parking.svg", ["Pin_red.svg", "free", 300, 0, 30]],
-      "base_url" : "data/integreen/parkingFrontEnd/rest/",
+      "base_url" : "data/integreen/parking2/rest/",
       "projection": "EPSG:4326",
       "format": "integreen",
       "custom-function": null,
@@ -34,7 +34,7 @@
    {
       "id": "Bluetooth",
       "icons": ["Bluetooth.svg", ["bluetooth-icon2.png", "Bluetooth Count record", 21600, 100, 250], ["Bluetooth.svg", "Bluetooth Count record", 21600, 0, 100]],
-      "base_url": "data/integreen/BluetoothFrontEnd/rest/",
+      "base_url": "data/integreen/bluetooth2/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null,
@@ -45,7 +45,7 @@
    {
       "id": "Traffic",
       "icons": ["Traffic.svg"],
-      "base_url": "data/integreen/sensors/rest/",
+      "base_url": "data/integreen/sensors2/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null,
@@ -56,7 +56,7 @@
    {
       "id": "Vehicular Travel Time",
       "icons": ["Journey_time.svg"],
-      "base_url": "data/integreen/LinkFrontEnd/rest/",
+      "base_url": "data/integreen/link2/rest/",
       "format": "integreen",
       "projection": "xxx",
       "custom-function": null,
@@ -67,7 +67,7 @@
    {
       "id": "Road Weather",
       "icons": ["Road_weather.svg"],
-      "base_url": "data/integreen/RWISFrontEnd/rest/",
+      "base_url": "data/integreen/rwis2/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null,
@@ -78,7 +78,7 @@
    {
       "id": "Car Sharing",
       "icons": ["Car_sharing.svg", ["carmarker_red.svg", "number-available", 600, 0, 1], ["Car_sharing.svg", "number-available", 600, 1, 2]],
-      "base_url": "data/integreen/carsharingFrontEnd/rest/",
+      "base_url": "data/integreen/carsharing2/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null,
@@ -89,7 +89,7 @@
    {
       "id": "Bike Sharing",
       "icons": ["Bike_sharing.svg", ["bikemarker_red.svg", "number-available", 600, 0, 1], ["Bike_sharing.svg", "number-available", 600, 1, 5]],
-      "base_url": "data/integreen/bikesharingFrontEnd/rest/",
+      "base_url": "data/integreen/bikesharing2/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null,
@@ -100,7 +100,7 @@
    {
       "id": "E-Mobility",
       "icons": ["E-Mobility.svg", ["emarker_red.svg", "number-available", 600, 0, 1], ["E-Mobility.svg", "number-available", 600, 1, 2]],
-      "base_url": "data/integreen/EchargingFrontEnd/rest/",
+      "base_url": "data/integreen/emobility2/rest/",
       "format": "integreen",
       "projection": "EPSG:4326",
       "custom-function": null,
@@ -111,7 +111,7 @@
 {
       "id": "pm10",
       "icon": "PM10.svg",
-      "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:pollution_pm10",
+      "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=integreen:V2-pollution_pm10",
       "format": "wms",
       "custom-function": null,
       "color": "#186900"
@@ -121,7 +121,7 @@
   {
       "id": "congestion",
       "icon": "Journey_time.svg",
-      "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:congestion",
+      "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=integreen:V2-congestion",
       "format": "wms",
       "custom-function": null,
       "color": "#C44921"

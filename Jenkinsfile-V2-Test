@@ -19,6 +19,12 @@ pipeline {
                 sh 'echo "        ${TESTSERVER_TOMCAT_CREDENTIALS}" >> ~/.m2/settings.xml'
                 sh 'echo "    </servers>" >> ~/.m2/settings.xml'
                 sh 'echo "</settings>" >> ~/.m2/settings.xml'
+
+                sh '''
+                    sed -ie 's%\\("url":\\s*\\)\\(.*\\)$%\\1"https://tomcatsec.testingmachine.eu",%' src/main/webapp/WEB-INF/config.json
+                '''
+
+                sh 'cp src/main/webapp/layers-config.testv2.json src/main/webapp/layers-config.json'
             }
         }
         stage('Test') {
@@ -33,7 +39,7 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh 'mvn -B tomcat:redeploy -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
+                sh 'mvn -B tomcat:redeploy -Dmaven.tomcat.path=/analytics2 -Dmaven.tomcat.url=${TESTSERVER_TOMCAT_ENDPOINT} -Dmaven.tomcat.server=testServer'
             }
         }
     }
