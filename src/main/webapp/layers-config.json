@@ -1,140 +1,158 @@
 [
    {
-      "id": "Weather",
-      "icons": ["Weather.svg"],
-      "base_url" : "data/integreen/meteorology/rest/",
-      "projection": "EPSG:4326",
-      "format": "integreen",
-      "custom-function": null,
-      "color": "#EAC324"
+      "id": "Stazioni Puntuali",
+      "layers":
+         [
+            {
+               "id": "Weather",
+               "icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 1], ["yellow.svg", "precipitation", 300, 1, 10], ["red.svg", "precipitation", 300, 10, 99999]],
+               "base_url" : "data/integreen/meteorology/rest/",
+               "projection": "EPSG:4326",
+               "format": "integreen",
+               "custom-function": null,
+               "color": "#EAC324",
+               "main-data": [["air-temperature",null],["precipitation",null]]
+            }
+            ,
+         
+            {
+               "id": "Air Quality",
+               "icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 3600, 40, 60], ["red.svg", "nitrogen-dioxide", 3600, 60, 99999]],
+               "base_url" : "data/integreen/environment/rest/",
+               "projection": "EPSG:4326",
+               "format": "integreen",
+               "custom-function": null,
+               "color": "#94A9BD",
+               "main-data": [["air-temperature",null],["precipitation",null]]
+            }
+            ,
+         
+           {
+               "id": "Parking",
+               "icons": ["Parking.svg", ["red.svg", "free", 600, 0, 10], ["yellow.svg", "free", 600, 10, 100], ["green.svg", "free", 600, 100, 99999]],
+               "base_url" : "data/integreen/parking/rest/",
+               "projection": "EPSG:4326",
+               "format": "integreen",
+               "custom-function": null,
+               "color": "#7FCBFA",
+               "main-data": [["Occupied",600]]
+            }
+            ,
+            {
+               "id": "Bluetooth",
+               "icons": ["Bluetooth.svg", ["green.png", "Bluetooth Count record", 600, 0, 75], ["yellow.svg", "Bluetooth Count record", 600, 75, 150], ["red.svg", "Bluetooth Count record", 600, 150, 99999]],
+               "base_url": "data/integreen/bluetooth/rest/",
+               "format": "integreen",
+               "projection": "EPSG:4326",
+               "custom-function": null,
+               "color": "#2C70B9"
+            }
+            ,
+         
+            {
+               "id": "Traffic",
+               "icons": ["Traffic.svg", ["green.png", "Nr. Equivalent Vehicles", 600, 0, 250], ["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350], ["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]],
+               "base_url": "data/integreen/sensors/rest/",
+               "format": "integreen",
+               "projection": "EPSG:4326",
+               "custom-function": null,
+               "color": "#996CBF"
+            }
+            ,
+         
+            {
+               "id": "Road Weather",
+               "icons": ["Road_weather.svg", ["green.png", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "Nr. Equivalent Vehicles", 600, -99999, -5]],
+               "base_url": "data/integreen/RWISFrontEnd/rest/",
+               "format": "integreen",
+               "projection": "EPSG:4326",
+               "custom-function": null,
+               "color": "#896b3a"
+            }
+            ,
+         
+            {
+               "id": "Car Sharing",
+               "icons": ["Car_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 2]],
+               "base_url": "data/integreen/carsharing/rest/",
+               "format": "integreen",
+               "projection": "EPSG:4326",
+               "custom-function": null,
+               "color": "#930044"
+            }
+            ,
+         
+            {
+               "id": "Bike Sharing",
+               "icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 5]],
+               "base_url": "data/integreen/bikesharing/rest/",
+               "format": "integreen",
+               "projection": "EPSG:4326",
+               "custom-function": null,
+               "color": "#E09011"
+            }
+            ,
+         
+            {
+               "id": "E-Mobility",
+               "icons": ["E-Mobility.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 2]],
+               "base_url": "data/integreen/emobility/rest/",
+               "format": "integreen",
+               "projection": "EPSG:4326",
+               "custom-function": null,
+               "color": "#477632"
+            }
+            ,
+            {
+               "id": "A22-VMS",
+               "icons": ["A22VMS.svg"],
+               "base_url" : "data/integreen/vms/rest/",
+               "projection": "EPSG:4326",
+               "format": "integreen",
+               "custom-function": null,
+               "color": "#C44921"
+            }
+            ,
+            {
+               "id": "pm10",
+               "icon": "PM10.svg",
+               "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:pollution_pm10",
+               "format": "wms",
+               "custom-function": null,
+               "color": "#186900"
+            }
+            ,
+            {
+               "id": "congestion",
+               "icon": "Journey_time.svg",
+               "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:congestion",
+               "format": "wms",
+               "custom-function": null,
+               "color": "#C44921"
+            }
+         ]
    }
    ,
-
    {
-      "id": "Air Quality",
-      "icons": ["Air_quality.svg"],
-      "base_url" : "data/integreen/environment/rest/",
-      "projection": "EPSG:4326",
-      "format": "integreen",
-      "custom-function": null,
-      "color": "#94A9BD"
-   }
-   ,
-
-  {
-      "id": "Parking",
-      "icons": ["Parking.svg", ["Pin_red.svg", "free", 300, 0, 30]],
-      "base_url" : "data/integreen/parking/rest/",
-      "projection": "EPSG:4326",
-      "format": "integreen",
-      "custom-function": null,
-      "color": "#7FCBFA"
+      "id": "Stazioni lineari",
+      "layers":
+         [
+            {
+               "id": "Vehicular Travel Time",
+               "icons": ["Journey_time.svg"],
+               "base_url": "data/integreen/origin-destination/rest/",
+               "format": "integreen",
+               "projection": "xxx",
+               "custom-function": null,
+               "color": "#E09011"
+            }
+         ]
    }
    ,
    {
-      "id": "Bluetooth",
-      "icons": ["Bluetooth.svg", ["bluetooth-icon2.png", "Bluetooth Count record", 21600, 100, 250], ["Bluetooth.svg", "Bluetooth Count record", 21600, 0, 100]],
-      "base_url": "data/integreen/bluetooth/rest/",
-      "format": "integreen",
-      "projection": "EPSG:4326",
-      "custom-function": null,
-      "color": "#2C70B9"
+      "id": "Mappe",
+      "layers":
+         [
+         ]
    }
-   ,
-
-   {
-      "id": "Traffic",
-      "icons": ["Traffic.svg"],
-      "base_url": "data/integreen/sensors/rest/",
-      "format": "integreen",
-      "projection": "EPSG:4326",
-      "custom-function": null,
-      "color": "#996CBF"
-   }
-   ,
-
-   {
-      "id": "Vehicular Travel Time",
-      "icons": ["Journey_time.svg"],
-      "base_url": "data/integreen/origin-destination/rest/",
-      "format": "integreen",
-      "projection": "xxx",
-      "custom-function": null,
-      "color": "#E09011"
-   }
-   ,
-
-   {
-      "id": "Road Weather",
-      "icons": ["Road_weather.svg"],
-      "base_url": "data/integreen/RWISFrontEnd/rest/",
-      "format": "integreen",
-      "projection": "EPSG:4326",
-      "custom-function": null,
-      "color": "#896b3a"
-   }
-   ,
-
-   {
-      "id": "Car Sharing",
-      "icons": ["Car_sharing.svg", ["carmarker_red.svg", "number-available", 600, 0, 1], ["Car_sharing.svg", "number-available", 600, 1, 2]],
-      "base_url": "data/integreen/carsharing/rest/",
-      "format": "integreen",
-      "projection": "EPSG:4326",
-      "custom-function": null,
-      "color": "#930044"
-   }
-   ,
-
-   {
-      "id": "Bike Sharing",
-      "icons": ["Bike_sharing.svg", ["bikemarker_red.svg", "number-available", 600, 0, 1], ["Bike_sharing.svg", "number-available", 600, 1, 5]],
-      "base_url": "data/integreen/bikesharing/rest/",
-      "format": "integreen",
-      "projection": "EPSG:4326",
-      "custom-function": null,
-      "color": "#E09011"
-   }
-   ,
-
-   {
-      "id": "E-Mobility",
-      "icons": ["E-Mobility.svg", ["emarker_red.svg", "number-available", 600, 0, 1], ["E-Mobility.svg", "number-available", 600, 1, 2]],
-      "base_url": "data/integreen/emobility/rest/",
-      "format": "integreen",
-      "projection": "EPSG:4326",
-      "custom-function": null,
-      "color": "#477632"
-   }
-   ,
-
-   {
-      "id": "A22-VMS",
-      "icons": ["A22VMS.svg"],
-      "base_url" : "data/integreen/vms/rest/",
-      "projection": "EPSG:4326",
-      "format": "integreen",
-      "custom-function": null,
-      "color": "#C44921"
-   }
-,
-{
-      "id": "pm10",
-      "icon": "PM10.svg",
-      "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:pollution_pm10",
-      "format": "wms",
-      "custom-function": null,
-      "color": "#186900"
-   }
-   ,
-
-  {
-      "id": "congestion",
-      "icon": "Journey_time.svg",
-      "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:congestion",
-      "format": "wms",
-      "custom-function": null,
-      "color": "#C44921"
-   }
-
-] 
+]
