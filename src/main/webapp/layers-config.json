@@ -112,24 +112,6 @@
                "custom-function": null,
                "color": "#C44921"
             }
-            ,
-            {
-               "id": "pm10",
-               "icon": "PM10.svg",
-               "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:pollution_pm10",
-               "format": "wms",
-               "custom-function": null,
-               "color": "#186900"
-            }
-            ,
-            {
-               "id": "congestion",
-               "icon": "Journey_time.svg",
-               "url": "http://geodata.integreen-life.bz.it/geoserver/edi/wms?LAYERS=edi:congestion",
-               "format": "wms",
-               "custom-function": null,
-               "color": "#C44921"
-            }
          ]
    }
    ,
