@@ -238,7 +238,6 @@ html, body
 	/* don't write text outside the div element */
 	overflow: hidden;
 	text-overflow: ellipsis;
-	
 }
 
 .details-value
@@ -294,4 +293,8 @@ html, body
   text-anchor: middle;
   display: none;
   stroke: #578ce8;
+}
+
+.layer_template .label.group_label {
+    font-weight: bold;
 }
