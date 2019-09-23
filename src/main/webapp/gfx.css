@@ -3,7 +3,8 @@
     graphics web ui / css 
 
     (C) 2018 IDM Suedtirol - Alto Adige
-
+    (C) 2019 NOI Techpark Suedtirol/Alto Adige
+ 
     see vendor/ for third pary libraries needed by this code
 
     author: chris@1006.org  
@@ -71,6 +72,29 @@
     left: 0;
     display: block;
 }
+
+
+/* data cursor */
+
+#gfx_data_cursor_pane {
+    position: absolute;
+    min-width: 40px;
+    min-height: 20px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    color: #000000;
+    background-color: rgba(160, 160, 160, 0.75);
+    padding: 8px;
+}
+
+#gfx_data_cursor_mark {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px 5px;
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
 
 
 /* spacer */
@@ -156,8 +180,7 @@
 }
 
 .gfx_status_error {
-  background-color: #FF1111;
-  color: #FFFFFF;
+  color: #FF0000;
 }
 
 #gfx_error_log {

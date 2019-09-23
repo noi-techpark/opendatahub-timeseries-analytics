@@ -3,6 +3,7 @@
     graphics web ui / javascript
 
     (C) 2018 IDM Suedtirol - Alto Adige
+    (C) 2019 NOI Techpark Suedtirol/Alto Adige
 
     see vendor/ for third pary libraries needed by this code
 
@@ -124,13 +125,20 @@ const get_csv = (ix) => {
 
 // we cycle through these colors for the graphs, as they're being added
 const colors = [
-    "#CC3333",
-    "#33CC33",
-    "#3333CC",
-    "#CCCC33",
-    "#CC33CC",
-    "#33CCCC" ];
-let color_ix = 2;
+    "#2288EE",
+    "#22EE88",
+    "#8822EE",
+    "#88EE22",
+    "#EE2288",
+    "#EE8822",
+    "#88EEEE",
+    "#EE88EE",
+    "#EEEE88",
+    "#228888",
+    "#882288",
+    "#888822"
+    ];
+let color_ix = 0;
 
 
 // -----------------------------------------------------------------------------
@@ -283,7 +291,9 @@ const show_legend = () => {
         if (statedata[ix] === undefined) {
             html += '<td class="gfx_notice">loading&hellip;</td>';
         } else if (statedata[ix].length === 0 && statedata_status[ix] !== 200) {
-            html += '<td class="gfx_status_error">d/l failed (status ' + statedata_status[ix]+ ')</td>';
+            html += '<td class="gfx_status_error">download failed (status ' + statedata_status[ix]+ ')</td>';
+        } else if (statedata[ix].length === 0 && statedata_status[ix] === 200) {
+            html += '<td class="gfx_status_error">no data available or missing authentication (status ' + statedata_status[ix]+ ')</td>';
         } else {
             html += "<td>" + statedata[ix].length + "</td>";
         }
@@ -461,8 +471,9 @@ const init_tab_dataset = () => {
                     "unit":         unit,
                     "period":       period,
                     "yaxis":        1,
-                    "color":        (++color_ix) % colors.length
+                    "color":        color_ix % colors.length
                   };
+        color_ix++;
 
         let found = false;
 
@@ -671,6 +682,9 @@ const load_data = () => {
 
 let plot = ()  => {
 
+    jQuery("#gfx_data_cursor_pane").remove();
+    jQuery("#gfx_data_cursor_mark").remove();
+
     if (state.graphs.length === 0) {
         qs("#gfx_wait").style.display = "block";
         qs("#gfx_flot").style.display = "none";
@@ -743,6 +757,30 @@ let plot = ()  => {
                 grid: { hoverable: true, clickable: true }
             }
         );
+    jQuery("#gfx_flot").bind("plotclick", (e, pos, ele) => {
+        jQuery("#gfx_data_cursor_pane").remove();
+        jQuery("#gfx_data_cursor_mark").remove();
+        if (ele) {
+            jQuery("body").append("<div id=\"gfx_data_cursor_pane\"></div>");
+            qs("#gfx_data_cursor_pane").innerHTML = ele.series.label           + "<br>" +
+                                               new Date(ele.datapoint[0]) + "<br>" +
+                                               "value: " + ele.datapoint[1];
+            let pane_width = parseInt(getComputedStyle(qs("#gfx_data_cursor_pane")).width);
+            let body_width = parseInt(getComputedStyle(qs("body")).width);
+            let x = Math.round(ele.pageX);
+            if (x > 0.5 * body_width) {
+                x -= pane_width + 16;
+            } 
+            qs("#gfx_data_cursor_pane").style.left = Math.round(x) + "px";
+            qs("#gfx_data_cursor_pane").style.top  = Math.round(ele.pageY + 10) + "px";
+
+            jQuery("body").append("<div id=\"gfx_data_cursor_mark\"></div>");
+            qs("#gfx_data_cursor_mark").style.left = (Math.round(ele.pageX) - 4) + "px";
+            qs("#gfx_data_cursor_mark").style.top  = (Math.round(ele.pageY) - 4) + "px";
+
+
+        } 
+    });
 
 };
 
