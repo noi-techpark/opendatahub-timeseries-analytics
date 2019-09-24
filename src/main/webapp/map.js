@@ -780,6 +780,12 @@ async function map_start_promise()
 function showMapOverview()
 {
 	document.getElementById('section_gfx').style.display='none';
+	if (document.getElementById("gfx_data_cursor_pane")) {
+		document.getElementById("gfx_data_cursor_pane").style.display='none';
+	}
+	if (document.getElementById("gfx_data_cursor_mark")) {
+		document.getElementById("gfx_data_cursor_mark").style.display='none';
+	}
 	document.getElementById('section_map').style.display='flex';
 	bzanalytics_map.updateSize();
 	document.getElementById('headline').style.color='#919499';
