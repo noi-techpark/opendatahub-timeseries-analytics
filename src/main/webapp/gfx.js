@@ -357,11 +357,14 @@ const init_tab_dataset = () => {
     jQuery.getJSON(CAT_CONFIG_URL, (data) => {
         let opt = `<option value="">Select category...</option>`;
         data
-            .filter( cat => cat.format === "integreen" )
-            .forEach( cat => { 
-                opt += `<option value="${cat.id}">&rarr; ${cat.id}</option>\n`;
-                CAT_BACKENDS[cat.id] = cat.base_url;
-            }); 
+            .forEach( layers_group => {
+                layers_group.layers
+                    .filter( cat => cat.format === "integreen" )
+                    .forEach( cat => {
+                        opt += `<option value="${cat.id}">&rarr; ${cat.id}</option>\n`;
+                        CAT_BACKENDS[cat.id] = cat.base_url;
+                    });
+            });
         qs("#gfx_selcategory").innerHTML = opt;
      });
 
