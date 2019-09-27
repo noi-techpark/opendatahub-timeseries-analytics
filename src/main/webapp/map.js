@@ -391,9 +391,6 @@ async function map_start_promise()
 					for (let mDi = 0; mDi < layer_info['main-data'].length; mDi++)
 					{
 						let mainData = layer_info['main-data'][mDi];
-						console.log(json_datatypes[dt]);
-						console.log(json_datatypes[dt][0] == mainData[0]);
-						console.log(json_datatypes[dt][0] == mainData[0] && (mainData[1] == null || json_datatypes[dt][3] == mainData[1]));
 						if(json_datatypes[dt][0] == mainData[0] && (mainData[1] == null || json_datatypes[dt][3] == mainData[1]))
 						{
 							currentValuesDiv = mainValuesDiv;
