@@ -45,6 +45,9 @@ async function map_start_promise()
 			sources[0] = new ol.source.OSM();
 		} else {
 			sources[sources.length] = new ol.source.OSM({
+			    attributions: [
+			        'Maps © <a href="http://www.thunderforest.com">Thunderforest</a>, Data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+			      ],
 				url : mapTileURLs[i][1] + thunderforest_api_key
 			})
 		}
