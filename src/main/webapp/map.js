@@ -18,12 +18,53 @@ async function map_start_promise()
 
 
 	let selectedFeature = null;
+	
+	let mapTileURLs = [
+		['OpenStreetMap', null],
+		['Neighbourhood', 'https://tile.thunderforest.com/neighbourhood/{z}/{x}/{y}.png?apikey='],
+		['OpenCycleMap', 'https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey='],
+		['Transport', 'https://tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey='],
+		['Landscape', 'https://tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey='],
+		['Outdoors', 'https://tile.thunderforest.com/outdoors/{z}/{x}/{y}.png?apikey='],
+		['Transport Dark', 'https://tile.thunderforest.com/transport-dark/{z}/{x}/{y}.png?apikey='],
+		['Spinal Map', 'https://tile.thunderforest.com/spinal-map/{z}/{x}/{y}.png?apikey='],
+		['Pioneer', 'https://tile.thunderforest.com/pioneer/{z}/{x}/{y}.png?apikey='],
+		['Mobile Atlas', 'https://tile.thunderforest.com/mobile-atlas/{z}/{x}/{y}.png?apikey=']
+	];
+	
+	let sources = [];
+	let selectCountainer = document.getElementById('header').getElementsByTagName('div')[0];
+	let mapSourceSelect = document.createElement('select');
+	mapSourceSelect.style.display = 'none';
+	selectCountainer.appendChild(mapSourceSelect);
+
+	let mapLayer = null;
+	
+	for(let i = 0; i < mapTileURLs.length; i++) {
+		if(i == 0) {
+			sources[0] = new ol.source.OSM();
+		} else {
+			sources[sources.length] = new ol.source.OSM({
+				url : mapTileURLs[i][1] + thunderforest_api_key
+			})
+		}
+		let opt = document.createElement('option');
+		opt.value = i;
+		opt.innerHTML = mapTileURLs[i][0];
+		mapSourceSelect.appendChild(opt);
+	}
+	mapSourceSelect.addEventListener("change", function (ev) {
+		mapLayer.setSource(sources[mapSourceSelect.selectedIndex])
+	});
+
+	mapLayer = new ol.layer.Tile({
+		source : thunderforest_api_key? sources[1]: sources[0]
+	})
+
 
 	let map = new ol.Map({
 		target : 'map',
-		layers : [ new ol.layer.Tile({
-			source : new ol.source.OSM()
-		})
+		layers : [ mapLayer
 
 		],
 		view : new ol.View({
@@ -347,29 +388,56 @@ async function map_start_promise()
 					for (let mDi = 0; mDi < layer_info['main-data'].length; mDi++)
 					{
 						let mainData = layer_info['main-data'][mDi];
-						console.log(mainData);
-						console.log(json_datatypes[dt][0] + " == " + mainData[0])
-						if(json_datatypes[dt][0] == mainData[0])
+						console.log(json_datatypes[dt]);
+						console.log(json_datatypes[dt][0] == mainData[0]);
+						console.log(json_datatypes[dt][0] == mainData[0] && (mainData[1] == null || json_datatypes[dt][3] == mainData[1]));
+						if(json_datatypes[dt][0] == mainData[0] && (mainData[1] == null || json_datatypes[dt][3] == mainData[1]))
 						{
 							currentValuesDiv = mainValuesDiv;
 							break;
 						}
 					}
-					if (dt == 0) {
-						valuesDiv.textContent = ''
-						valuesDiv.appendChild(mainValuesDiv)
-						valuesDiv.appendChild(moreValuesDiv)
-					}
 					let row = document.createElement('div')
-					let rowText = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']'
-					row.textContent =  rowText.toUpperCase()
 					row.className = "details-valueItem1"
 					currentValuesDiv.appendChild(row)
+					let rowAlink = document.createElement('a')
+					let rowText = value_struct['value'] + ' ' + json_datatypes[dt][0] + ' [' + json_datatypes[dt][3] + ']'
+					rowAlink.textContent =  rowText.toUpperCase()
+//					rowAlink.href = '/#{"active_tab":0,"height":"400px","auto_refresh":false,"scale":{"from":1567375200000,"to":1567980000000},
+//					"graphs":[{"category":"Weather","station":"82910MS","station_name":"San Genesio","data_type":
+//					"precipitation","unit":"mm","period":"300","yaxis":1,"color":3}]}'
+					let state = {
+						active_tab: 0,
+						height: "400px",
+						auto_refresh: false,
+						scale: {
+							from:  value_struct['timestamp'] - 7 * 24 * 60 * 60 * 1000,
+							to:    value_struct['timestamp']
+						},
+						graphs: [
+							{
+								category: layer_info.id,
+								station: integreen_data.id,
+								station_name: integreen_data.name,
+								data_type: json_datatypes[dt][0],
+								unit: json_datatypes[dt][1],
+								period: json_datatypes[dt][3],
+								yaxis:1,
+								color:3
+							}
+						]
+					};
+					rowAlink.href = location.origin + location.pathname + "#" + encodeURI(JSON.stringify(state))
+					rowAlink.target = '_blank'
+					row.appendChild(rowAlink)
 					let row2 = document.createElement('div')
 					row2.textContent = ' (' + new Date(value_struct['timestamp']).toLocaleString() + ')'
 					row2.className = "details-valueItem2"
 					currentValuesDiv.appendChild(row2)
 				}
+				valuesDiv.textContent = ''
+				valuesDiv.appendChild(mainValuesDiv)
+				valuesDiv.appendChild(moreValuesDiv)
 				if(mainValuesDiv.childElementCount > 0)
 				{
 					let moreButton = document.createElement('button')
