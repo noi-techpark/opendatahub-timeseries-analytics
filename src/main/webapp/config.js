@@ -1,1 +1,1 @@
-var thunderforrest_api_key = ''
+var thunderforest_api_key = ''
