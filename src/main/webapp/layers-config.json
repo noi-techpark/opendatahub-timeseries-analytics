@@ -23,7 +23,7 @@
                "format": "integreen",
                "custom-function": null,
                "color": "#94A9BD",
-               "main-data": [["air-temperature",null],["precipitation",null]]
+               "main-data": [["nitrogen-dioxide",null],["particulate-matter10",null]]
             }
             ,
          
@@ -35,7 +35,7 @@
                "format": "integreen",
                "custom-function": null,
                "color": "#7FCBFA",
-               "main-data": [["Occupied",600]]
+               "main-data": [["occupied",600],["parking-forecast-30",1800],["parking-forecast-60",3600]]
             }
             ,
             {
@@ -45,7 +45,8 @@
                "format": "integreen",
                "projection": "EPSG:4326",
                "custom-function": null,
-               "color": "#2C70B9"
+               "color": "#2C70B9",
+               "main-data": [["Bluetooth Count record",600],["Bluetooth Count record",3600]]
             }
             ,
          
@@ -56,18 +57,20 @@
                "format": "integreen",
                "projection": "EPSG:4326",
                "custom-function": null,
-               "color": "#996CBF"
+               "color": "#996CBF",
+               "main-data": [["Nr. Equivalent Vehicles",600],["Average Flow",600],["Average Speed Light Vehicles",600]]
             }
             ,
          
             {
                "id": "Road Weather",
-               "icons": ["Road_weather.svg", ["green.png", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "Nr. Equivalent Vehicles", 600, -99999, -5]],
+               "icons": ["Road_weather.svg", ["green.png", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "ground-surface-temperature", 600, -99999, -5]],
                "base_url": "data/integreen/RWISFrontEnd/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
                "custom-function": null,
-               "color": "#896b3a"
+               "color": "#896b3a",
+              "main-data": [["ground-surface-temperature",600],["air-temperature",600],["precipitation-intensity",600],["wind-speed",600]]
             }
             ,
          
