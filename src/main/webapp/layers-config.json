@@ -70,7 +70,7 @@
                "projection": "EPSG:4326",
                "custom-function": null,
                "color": "#896b3a",
-              "main-data": [["ground-surface-temperature",600],["air-temperature",600],["precipitation-intensity",600],["wind-speed",600]]
+               "main-data": [["ground-surface-temperature",600],["air-temperature",600],["precipitation-intensity",600],["wind-speed",600]]
             }
             ,
          
@@ -81,7 +81,8 @@
                "format": "integreen",
                "projection": "EPSG:4326",
                "custom-function": null,
-               "color": "#930044"
+               "color": "#930044",
+               "main-data": []
             }
             ,
          
@@ -92,7 +93,8 @@
                "format": "integreen",
                "projection": "EPSG:4326",
                "custom-function": null,
-               "color": "#E09011"
+               "color": "#E09011",
+               "main-data": []
             }
             ,
          
@@ -103,7 +105,8 @@
                "format": "integreen",
                "projection": "EPSG:4326",
                "custom-function": null,
-               "color": "#477632"
+               "color": "#477632",
+               "main-data": []
             }
             ,
             {
@@ -113,7 +116,8 @@
                "projection": "EPSG:4326",
                "format": "integreen",
                "custom-function": null,
-               "color": "#C44921"
+               "color": "#C44921",
+               "main-data": []
             }
          ]
    }
@@ -129,7 +133,8 @@
                "format": "integreen",
                "projection": "xxx",
                "custom-function": null,
-               "color": "#E09011"
+               "color": "#E09011",
+               "main-data": []
             }
          ]
    }
