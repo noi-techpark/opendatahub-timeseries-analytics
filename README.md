@@ -41,3 +41,5 @@ docker-compose exec java /bin/bash -c "mvn clean install"
 
 docker-compose exec java /bin/bash -c "mvn clean test"
 ```
+### Map style
+Default map style uses openstreetmap. To use the [Thunderforest](https://www.thunderforest.com) map style, you can add your Thunderforest API key to the configuration file in src/main/webapp/config.js
