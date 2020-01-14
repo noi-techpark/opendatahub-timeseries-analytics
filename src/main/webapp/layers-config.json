@@ -40,7 +40,7 @@
             ,
             {
                "id": "Bluetooth",
-               "icons": ["Bluetooth.svg", ["green.png", "Bluetooth Count record", 600, 0, 75], ["yellow.svg", "Bluetooth Count record", 600, 75, 150], ["red.svg", "Bluetooth Count record", 600, 150, 99999]],
+               "icons": ["Bluetooth.svg", ["green.svg", "Bluetooth Count record", 600, 0, 75], ["yellow.svg", "Bluetooth Count record", 600, 75, 150], ["red.svg", "Bluetooth Count record", 600, 150, 99999]],
                "base_url": "data/integreen/bluetooth/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
@@ -52,7 +52,7 @@
          
             {
                "id": "Traffic",
-               "icons": ["Traffic.svg", ["green.png", "Nr. Equivalent Vehicles", 600, 0, 250], ["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350], ["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]],
+               "icons": ["Traffic.svg", ["green.svg", "Nr. Equivalent Vehicles", 600, 0, 250], ["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350], ["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]],
                "base_url": "data/integreen/sensors/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
@@ -64,7 +64,7 @@
          
             {
                "id": "Road Weather",
-               "icons": ["Road_weather.svg", ["green.png", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "ground-surface-temperature", 600, -99999, -5]],
+               "icons": ["Road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "ground-surface-temperature", 600, -99999, -5]],
                "base_url": "data/integreen/RWISFrontEnd/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
