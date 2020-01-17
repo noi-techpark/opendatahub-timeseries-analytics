@@ -9,6 +9,7 @@ pipeline {
     environment {
         TESTSERVER_TOMCAT_ENDPOINT=credentials('testserver-tomcat8-url')
         TESTSERVER_TOMCAT_CREDENTIALS=credentials('testserver-tomcat8-credentials')
+        THUNDERFOREST_MAPS=credentials('thunderforest_api_key')
     }
 
     stages {
@@ -20,6 +21,7 @@ pipeline {
                 sh 'echo "    </servers>" >> ~/.m2/settings.xml'
                 sh 'echo "</settings>" >> ~/.m2/settings.xml'
                 sh 'jq \'.endpoints[0].url="http://tomcat.testingmachine.eu"\' src/main/webapp/WEB-INF/config.json > tmpFile && mv tmpFile src/main/webapp/WEB-INF/config.json'
+                sh '''sed -i -e "s/\\(var thunderforest_api_key = \\)''/\1 '${THUNDERFOREST_MAPS}'/g" src/main/webapp/config.js'''
             }
         }
         stage('Test') {
