@@ -12,7 +12,7 @@ pipeline {
         stage('Configure'){
             steps{
                 sh 'jq \'.endpoints[0].url="https://ipchannels.integreen-life.bz.it"\' src/main/webapp/WEB-INF/config.json > tmpFile && mv tmpFile src/main/webapp/WEB-INF/config.json'
-                sh '''sed -i -e "s/\\(var thunderforest_api_key =\\).*/\1'${THUNDERFOREST_MAPS}'/g" src/main/webapp/config.js'''
+                sh '''sed -i -e "s/\\(var thunderforest_api_key =\\).*/\\1'${THUNDERFOREST_MAPS}'/g" src/main/webapp/config.js'''
             }
         }
         stage('Test') {
