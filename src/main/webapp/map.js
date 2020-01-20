@@ -618,10 +618,10 @@ async function map_start_promise()
 			var icona = 'transparent.svg';
 
 
-			for (var ic = 1; ic < layer_info.icons.length - 1; ic++)
+			for (var ic = 1; ic < layer_info.icons.length; ic++)
 			{
-				if (ic == 1)
-					icona = 'gray.svg'
+				// if (ic == 1)
+				// 	icona = 'black.svg'
 				try
 				{
 					var cond = layer_info.icons[ic]
@@ -629,20 +629,14 @@ async function map_start_promise()
 					+ '&type=' + cond[1]
 					+ '&period=' + cond[2]);
 					var valore_attuale = json_value.value;
-					if(json_value.timestamp > new Date().getTime() - 7 * 24* 60 * 60 * 1000
-						&& cond[3] <= valore_attuale && valore_attuale < cond[4])
+					if(cond[3] <= valore_attuale && valore_attuale < cond[4])
 					{
-						icona = cond[0];
+						if (json_value.timestamp < new Date().getTime() - 7 * 24* 60 * 60 * 1000)
+							icona = 'gray.svg'
+						else
+							icona = cond[0];
 						break;
 					}
-//							if (cond[3] <= valore_attuale && valore_attuale < cond[4])
-//							{
-//							    if (ic == 2 && layer_info.icons.length == 3)
-//									icona = 'yellow.svg';
-//								else
-//									icona = 'red.svg';
-//								break;
-//							}
 				}
 				catch (e)
 				{

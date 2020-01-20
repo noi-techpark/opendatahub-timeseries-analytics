@@ -89,7 +89,7 @@
             {
                "id": "Bike Sharing",
                "icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 5]],
-               "base_url": "data/integreen/bikesharing/rest/",
+               "base_url": "data/integreen/bikesharing/rest/bikes/",
                "format": "integreen",
                "projection": "EPSG:4326",
                "custom-function": null,
