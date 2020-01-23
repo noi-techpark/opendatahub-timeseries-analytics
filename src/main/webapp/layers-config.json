@@ -17,13 +17,16 @@
          
             {
                "id": "Air Quality",
-               "icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 3600, 40, 60], ["red.svg", "nitrogen-dioxide", 3600, 60, 99999]],
+               "icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 3600, 40, 60], ["red.svg", "nitrogen-dioxide", 3600, 60, 99999], 
+                         ["green.svg", "NO2 - Ossidi di azoto", 3600, 0, 40], ["yellow.svg", "NO2 - Ossidi di azoto", 3600, 40, 60], ["red.svg", "NO2 - Ossidi di azoto", 3600, 60,99999], 
+                         ["green.svg", "nitrogen-dioxide", 600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 600, 40, 60], ["red.svg", "nitrogen-dioxide", 600, 60, 99999], 
+                         ["green.svg", "Biossido di Azoto", 600, 0, 40], ["yellow.svg", "Biossido di Azoto", 600, 40, 60], ["red.svg", "Biossido di Azoto", 600, 60, 99999]]
                "base_url" : "data/integreen/environment/rest/",
                "projection": "EPSG:4326",
                "format": "integreen",
                "custom-function": null,
                "color": "#94A9BD",
-               "main-data": [["nitrogen-dioxide",null],["particulate-matter10",null]]
+               "main-data": [["nitrogen-dioxide",null],["particulate-matter10",null],["NO2 - Ossidi di azoto",null],["Biossido di Azoto",null]]
             }
             ,
          
