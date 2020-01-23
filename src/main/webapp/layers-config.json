@@ -17,13 +17,16 @@
          
             {
                "id": "Air Quality",
-               "icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 3600, 40, 60], ["red.svg", "nitrogen-dioxide", 3600, 60, 99999]],
+               "icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 3600, 40, 60], ["red.svg", "nitrogen-dioxide", 3600, 60, 99999], 
+                         ["green.svg", "NO2 - Ossidi di azoto", 3600, 0, 40], ["yellow.svg", "NO2 - Ossidi di azoto", 3600, 40, 60], ["red.svg", "NO2 - Ossidi di azoto", 3600, 60,99999], 
+                         ["green.svg", "nitrogen-dioxide", 600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 600, 40, 60], ["red.svg", "nitrogen-dioxide", 600, 60, 99999], 
+                         ["green.svg", "Biossido di Azoto", 600, 0, 40], ["yellow.svg", "Biossido di Azoto", 600, 40, 60], ["red.svg", "Biossido di Azoto", 600, 60, 99999]]
                "base_url" : "data/integreen/environment/rest/",
                "projection": "EPSG:4326",
                "format": "integreen",
                "custom-function": null,
                "color": "#94A9BD",
-               "main-data": [["nitrogen-dioxide",null],["particulate-matter10",null]]
+               "main-data": [["nitrogen-dioxide",null],["particulate-matter10",null],["NO2 - Ossidi di azoto",null],["Biossido di Azoto",null]]
             }
             ,
          
@@ -40,7 +43,7 @@
             ,
             {
                "id": "Bluetooth",
-               "icons": ["Bluetooth.svg", ["green.png", "Bluetooth Count record", 600, 0, 75], ["yellow.svg", "Bluetooth Count record", 600, 75, 150], ["red.svg", "Bluetooth Count record", 600, 150, 99999]],
+               "icons": ["Bluetooth.svg", ["green.svg", "Bluetooth Count record", 600, 0, 75], ["yellow.svg", "Bluetooth Count record", 600, 75, 150], ["red.svg", "Bluetooth Count record", 600, 150, 99999]],
                "base_url": "data/integreen/bluetooth/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
@@ -52,7 +55,7 @@
          
             {
                "id": "Traffic",
-               "icons": ["Traffic.svg", ["green.png", "Nr. Equivalent Vehicles", 600, 0, 250], ["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350], ["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]],
+               "icons": ["Traffic.svg", ["green.svg", "Nr. Equivalent Vehicles", 600, 0, 250], ["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350], ["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]],
                "base_url": "data/integreen/sensors/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
@@ -64,7 +67,7 @@
          
             {
                "id": "Road Weather",
-               "icons": ["Road_weather.svg", ["green.png", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "ground-surface-temperature", 600, -99999, -5]],
+               "icons": ["Road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "ground-surface-temperature", 600, -99999, -5]],
                "base_url": "data/integreen/RWISFrontEnd/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
