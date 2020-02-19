@@ -5,7 +5,7 @@
          [
             {
                "id": "Weather",
-               "icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 1], ["yellow.svg", "precipitation", 300, 1, 10], ["red.svg", "precipitation", 300, 10, 99999]],
+               "icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 1], ["green.svg", "precipitation", 900, 0, 1], ["yellow.svg", "precipitation", 300, 1, 10], ["yellow.svg", "precipitation", 900, 1, 10],["red.svg", "precipitation", 300, 10, 99999], ["red.svg", "precipitation", 900, 10, 99999]],
                "base_url" : "data/integreen/meteorology/rest/",
                "projection": "EPSG:4326",
                "format": "integreen",
@@ -79,7 +79,7 @@
          
             {
                "id": "Car Sharing",
-               "icons": ["Car_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 2]],
+               "icons": ["Car_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["yellow.svg", "number-available", 600, 1, 2], ["green.svg", "number-available", 600, 2, 100]],
                "base_url": "data/integreen/carsharing/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
@@ -91,7 +91,7 @@
          
             {
                "id": "Bike Sharing",
-               "icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 5]],
+               "icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 100]],
                "base_url": "data/integreen/bikesharing/rest/bikes/",
                "format": "integreen",
                "projection": "EPSG:4326",
@@ -103,7 +103,7 @@
          
             {
                "id": "E-Mobility",
-               "icons": ["E-Mobility.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 2]],
+               "icons": ["E-Mobility.svg", ["red.svg", "number-available", 600, 0, 1], ["yellow.svg", "number-available", 600, 1, 2], ["green.svg", "number-available", 600, 2, 100]],
                "base_url": "data/integreen/emobility/rest/",
                "format": "integreen",
                "projection": "EPSG:4326",
@@ -114,7 +114,7 @@
             ,
             {
                "id": "A22-VMS",
-               "icons": ["A22VMS.svg"],
+               "icons": ["A22VMS.svg", ["red.svg", "stato", 1, 0, 1], ["green.svg", "stato", 1, 1, 2]],
                "base_url" : "data/integreen/vms/rest/",
                "projection": "EPSG:4326",
                "format": "integreen",
