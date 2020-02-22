@@ -1,151 +1,193 @@
-[
-   {
-      "id": "Stazioni Puntuali",
-      "layers":
-         [
-            {
-               "id": "Weather",
-               "icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 1], ["green.svg", "precipitation", 900, 0, 1], ["yellow.svg", "precipitation", 300, 1, 10], ["yellow.svg", "precipitation", 900, 1, 10],["red.svg", "precipitation", 300, 10, 99999], ["red.svg", "precipitation", 900, 10, 99999]],
-               "base_url" : "data/integreen/meteorology/rest/",
-               "projection": "EPSG:4326",
-               "format": "integreen",
-               "custom-function": null,
-               "color": "#EAC324",
-               "main-data": [["air-temperature",null],["precipitation",null]]
-            }
-            ,
-         
-            {
-               "id": "Air Quality",
-               "icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 3600, 40, 60], ["red.svg", "nitrogen-dioxide", 3600, 60, 99999], 
-                         ["green.svg", "NO2 - Ossidi di azoto", 3600, 0, 40], ["yellow.svg", "NO2 - Ossidi di azoto", 3600, 40, 60], ["red.svg", "NO2 - Ossidi di azoto", 3600, 60,99999], 
-                         ["green.svg", "nitrogen-dioxide", 600, 0, 40], ["yellow.svg", "nitrogen-dioxide", 600, 40, 60], ["red.svg", "nitrogen-dioxide", 600, 60, 99999], 
-                         ["green.svg", "Biossido di Azoto", 600, 0, 40], ["yellow.svg", "Biossido di Azoto", 600, 40, 60], ["red.svg", "Biossido di Azoto", 600, 60, 99999]]
-               "base_url" : "data/integreen/environment/rest/",
-               "projection": "EPSG:4326",
-               "format": "integreen",
-               "custom-function": null,
-               "color": "#94A9BD",
-               "main-data": [["nitrogen-dioxide",null],["particulate-matter10",null],["NO2 - Ossidi di azoto",null],["Biossido di Azoto",null]]
-            }
-            ,
-         
-           {
-               "id": "Parking",
-               "icons": ["Parking.svg", ["red.svg", "free", 600, 0, 10], ["yellow.svg", "free", 600, 10, 100], ["green.svg", "free", 600, 100, 99999]],
-               "base_url" : "data/integreen/parking/rest/",
-               "projection": "EPSG:4326",
-               "format": "integreen",
-               "custom-function": null,
-               "color": "#7FCBFA",
-               "main-data": [["occupied",600],["parking-forecast-30",1800],["parking-forecast-60",3600]]
-            }
-            ,
-            {
-               "id": "Bluetooth",
-               "icons": ["Bluetooth.svg", ["green.svg", "Bluetooth Count record", 600, 0, 75], ["yellow.svg", "Bluetooth Count record", 600, 75, 150], ["red.svg", "Bluetooth Count record", 600, 150, 99999]],
-               "base_url": "data/integreen/bluetooth/rest/",
-               "format": "integreen",
-               "projection": "EPSG:4326",
-               "custom-function": null,
-               "color": "#2C70B9",
-               "main-data": [["Bluetooth Count record",600],["Bluetooth Count record",3600]]
-            }
-            ,
-         
-            {
-               "id": "Traffic",
-               "icons": ["Traffic.svg", ["green.svg", "Nr. Equivalent Vehicles", 600, 0, 250], ["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350], ["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]],
-               "base_url": "data/integreen/sensors/rest/",
-               "format": "integreen",
-               "projection": "EPSG:4326",
-               "custom-function": null,
-               "color": "#996CBF",
-               "main-data": [["Nr. Equivalent Vehicles",600],["Average Flow",600],["Average Speed Light Vehicles",600]]
-            }
-            ,
-         
-            {
-               "id": "Road Weather",
-               "icons": ["Road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999], ["yellow.svg", "ground-surface-temperature", 600, -5, 0], ["red.svg", "ground-surface-temperature", 600, -99999, -5]],
-               "base_url": "data/integreen/RWISFrontEnd/rest/",
-               "format": "integreen",
-               "projection": "EPSG:4326",
-               "custom-function": null,
-               "color": "#896b3a",
-               "main-data": [["ground-surface-temperature",600],["air-temperature",600],["precipitation-intensity",600],["wind-speed",600]]
-            }
-            ,
-         
-            {
-               "id": "Car Sharing",
-               "icons": ["Car_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["yellow.svg", "number-available", 600, 1, 2], ["green.svg", "number-available", 600, 2, 100]],
-               "base_url": "data/integreen/carsharing/rest/",
-               "format": "integreen",
-               "projection": "EPSG:4326",
-               "custom-function": null,
-               "color": "#930044",
-               "main-data": []
-            }
-            ,
-         
-            {
-               "id": "Bike Sharing",
-               "icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1], ["green.svg", "number-available", 600, 1, 100]],
-               "base_url": "data/integreen/bikesharing/rest/bikes/",
-               "format": "integreen",
-               "projection": "EPSG:4326",
-               "custom-function": null,
-               "color": "#E09011",
-               "main-data": []
-            }
-            ,
-         
-            {
-               "id": "E-Mobility",
-               "icons": ["E-Mobility.svg", ["red.svg", "number-available", 600, 0, 1], ["yellow.svg", "number-available", 600, 1, 2], ["green.svg", "number-available", 600, 2, 100]],
-               "base_url": "data/integreen/emobility/rest/",
-               "format": "integreen",
-               "projection": "EPSG:4326",
-               "custom-function": null,
-               "color": "#477632",
-               "main-data": []
-            }
-            ,
-            {
-               "id": "A22-VMS",
-               "icons": ["A22VMS.svg", ["red.svg", "stato", 1, 0, 1], ["green.svg", "stato", 1, 1, 2]],
-               "base_url" : "data/integreen/vms/rest/",
-               "projection": "EPSG:4326",
-               "format": "integreen",
-               "custom-function": null,
-               "color": "#C44921",
-               "main-data": []
-            }
-         ]
-   }
-   ,
-   {
-      "id": "Stazioni lineari",
-      "layers":
-         [
-            {
-               "id": "Vehicular Travel Time",
-               "icons": ["Journey_time.svg"],
-               "base_url": "data/integreen/origin-destination/rest/",
-               "format": "integreen",
-               "projection": "xxx",
-               "custom-function": null,
-               "color": "#E09011",
-               "main-data": []
-            }
-         ]
-   }
-   ,
-   {
-      "id": "Mappe",
-      "layers":
-         [
-         ]
-   }
+[{
+		"id": "Stazioni Puntuali",
+		"layers": [{
+				"id": "Weather",
+				"icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 1],
+					["green.svg", "precipitation", 900, 0, 1],
+					["yellow.svg", "precipitation", 300, 1, 10],
+					["yellow.svg", "precipitation", 900, 1, 10],
+					["red.svg", "precipitation", 300, 10, 99999],
+					["red.svg", "precipitation", 900, 10, 99999]
+				],
+				"base_url": "data/integreen/meteorology/rest/",
+				"projection": "EPSG:4326",
+				"format": "integreen",
+				"custom-function": null,
+				"color": "#EAC324",
+				"main-data": [
+					["air-temperature", null],
+					["precipitation", null]
+				]
+			},
+
+			{
+				"id": "Air Quality",
+				"icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40],
+					["yellow.svg", "nitrogen-dioxide", 3600, 40, 60],
+					["red.svg", "nitrogen-dioxide", 3600, 60, 99999],
+					["green.svg", "NO2 - Ossidi di azoto", 3600, 0, 40],
+					["yellow.svg", "NO2 - Ossidi di azoto", 3600, 40, 60],
+					["red.svg", "NO2 - Ossidi di azoto", 3600, 60, 99999],
+					["green.svg", "nitrogen-dioxide", 600, 0, 40],
+					["yellow.svg", "nitrogen-dioxide", 600, 40, 60],
+					["red.svg", "nitrogen-dioxide", 600, 60, 99999],
+					["green.svg", "Biossido di Azoto", 600, 0, 40],
+					["yellow.svg", "Biossido di Azoto", 600, 40, 60],
+					["red.svg", "Biossido di Azoto", 600, 60, 99999]
+				],
+				"base_url": "data/integreen/environment/rest/",
+				"projection": "EPSG:4326",
+				"format": "integreen",
+				"custom-function": null,
+				"color": "#94A9BD",
+				"main-data": [
+					["nitrogen-dioxide", null],
+					["particulate-matter10", null],
+					["NO2 - Ossidi di azoto", null],
+					["Biossido di Azoto", null]
+				]
+			},
+
+			{
+				"id": "Parking",
+				"icons": ["Parking.svg", ["red.svg", "free", 600, 0, 10],
+					["yellow.svg", "free", 600, 10, 100],
+					["green.svg", "free", 600, 100, 99999]
+				],
+				"base_url": "data/integreen/parking/rest/",
+				"projection": "EPSG:4326",
+				"format": "integreen",
+				"custom-function": null,
+				"color": "#7FCBFA",
+				"main-data": [
+					["occupied", 600],
+					["parking-forecast-30", 1800],
+					["parking-forecast-60", 3600]
+				]
+			},
+			{
+				"id": "Bluetooth",
+				"icons": ["Bluetooth.svg", ["green.svg", "Bluetooth Count record", 600, 0, 75],
+					["yellow.svg", "Bluetooth Count record", 600, 75, 150],
+					["red.svg", "Bluetooth Count record", 600, 150, 99999]
+				],
+				"base_url": "data/integreen/bluetooth/rest/",
+				"format": "integreen",
+				"projection": "EPSG:4326",
+				"custom-function": null,
+				"color": "#2C70B9",
+				"main-data": [
+					["Bluetooth Count record", 600],
+					["Bluetooth Count record", 3600]
+				]
+			},
+
+			{
+				"id": "Traffic",
+				"icons": ["Traffic.svg", ["green.svg", "Nr. Equivalent Vehicles", 600, 0, 250],
+					["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350],
+					["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]
+				],
+				"base_url": "data/integreen/sensors/rest/",
+				"format": "integreen",
+				"projection": "EPSG:4326",
+				"custom-function": null,
+				"color": "#996CBF",
+				"main-data": [
+					["Nr. Equivalent Vehicles", 600],
+					["Average Flow", 600],
+					["Average Speed Light Vehicles", 600]
+				]
+			},
+
+			{
+				"id": "Road Weather",
+				"icons": ["Road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999],
+					["yellow.svg", "ground-surface-temperature", 600, -5, 0],
+					["red.svg", "ground-surface-temperature", 600, -99999, -5]
+				],
+				"base_url": "data/integreen/RWISFrontEnd/rest/",
+				"format": "integreen",
+				"projection": "EPSG:4326",
+				"custom-function": null,
+				"color": "#896b3a",
+				"main-data": [
+					["ground-surface-temperature", 600],
+					["air-temperature", 600],
+					["precipitation-intensity", 600],
+					["wind-speed", 600]
+				]
+			},
+
+			{
+				"id": "Car Sharing",
+				"icons": ["Car_sharing.svg", ["red.svg", "number-available", 600, 0, 1],
+					["yellow.svg", "number-available", 600, 1, 2],
+					["green.svg", "number-available", 600, 2, 100]
+				],
+				"base_url": "data/integreen/carsharing/rest/",
+				"format": "integreen",
+				"projection": "EPSG:4326",
+				"custom-function": null,
+				"color": "#930044",
+				"main-data": []
+			},
+
+			{
+				"id": "Bike Sharing",
+				"icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1],
+					["green.svg", "number-available", 600, 1, 100]
+				],
+				"base_url": "data/integreen/bikesharing/rest/bikes/",
+				"format": "integreen",
+				"projection": "EPSG:4326",
+				"custom-function": null,
+				"color": "#E09011",
+				"main-data": []
+			},
+
+			{
+				"id": "E-Mobility",
+				"icons": ["E-Mobility.svg", ["red.svg", "number-available", 600, 0, 1],
+					["yellow.svg", "number-available", 600, 1, 2],
+					["green.svg", "number-available", 600, 2, 100]
+				],
+				"base_url": "data/integreen/emobility/rest/",
+				"format": "integreen",
+				"projection": "EPSG:4326",
+				"custom-function": null,
+				"color": "#477632",
+				"main-data": []
+			},
+			{
+				"id": "A22-VMS",
+				"icons": ["A22VMS.svg", ["red.svg", "stato", 1, 0, 1],
+					["green.svg", "stato", 1, 1, 2]
+				],
+				"base_url": "data/integreen/vms/rest/",
+				"projection": "EPSG:4326",
+				"format": "integreen",
+				"custom-function": null,
+				"color": "#C44921",
+				"main-data": []
+			}
+		]
+	},
+	{
+		"id": "Stazioni lineari",
+		"layers": [{
+			"id": "Vehicular Travel Time",
+			"icons": ["Journey_time.svg"],
+			"base_url": "data/integreen/origin-destination/rest/",
+			"format": "integreen",
+			"projection": "xxx",
+			"custom-function": null,
+			"color": "#E09011",
+			"main-data": []
+		}]
+	},
+	{
+		"id": "Mappe",
+		"layers": []
+	}
 ]
