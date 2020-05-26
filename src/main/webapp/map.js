@@ -132,7 +132,7 @@ async function map_start_promise()
 
 	setupFeatureClickPopup()
 
-	setupLoginForm()
+//	setupLoginForm()
 
 	//////////////////////////////////////////////////////
 	// Functions

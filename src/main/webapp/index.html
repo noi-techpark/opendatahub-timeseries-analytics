@@ -17,7 +17,9 @@
     <script src="vendor/flot/0.8.3/jquery.flot.js"></script>
     <script src="vendor/flot/0.8.3/jquery.flot.time.js"></script>
     <script src="vendor/flot-axislabels/2.0.1/jquery.flot.axislabels.js"></script>
+    <script src="vendor/keycloak-js/keycloak.js"></script>
     <script src="config.js"></script>
+    <script src="authentification.js"></script>
     <script src="map.js"></script>
     <script src="gfx.js" defer></script>
 
@@ -43,15 +45,15 @@
         <div class="header_text" id="headline"     onClick="showCharts()" style="color: #FFFFFF;">CHARTS</div>
     </div>
     <div style="padding-top:19px; padding-right:8px display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden;">
-        <form id="loginform">
-            <input id="loginuser" class="login_element" placeholder="username">
-            <input id="loginpass" class="login_element" placeholder="password" type="password">
-            <input id="login_button" type="submit" class="loginout_button" value="LOGIN">
-        </form>
+        <button id="login_button" class="loginout_button" style="display: none;">
+            Log in with&nbsp;<strong>NOI Authentication</strong>
+        </button>
         <span id="logout" style="display: none; align-items: center">
              <img src="icons/03_Icon_login/user .svg" style="height: 24px">
              <span id="logoutuser" style="color: white; font-family: 'Roboto', sans-serif; min-width: 8em; display:inline-block; margin-left: 1em" >user</span>
-             <input id="logout_button" type="submit" class="loginout_button" value="LOGOUT">
+             <button id="logout_button" class="loginout_button">
+                 Logout
+             </button>
           </span>
     </div>
 </div>
@@ -259,4 +261,3 @@
 
 </html>
 
-s
