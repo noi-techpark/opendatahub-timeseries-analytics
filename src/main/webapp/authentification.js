@@ -13,25 +13,27 @@ $(document).ready(function () {
         clientId: KEYCLOAK_CLIENT_ID
     });
 
-    let setupAuthenticated = function() {
-        AUTHORIZATION_TOKEN = keycloak.authenticated && !keycloak.isTokenExpired()? 'Bearer ' + keycloak.token: '';
+    let setupAuthenticated = function () {
+        AUTHORIZATION_TOKEN = keycloak.authenticated && !keycloak.isTokenExpired() ? 'Bearer ' + keycloak.token : '';
         login_button.css('display', 'none');
         logout.css('display', 'flex');
         logoutuser.text(keycloak.idTokenParsed.name)
     }
-    let setupNonAuthenticated = function() {
+    let setupNonAuthenticated = function () {
         AUTHORIZATION_TOKEN = null;
         login_button.css('display', 'flex');
         logout.css('display', 'none');
     }
 
     keycloak.init({
-        flow: 'implicit'
-    }).then(function(authenticated) {
-        if(!authenticated) {
+        flow: 'implicit',
+        onLoad: 'check-sso',
+        silentCheckSsoRedirectUri: KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI
+    }).then(function (authenticated) {
+        if (!authenticated) {
             setupNonAuthenticated();
         }
-    }).catch(function() {
+    }).catch(function () {
         alert('failed to initialize');
     });
     keycloak.onAuthSuccess = function () {
@@ -44,7 +46,6 @@ $(document).ready(function () {
         setupNonAuthenticated();
     }
     keycloak.onTokenExpired = function () {
-        console.log(keycloak.authenticated)
         setupNonAuthenticated();
     }
 
