@@ -11,14 +11,31 @@ pipeline {
 
         ENDPOINT_URL = "https://analytics.opendatahub.testingmachine.eu"
         THUNDERFOREST_MAPS = credentials('thunderforest_api_key')
+
+        KEYCLOAK_AUTHORIZATION_URI = ""
+        KEYCLOAK_REALM = ""
+        KEYCLOAK_CLIENT_ID = ""
+        KEYCLOAK_REDIRECT_URI = ""
+        KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI = ""
     }
 
     stages {
+        stage('Clean') {
+            steps {
+                sh 'rm -rf src/main/webapp/WEB-INF'
+            }
+        }
         stage('Configure') {
             steps {
                 sh """
                     jq '.endpoints[0].url="${ENDPOINT_URL}"' src/main/webapp/WEB-INF/config.json > tmpFile && mv tmpFile src/main/webapp/WEB-INF/config.json
                     sed -i -e "s/\\(var thunderforest_api_key =\\).*/\\1'${THUNDERFOREST_MAPS}'/g" src/main/webapp/config.js
+
+                    rm -rf .env
+                    echo "ENDPOINT_URL=${ENDPOINT_URL}" >> .env
+                    echo "THUNDERFOREST_MAPS=${THUNDERFOREST_MAPS}" >> .env
+                    cd infrastructure
+                    ./dotenv-sed.sh
                 """
 
             }
@@ -26,9 +43,8 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                    docker network create authentication || true
                     docker-compose --no-ansi build --pull --build-arg JENKINS_USER_ID=$(id -u jenkins) --build-arg JENKINS_GROUP_ID=$(id -g jenkins)
-                    docker-compose --no-ansi run --rm --no-deps -u $(id -u jenkins):$(id -g jenkins) app mvn -B clean test
+                    docker-compose --no-ansi run --rm --no-deps -u $(id -u jenkins):$(id -g jenkins) app mvn -B -U clean test
                 '''
             }
         }
