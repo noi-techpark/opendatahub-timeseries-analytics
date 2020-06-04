@@ -20,11 +20,6 @@ pipeline {
     }
 
     stages {
-        stage('Clean') {
-            steps {
-                sh 'rm -rf src/main/webapp/WEB-INF'
-            }
-        }
         stage('Configure') {
             steps {
                 sh """
