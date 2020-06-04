@@ -27,6 +27,12 @@ pipeline {
                     sed -i -e "s/\\(var thunderforest_api_key =\\).*/\\1'${THUNDERFOREST_MAPS}'/g" src/main/webapp/config.js
 
                     rm -rf .env
+                    echo 'DOCKER_PROJECT_NAME=${DOCKER_PROJECT_NAME}' >> .env
+                    echo 'DOCKER_IMAGE=${DOCKER_IMAGE}' >> .env
+                    echo 'DOCKER_TAG=${DOCKER_TAG}' >> .env
+
+                    echo 'SERVER_PORT=${SERVER_PORT}' >> .env
+                    echo 'LOG_APPLICATION_NAME=${LOG_APPLICATION_NAME}' >> .env                    
                     echo "ENDPOINT_URL=${ENDPOINT_URL}" >> .env
                     echo "THUNDERFOREST_MAPS=${THUNDERFOREST_MAPS}" >> .env
                     cd infrastructure
