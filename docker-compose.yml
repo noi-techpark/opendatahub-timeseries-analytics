@@ -1,11 +1,15 @@
-version: "3"
+version: "3.4"
+
 services:
   java:
     build:
       context: .
-      dockerfile: docker/dockerfile-java
+      dockerfile: infrastructure/docker/Dockerfile
+      target: dev
     volumes:
        - ./:/code
     working_dir: /code
-    command: tail -f /dev/null
+    command: mvn tomcat:run
+    ports: 
+      - "8999:8080"
     tty: true

@@ -1,1 +1,1 @@
-http://analytics.mobility.bz.it/
+https://analytics.opendatahub.bz.it/
