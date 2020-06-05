@@ -9,7 +9,7 @@ services:
     volumes:
        - ./:/code
     working_dir: /code
-    command: mvn tomcat:run
+    command: ["mvn", "tomcat7:run"]
     ports: 
-      - "8999:8080"
+      - "8999:8999"
     tty: true
