@@ -22,4 +22,4 @@ WORKDIR /code
 
 COPY ./ /code
 RUN mvn -B -DskipTests install
-CMD [ "mvn", "-B", "tomcat7:run" ]
+CMD [ "mvn tomcat7:run" ]

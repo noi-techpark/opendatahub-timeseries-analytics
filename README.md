@@ -1,5 +1,9 @@
 # geobank-analytics
 
+## Local development
+
+Run the application with `SERVER_PORT=8999 mvn tomcat7:run`
+
 ## Docker environment
 
 For the project a Docker environment is already prepared and ready to use with all necessary prerequisites.
