@@ -842,13 +842,16 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(open_mobility_api_uri + "/v2/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false")
+				let json_stations_flat = await fetchJson_promise(open_mobility_api_uri + "/v2/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true")
 				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
 
 
 				let allFeatures = [];
 
 				for (var i = 0; i < json_stations.length; i++) {
+					if (!json_stations[i].smetadata || !json_stations[i].smetadata.coordinates)
+						continue;
+
 					let coordinates = json_stations[i].smetadata.coordinates;
 
 					let points = [];
