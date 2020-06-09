@@ -18,6 +18,7 @@ async function map_start_promise()
 
 
 	let selectedFeature = null;
+	let hoverFeature = null;
 
 	let mapTileURLs = [
 		['OpenStreetMap', null],
@@ -126,7 +127,7 @@ async function map_start_promise()
 
 		for (var layer_info of layer_group.layers)
 		{
-			setupLayer_promise(layer_info)
+			setupLayer_promise(layer_info, layer_group.id)
 		}
 	}
 
@@ -138,7 +139,7 @@ async function map_start_promise()
 	// Functions
 	//////////////////////////////////////////////////////
 
-	async function setupLayer_promise(layer_info)
+	async function setupLayer_promise(layer_info, layer_group_id)
 	{
 		let layer_display = layer_template.cloneNode(true)
 		layer_display.style.paddingLeft = '40px'
@@ -213,7 +214,18 @@ async function map_start_promise()
 					switch (format)
 					{
 						case 'integreen':
-							layer = await loadIntegreenLayer(layer_info, layer_display.querySelector('.circle-spinner'))
+							switch (layer_group_id){
+								case "Stazioni Puntuali":
+									layer = await loadIntegreenLayerPuntuali(layer_info, layer_display.querySelector('.circle-spinner'))
+									break;
+								case "Stazioni lineari":
+									layer = await loadIntegreenLayerLineari(layer_info, layer_display.querySelector('.circle-spinner'))
+									break;
+								default:
+									// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+									alert('Unknow layer group: ' + layer_group_id)
+									break;
+							}
 							break;
 						case 'wms':
 							layer = await loadWMSLayer(layer_info)
@@ -226,7 +238,6 @@ async function map_start_promise()
 				}
 				catch (e)
 				{
-					console.log(e)
 					error_console.textContent = format_time() + ': ' + e;
 				}
 				finally
@@ -363,15 +374,17 @@ async function map_start_promise()
 				}
 				createDetailsRow('code', integreen_data['scode'], true);
 				createDetailsRow('name', integreen_data['sname'], false);
-				createDetailsRow('latitude', integreen_data['scoordinate']['x'], false);
-				createDetailsRow('longitude', integreen_data['scoordinate']['y'], false);
-				createDetailsRow('COORDINATEREFERENCESYSTEM', integreen_data['scoordinate']['srid'], false);
+				if(!!integreen_data['scoordinate']) {
+					createDetailsRow('latitude', integreen_data['scoordinate']['x'], false);
+					createDetailsRow('longitude', integreen_data['scoordinate']['y'], false);
+					createDetailsRow('COORDINATEREFERENCESYSTEM', integreen_data['scoordinate']['srid'], false);
+				}
 				createDetailsRow('origin', integreen_data['sorigin'], false);
 				createDetailsRow('type', integreen_data['stype'], false);
-				console.log(integreen_data)
 				for (var name in integreen_data['smetadata']) {
-					console.log(name)
-					createDetailsRow(name, integreen_data['smetadata'][name], false);
+					if(name != 'coordinates') {
+						createDetailsRow(name, integreen_data['smetadata'][name], false);
+					}
 				}
 
 
@@ -473,9 +486,27 @@ async function map_start_promise()
 			}
 		});
 
+		map.on('pointermove', function(e) {
+			let preHoverFeature = hoverFeature;
+			hoverFeature = null;
+
+			map.forEachFeatureAtPixel(e.pixel, function(f) {
+				hoverFeature = f;
+				return true;
+			});
+
+			if(hoverFeature == null && preHoverFeature != null) {
+				preHoverFeature.changed();
+			}
+
+			if(hoverFeature != null && hoverFeature != preHoverFeature) {
+				hoverFeature.changed();
+			}
+		});
+
 	}
 
-	async function loadIntegreenLayer(layer_info, progressbar_line)
+	async function loadIntegreenLayerPuntuali(layer_info, progressbar_line)
 	{
 		return new Promise(async function(ok,fail)
 		{
@@ -699,6 +730,144 @@ async function map_start_promise()
 						f.setGeometry(new ol.geom.Point(fPoints));
 					}
 
+				}
+				sourcevector.addFeatures(allFeatures);
+
+				progressbar_line.style.display = "none";
+				ok(layer)
+			}
+			catch(e)
+			{
+				fail(e)
+			}
+		})
+
+	}
+
+	async function loadIntegreenLayerLineari(layer_info, progressbar_line)
+	{
+		return new Promise(async function(ok,fail)
+		{
+			try {
+
+				var sourcevector = new ol.source.Vector({
+					wrapX: false
+				});
+
+				let parseColor = function (color) {
+					let m = color.match(/^#([0-9a-f]{3})$/i);
+					if( m) {
+						m = m[0];
+						return [
+							parseInt(m.charAt(1),16)*0x11,
+							parseInt(m.charAt(2),16)*0x11,
+							parseInt(m.charAt(3),16)*0x11
+						];
+					}
+
+					m = color.match(/^#([0-9a-f]{6})$/i);
+					if( m) {
+						m = m[0];
+						return [
+							parseInt(m.substr(1,2),16),
+							parseInt(m.substr(3,2),16),
+							parseInt(m.substr(5,2),16)
+						];
+					}
+
+					m = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
+					if( m) {
+						return [m[1],m[2],m[3]];
+					}
+
+					return [0, 0, 0];
+				}
+				let lineColor = parseColor(layer_info.color);
+
+				var lineStyle = new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: [lineColor[0], lineColor[1], lineColor[2], 0.7],
+						width: 3
+					}),
+					zIndex: 100
+				})
+
+				var selectedLineStyle = new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: layer_info.color,
+						width: 3
+					}),
+					zIndex: 102
+				})
+
+				var selectedLineStyleStroke = new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: "#000",
+						width: 5
+					}),
+					zIndex: 101
+				})
+
+				var hoverLineStyle = new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: [lineColor[0], lineColor[1], lineColor[2], 0.7],
+						width: 3
+					}),
+					zIndex: 104
+				})
+
+				var hoverLineStyleStroke = new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: [0, 0, 0, 0.7],
+						width: 5
+					}),
+					zIndex: 101
+				})
+
+				var layer = new ol.layer.Vector({
+					source: sourcevector,
+					style: function(list) {
+						let features = list.get('features')
+						if (selectedFeature != null && selectedFeature.getId() === features[0].getId())
+							return [selectedLineStyleStroke, selectedLineStyle]
+						else if (hoverFeature != null && hoverFeature.getId() === features[0].getId())
+							return [hoverLineStyleStroke, hoverLineStyle]
+						else
+							return [lineStyle]
+					}
+				});
+
+				map.addLayer(layer)
+
+
+				progressbar_line.style.display = "block";
+
+				let json_stations_flat = await fetchJson_promise(open_mobility_api_uri + "/v2/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false")
+				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
+
+
+				let allFeatures = [];
+
+				for (var i = 0; i < json_stations.length; i++) {
+					let coordinates = json_stations[i].smetadata.coordinates;
+
+					let points = [];
+					for (let ci = 0; ci < coordinates.length; ci++) {
+						points.push(ol.proj.fromLonLat([coordinates[ci].lat, coordinates[ci].lon]))
+					}
+
+					var featurething = new ol.Feature({
+						geometry: new ol.geom.LineString(points),
+						integreen_data: json_stations[i],
+						'layer_info': layer_info
+					});
+					featurething.setId(json_stations[i].scode);
+					featurething.set('features', [featurething]);
+
+
+					featurething.setProperties({'color': layer_info.color})
+
+					allFeatures.push(featurething);
 				}
 				sourcevector.addFeatures(allFeatures);
 
