@@ -11,6 +11,7 @@ pipeline {
 
         ENDPOINT_URL = "https://analytics.opendatahub.testingmachine.eu"
         THUNDERFOREST_MAPS = credentials('thunderforest_api_key')
+        ODH_MOBILITY_API_URI = "https://mobility.api.opendatahub.bz.it"
 
         KEYCLOAK_AUTHORIZATION_URI = "https://auth.opendatahub.testingmachine.eu/auth"
         KEYCLOAK_REALM = "noi"
@@ -34,6 +35,7 @@ pipeline {
                     echo 'LOG_APPLICATION_NAME=${LOG_APPLICATION_NAME}' >> .env                    
                     echo "ENDPOINT_URL=${ENDPOINT_URL}" >> .env
                     echo "THUNDERFOREST_MAPS=${THUNDERFOREST_MAPS}" >> .env
+                    echo "ODH_MOBILITY_API_URI=${ODH_MOBILITY_API_URI}" >> .env
 
                     echo "KEYCLOAK_AUTHORIZATION_URI=${KEYCLOAK_AUTHORIZATION_URI}" >> .env
                     echo "KEYCLOAK_REALM=${KEYCLOAK_REALM}" >> .env
