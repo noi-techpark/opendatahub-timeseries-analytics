@@ -10,4 +10,5 @@
 /.idea
 /analytics.iml
 .vscode
+.env
 
