@@ -8,9 +8,9 @@ $(document).ready(function () {
     let logout_button = $('#logout_button');
 
     var keycloak = new Keycloak({
-        url: KEYCLOAK_AUTHORIZATION_URI,
-        realm: KEYCLOAK_REALM,
-        clientId: KEYCLOAK_CLIENT_ID
+        url: env.KEYCLOAK_AUTHORIZATION_URI,
+        realm: env.KEYCLOAK_REALM,
+        clientId: env.KEYCLOAK_CLIENT_ID
     });
 
     let setupAuthenticated = function () {
@@ -28,7 +28,7 @@ $(document).ready(function () {
     keycloak.init({
         flow: 'implicit',
         onLoad: 'check-sso',
-        silentCheckSsoRedirectUri: KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI
+        silentCheckSsoRedirectUri: env.KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI
     }).then(function (authenticated) {
         if (!authenticated) {
             setupNonAuthenticated();
@@ -51,12 +51,12 @@ $(document).ready(function () {
 
     login_button.click(function () {
         keycloak.login({
-            redirectUri: KEYCLOAK_REDIRECT_URI
+            redirectUri: env.KEYCLOAK_REDIRECT_URI
         })
     })
     logout_button.click(function () {
         keycloak.logout({
-            redirectUri: KEYCLOAK_REDIRECT_URI
+            redirectUri: env.KEYCLOAK_REDIRECT_URI
         })
     })
 
