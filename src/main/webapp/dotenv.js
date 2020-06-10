@@ -9,7 +9,7 @@ window.env = {
 	ENDPOINT_URL: "https://analytics.opendatahub.testingmachine.eu",
 	ODH_MOBILITY_API_URI: "https://mobility.api.opendatahub.bz.it",
 	LOG_APPLICATION_NAME: "opendatahub-analytics",
-	THUNDERFOREST_MAPS_API_KEY: "",
+	THUNDERFOREST_MAP_API_KEY: "",
 	KEYCLOAK_AUTHORIZATION_URI: "https://auth.opendatahub.testingmachine.eu/auth",
 	KEYCLOAK_REALM: "noi",
 	KEYCLOAK_CLIENT_ID: "odh-mobility-analytics",
