@@ -11,7 +11,7 @@ pipeline {
 
         ENDPOINT_URL = "https://analytics.opendatahub.testingmachine.eu"
         THUNDERFOREST_MAP_API_KEY = credentials('thunderforest_api_key')
-        ODH_MOBILITY_API_URI = "https://mobility.api.opendatahub.bz.it"
+        ODH_MOBILITY_API_URI = "https://mobility.api.opendatahub.bz.it/v2"
 
         KEYCLOAK_AUTHORIZATION_URI = "https://auth.opendatahub.testingmachine.eu/auth"
         KEYCLOAK_REALM = "noi"
