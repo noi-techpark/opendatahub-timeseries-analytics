@@ -5,7 +5,7 @@ DOTENVFILEJS="../src/main/webapp/dotenv.js"
 DOTENVFILE="../.env"
 
 # Remove comments, quotes and invalid assignments, which should not be surrounded by any whitespace
-sed -e 's/[\t ]*=[\t ]*/=/g' "$DOTENVFILE" | grep -vE "^#" | sed -e 's/="/=/' -e 's/"[\t ]*$//' > .env.corrected
+sed -e 's/[\t ]*=[\t ]*/=/g' "$DOTENVFILE" | grep -vE "^#" | grep -vE "^[\t ]*$" | sed -e 's/="/=/' -e 's/"[\t ]*$//' > .env.corrected
 
 cat << DOC > "$DOTENVFILEJS"
 /**
