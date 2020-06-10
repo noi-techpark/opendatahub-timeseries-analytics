@@ -12,11 +12,11 @@ pipeline {
         ENDPOINT_URL = "https://analytics.opendatahub.testingmachine.eu"
         THUNDERFOREST_MAPS = credentials('thunderforest_api_key')
 
-        KEYCLOAK_AUTHORIZATION_URI = ""
-        KEYCLOAK_REALM = ""
-        KEYCLOAK_CLIENT_ID = ""
-        KEYCLOAK_REDIRECT_URI = ""
-        KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI = ""
+        KEYCLOAK_AUTHORIZATION_URI = "https://auth.opendatahub.testingmachine.eu/auth"
+        KEYCLOAK_REALM = "noi"
+        KEYCLOAK_CLIENT_ID = "odh-mobility-v2"
+        KEYCLOAK_REDIRECT_URI = "https://analytics.opendatahub.testingmachine.eu/"
+        KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI = "https://analytics.opendatahub.testingmachine.eu/callback.html"
     }
 
     stages {
@@ -24,7 +24,6 @@ pipeline {
             steps {
                 sh """
                     jq '.endpoints[0].url="${ENDPOINT_URL}"' src/main/webapp/WEB-INF/config.json > tmpFile && mv tmpFile src/main/webapp/WEB-INF/config.json
-                    sed -i -e "s/\\(var thunderforest_api_key =\\).*/\\1'${THUNDERFOREST_MAPS}'/g" src/main/webapp/config.js
 
                     rm -rf .env
                     echo 'DOCKER_PROJECT_NAME=${DOCKER_PROJECT_NAME}' >> .env
@@ -35,6 +34,13 @@ pipeline {
                     echo 'LOG_APPLICATION_NAME=${LOG_APPLICATION_NAME}' >> .env                    
                     echo "ENDPOINT_URL=${ENDPOINT_URL}" >> .env
                     echo "THUNDERFOREST_MAPS=${THUNDERFOREST_MAPS}" >> .env
+
+                    echo "KEYCLOAK_AUTHORIZATION_URI=${KEYCLOAK_AUTHORIZATION_URI}" >> .env
+                    echo "KEYCLOAK_REALM=${KEYCLOAK_REALM}" >> .env
+                    echo "KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}" >> .env
+                    echo "KEYCLOAK_REDIRECT_URI=${KEYCLOAK_REDIRECT_URI}" >> .env
+                    echo "KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI=${KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI}" >> .env
+
                     cd infrastructure
                     ./dotenv-sed.sh
                 """
