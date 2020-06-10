@@ -49,7 +49,7 @@ async function map_start_promise()
 				attributions: [
 					'Maps © <a href="http://www.thunderforest.com">Thunderforest</a>, Data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
 				],
-				url : mapTileURLs[i][1] + thunderforest_api_key
+				url : mapTileURLs[i][1] + env.THUNDERFOREST_MAP_API_KEY
 			})
 		}
 		let opt = document.createElement('option');
@@ -62,7 +62,7 @@ async function map_start_promise()
 	});
 
 	mapLayer = new ol.layer.Tile({
-		source : thunderforest_api_key? sources[1]: sources[0]
+		source : env.THUNDERFOREST_MAP_API_KEY ? sources[1] : sources[0]
 	})
 
 
@@ -603,7 +603,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(open_mobility_api_uri + "/v2/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true")
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/v2/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true")
 				let json_stations = json_stations_flat.data[layer_info.stationType]? Object.values(json_stations_flat.data[layer_info.stationType].stations): [];
 
 
@@ -842,7 +842,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(open_mobility_api_uri + "/v2/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true")
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/v2/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true")
 				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
 
 
