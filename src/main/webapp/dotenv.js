@@ -13,6 +13,6 @@ window.env = {
 	KEYCLOAK_AUTHORIZATION_URI: "https://auth.opendatahub.testingmachine.eu/auth",
 	KEYCLOAK_REALM: "noi",
 	KEYCLOAK_CLIENT_ID: "odh-mobility-analytics",
-	KEYCLOAK_REDIRECT_URI: "https://analytics.opendatahub.testingmachine.eu/",
-	KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI: "https://analytics.opendatahub.testingmachine.eu/callback.html",
+	KEYCLOAK_REDIRECT_URI: "http://localhost:8999/",
+	KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI: "http://localhost:8999/callback.html",
 }
