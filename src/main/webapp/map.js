@@ -603,7 +603,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true")
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true", AUTHORIZATION_TOKEN)
 				let json_stations = json_stations_flat.data[layer_info.stationType]? Object.values(json_stations_flat.data[layer_info.stationType].stations): [];
 
 
@@ -842,7 +842,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false")
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false", AUTHORIZATION_TOKEN)
 				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
 
 
@@ -912,12 +912,15 @@ async function map_start_promise()
 
 	}
 
-	function fetchJson_promise(url)
+	function fetchJson_promise(url, authorisation_header)
 	{
 		return new Promise(function(success, fail)
 		{
 			var xhttp = new XMLHttpRequest();
 			xhttp.open("GET", url , true);
+			if(authorisation_header) {
+				xhttp.setRequestHeader("Authorization", authorisation_header);
+			}
 			xhttp.onreadystatechange = function(readystatechange)
 			{
 				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
