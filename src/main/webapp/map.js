@@ -109,6 +109,7 @@ async function map_start_promise()
 
 
 	let json = await fetchJson_promise('layers-config.json')
+	let linkstationConfig = await fetchJson_promise('linkstation-config.json')
 
 	// for groups
 	/*
@@ -603,7 +604,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true")
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true", AUTHORIZATION_TOKEN)
 				let json_stations = json_stations_flat.data[layer_info.stationType]? Object.values(json_stations_flat.data[layer_info.stationType].stations): [];
 
 
@@ -782,58 +783,56 @@ async function map_start_promise()
 
 					return [0, 0, 0];
 				}
-				let lineColor = parseColor(layer_info.color);
-
-				var lineStyle = new ol.style.Style({
-					stroke: new ol.style.Stroke({
-						color: [lineColor[0], lineColor[1], lineColor[2], 0.7],
-						width: 3
-					}),
-					zIndex: 100
-				})
-
-				var selectedLineStyle = new ol.style.Style({
-					stroke: new ol.style.Stroke({
-						color: layer_info.color,
-						width: 3
-					}),
-					zIndex: 102
-				})
-
-				var selectedLineStyleStroke = new ol.style.Style({
-					stroke: new ol.style.Stroke({
-						color: "#000",
-						width: 5
-					}),
-					zIndex: 101
-				})
-
-				var hoverLineStyle = new ol.style.Style({
-					stroke: new ol.style.Stroke({
-						color: [lineColor[0], lineColor[1], lineColor[2], 0.7],
-						width: 3
-					}),
-					zIndex: 104
-				})
-
-				var hoverLineStyleStroke = new ol.style.Style({
-					stroke: new ol.style.Stroke({
-						color: [0, 0, 0, 0.7],
-						width: 5
-					}),
-					zIndex: 101
-				})
 
 				var layer = new ol.layer.Vector({
 					source: sourcevector,
 					style: function(list) {
 						let features = list.get('features')
+						let condColor = features[0].get('condColor');
 						if (selectedFeature != null && selectedFeature.getId() === features[0].getId())
-							return [selectedLineStyleStroke, selectedLineStyle]
+							return [
+								new ol.style.Style({
+									stroke: new ol.style.Stroke({
+										color: "#000000",
+										width: 5
+									}),
+									zIndex: 101
+								}),
+								new ol.style.Style({
+									stroke: new ol.style.Stroke({
+										color: condColor,
+										width: 3
+									}),
+									zIndex: 102
+								})
+							]
 						else if (hoverFeature != null && hoverFeature.getId() === features[0].getId())
-							return [hoverLineStyleStroke, hoverLineStyle]
+							return [
+								new ol.style.Style({
+									stroke: new ol.style.Stroke({
+										color: '#000000',
+										width: 5
+									}),
+									zIndex: 103
+								}),
+								new ol.style.Style({
+									stroke: new ol.style.Stroke({
+										color: condColor,
+										width: 3
+									}),
+									zIndex: 104
+								})
+							]
 						else
-							return [lineStyle]
+							return [
+								new ol.style.Style({
+									stroke: new ol.style.Stroke({
+										color: condColor,
+										width: 3
+									}),
+									zIndex: 100
+								})
+							]
 					}
 				});
 
@@ -842,7 +841,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false")
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false", AUTHORIZATION_TOKEN)
 				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
 
 
@@ -867,8 +866,37 @@ async function map_start_promise()
 					featurething.setId(json_stations[i].scode);
 					featurething.set('features', [featurething]);
 
+					var condColor = '#808080';
 
-					featurething.setProperties({'color': layer_info.color})
+					let conditions = linkstationConfig[json_stations[i].scode];
+
+					if(conditions) {
+						for (var ic = 0; ic < conditions.length; ic++) {
+							try {
+								var cond = conditions[ic]
+								let json_value = json_stations[i].sdatatypes[cond[1]];
+								if (json_value)
+									for (let jc = 0; jc < json_value.tmeasurements.length; jc++) {
+										if (json_value.tmeasurements[jc].mperiod == cond[2]) {
+											let valore_attuale = json_value.tmeasurements[jc].mvalue;
+											let timestamp = json_value.tmeasurements[jc].mvalidtime;
+											if (cond[3] <= valore_attuale && valore_attuale < cond[4]) {
+//												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+//													condColor = '#808080';
+//												else
+													condColor = cond[0];
+												break;
+											}
+										}
+									}
+							} catch (e) {
+								console.log(e)
+							}
+						}
+					}
+
+
+					featurething.setProperties({'condColor': condColor, 'color': layer_info.color})
 
 					allFeatures.push(featurething);
 				}
@@ -912,12 +940,15 @@ async function map_start_promise()
 
 	}
 
-	function fetchJson_promise(url)
+	function fetchJson_promise(url, authorisation_header)
 	{
 		return new Promise(function(success, fail)
 		{
 			var xhttp = new XMLHttpRequest();
 			xhttp.open("GET", url , true);
+			if(authorisation_header) {
+				xhttp.setRequestHeader("Authorization", authorisation_header);
+			}
 			xhttp.onreadystatechange = function(readystatechange)
 			{
 				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
