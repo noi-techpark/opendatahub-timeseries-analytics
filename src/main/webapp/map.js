@@ -604,7 +604,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.true", AUTHORIZATION_TOKEN)
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?select=scode,sname,scoordinate,smetadata.coordinates,sorigin,stype,tname,tunit,mperiod,mvalue,mvalidtime&limit=-1&distinct=true&where=sactive.eq.true", AUTHORIZATION_TOKEN)
 				let json_stations = json_stations_flat.data[layer_info.stationType]? Object.values(json_stations_flat.data[layer_info.stationType].stations): [];
 
 
@@ -841,7 +841,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false", AUTHORIZATION_TOKEN)
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?select=scode,sname,scoordinate,smetadata.coordinates,sorigin,stype,tname,tunit,mperiod,mvalue,mvalidtime&limit=-1&distinct=true&where=sactive.eq.false", AUTHORIZATION_TOKEN)
 				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
 
 
