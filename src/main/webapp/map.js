@@ -340,11 +340,16 @@ async function map_start_promise()
 				selectedFeature = features[0].get("features")[0];
 				selectedFeature.changed();
 
+				details_content.textContent  = '';
+				details_title.textContent = '';
 				details_container.style.display = 'block';
 				map.updateSize();
 				var coords = features[0].getGeometry().getCoordinates();
 
-				var integreen_data = features[0].get("features")[0].getProperties()['integreen_data'];
+				var scode = features[0].get("features")[0].getProperties()['scode'];
+				var stationType = features[0].get("features")[0].getProperties()['stationType'];
+				let station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*/latest?where=scode.eq." + scode, AUTHORIZATION_TOKEN)
+				var integreen_data = station_data_json.data[stationType].stations[scode];
 				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
 				let color = features[0].get("features")[0].getProperties()['color'];
 
@@ -604,8 +609,25 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?select=scode,sname,scoordinate,smetadata.coordinates,sorigin,stype,tname,tunit,mperiod,mvalue,mvalidtime&limit=-1&distinct=true&where=sactive.eq.true", AUTHORIZATION_TOKEN)
-				let json_stations = json_stations_flat.data[layer_info.stationType]? Object.values(json_stations_flat.data[layer_info.stationType].stations): [];
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
+					"/?limit=-1&distinct=true&select=scoordinate%2Cscode&where=sactive.eq.true", AUTHORIZATION_TOKEN)
+				let json_stations_status = {};
+				if(layer_info.icons.length > 1) {
+					let datatype_period_duplicates = {};
+					let query_where_datatypes = "";
+					for(let i = 1; i < layer_info.icons.length; i++) {
+						let key = layer_info.icons[i][1] + ";" + layer_info.icons[i][2];
+						if(!datatype_period_duplicates[key]) {
+							datatype_period_duplicates[key] = true;
+							let query_datatype = "and(mperiod.eq." + layer_info.icons[i][2] + ",tname.eq." + layer_info.icons[i][1].replace(/(['"\\])/g, "\\$1") + ")";
+							query_where_datatypes += (query_where_datatypes === ""? "or(": ",") + query_datatype;
+						}
+					}
+					query_where_datatypes += ")";
+					let json_stations_status_result = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType)
+						+ "/*/latest?limit=-1&distinct=true&where=and(sactive.eq.true," + encodeURIComponent(query_where_datatypes) + ")", AUTHORIZATION_TOKEN)
+					json_stations_status = json_stations_status_result.data[layer_info.stationType]? json_stations_status_result.data[layer_info.stationType].stations: {};
+				}
 
 
 				let overlapping_points = {};
@@ -613,13 +635,13 @@ async function map_start_promise()
 				let overlapping_star_features = [];
 				let allFeatures = [];
 
-				for (var i = 0; i < json_stations.length; i++)
+				for (var i = 0; i < json_stations_flat.data.length; i++)
 				{
 
 					//progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
 
-					let lat = json_stations[i].scoordinate? json_stations[i].scoordinate.y: 0;
-					let lon = json_stations[i].scoordinate? json_stations[i].scoordinate.x: 0;
+					let lat = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.y: 0;
+					let lon = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.x: 0;
 
 					if (!lat || !lon)
 					{
@@ -632,10 +654,11 @@ async function map_start_promise()
 
 					var featurething = new ol.Feature({
 						geometry : thing,
-						integreen_data: json_stations[i],
+						stationType: layer_info.stationType,
+						scode: json_stations_flat.data[i].scode,
 						'layer_info': layer_info
 					});
-					featurething.setId(json_stations[i].scode);
+					featurething.setId(json_stations_flat.data[i].scode);
 
 					if (overlapping_points[key] != undefined)
 					{
@@ -658,33 +681,30 @@ async function map_start_promise()
 					var icona = 'transparent.svg';
 
 
-					for (var ic = 1; ic < layer_info.icons.length; ic++)
-					{
-						// if (ic == 1)
-						// 	icona = 'black.svg'
-						try
-						{
-							var cond = layer_info.icons[ic]
-							json_stations[i].sdatatypes[cond[1]]
-							let json_value = json_stations[i].sdatatypes[cond[1]];
-							if(json_value)
-								for(let jc = 0; jc < json_value.tmeasurements.length; jc++) {
-									if (json_value.tmeasurements[jc].mperiod == cond[2]) {
-										let valore_attuale = json_value.tmeasurements[jc].mvalue;
-										let timestamp = json_value.tmeasurements[jc].mvalidtime;
-										if (cond[3] <= valore_attuale && valore_attuale < cond[4]) {
-											if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
-												icona = 'gray.svg'
-											else
+					if(json_stations_status[json_stations_flat.data[i].scode]) {
+						for (var ic = 1; ic < layer_info.icons.length; ic++) {
+							// if (ic == 1)
+							// 	icona = 'black.svg'
+							try {
+								var cond = layer_info.icons[ic]
+								let json_value = json_stations_status[json_stations_flat.data[i].scode].sdatatypes[cond[1]];
+								if (json_value)
+									for (let jc = 0; jc < json_value.tmeasurements.length; jc++) {
+										if (json_value.tmeasurements[jc].mperiod == cond[2]) {
+											let valore_attuale = json_value.tmeasurements[jc].mvalue;
+											let timestamp = json_value.tmeasurements[jc].mvalidtime;
+											if (cond[3] <= valore_attuale && valore_attuale < cond[4]) {
+//												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+//													icona = 'gray.svg'
+//												else
 												icona = cond[0];
-											break;
+												break;
+											}
 										}
 									}
-								}
-						}
-						catch (e)
-						{
-							console.log(e)
+							} catch (e) {
+								console.log(e)
+							}
 						}
 					}
 
@@ -841,7 +861,7 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + layer_info.stationType + "/%2A/latest?select=scode,sname,scoordinate,smetadata.coordinates,sorigin,stype,tname,tunit,mperiod,mvalue,mvalidtime&limit=-1&distinct=true&where=sactive.eq.false", AUTHORIZATION_TOKEN)
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType) + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false", AUTHORIZATION_TOKEN)
 				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
 
 
@@ -884,7 +904,7 @@ async function map_start_promise()
 //												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
 //													condColor = '#808080';
 //												else
-													condColor = cond[0];
+												condColor = cond[0];
 												break;
 											}
 										}
@@ -944,7 +964,8 @@ async function map_start_promise()
 	{
 		return new Promise(function(success, fail)
 		{
-			var xhttp = new XMLHttpRequest();
+			var xhttp = new XMLHttpRequest()
+			console.log(url)
 			xhttp.open("GET", url , true);
 			if(authorisation_header) {
 				xhttp.setRequestHeader("Authorization", authorisation_header);
