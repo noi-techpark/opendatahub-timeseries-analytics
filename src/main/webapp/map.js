@@ -340,7 +340,7 @@ async function map_start_promise()
 				selectedFeature = features[0].get("features")[0];
 				selectedFeature.changed();
 
-				details_content.textContent  = '';
+				details_content.textContent  = 'loading ...';
 				details_title.textContent = '';
 				details_container.style.display = 'block';
 				map.updateSize();
@@ -348,7 +348,7 @@ async function map_start_promise()
 
 				var scode = features[0].get("features")[0].getProperties()['scode'];
 				var stationType = features[0].get("features")[0].getProperties()['stationType'];
-				let station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*/latest?where=scode.eq." + scode, AUTHORIZATION_TOKEN)
+				let station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*/latest?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
 				var integreen_data = station_data_json.data[stationType].stations[scode];
 				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
 				let color = features[0].get("features")[0].getProperties()['color'];
@@ -861,17 +861,35 @@ async function map_start_promise()
 
 				progressbar_line.style.display = "block";
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType) + "/%2A/latest?limit=-1&distinct=true&where=sactive.eq.false", AUTHORIZATION_TOKEN)
-				let json_stations = json_stations_flat.data[layer_info.stationType] ? Object.values(json_stations_flat.data[layer_info.stationType].stations) : [];
 
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
+					"/?limit=-1&distinct=true&select=smetadata.coordinates%2Cscode&where=sactive.eq.false", AUTHORIZATION_TOKEN);
+
+				let json_stations_status = {};
+				let datatype_period_duplicates = {};
+				let query_where_datatypes = "";
+				$.each(linkstationConfig, function (configI, config) {
+					for (let i = 1; i < config.length; i++) {
+						let key = config[i][1];
+						if (!datatype_period_duplicates[key]) {
+							datatype_period_duplicates[key] = true;
+							let query_datatype = "and(tname.eq." + config[i][1].replace(/(['"\\])/g, "\\$1") + ")";
+							query_where_datatypes += (query_where_datatypes === "" ? "or(" : ",") + query_datatype;
+						}
+					}
+				});
+				query_where_datatypes += ")";
+				let json_stations_status_result = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType)
+					+ "/*/latest?limit=-1&distinct=true&where=sactive.eq.false," + encodeURIComponent(query_where_datatypes), AUTHORIZATION_TOKEN)
+				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
 
 				let allFeatures = [];
 
-				for (var i = 0; i < json_stations.length; i++) {
-					if (!json_stations[i].smetadata || !json_stations[i].smetadata.coordinates)
+				for (var i = 0; i < json_stations_flat.data.length; i++) {
+					if (!json_stations_flat.data[i]['smetadata.coordinates'])
 						continue;
 
-					let coordinates = json_stations[i].smetadata.coordinates;
+					let coordinates = json_stations_flat.data[i]['smetadata.coordinates'];
 
 					let points = [];
 					for (let ci = 0; ci < coordinates.length; ci++) {
@@ -880,21 +898,22 @@ async function map_start_promise()
 
 					var featurething = new ol.Feature({
 						geometry: new ol.geom.LineString(points),
-						integreen_data: json_stations[i],
+						stationType: layer_info.stationType,
+						scode: json_stations_flat.data[i].scode,
 						'layer_info': layer_info
 					});
-					featurething.setId(json_stations[i].scode);
+					featurething.setId(json_stations_flat.data[i].scode);
 					featurething.set('features', [featurething]);
 
 					var condColor = '#808080';
 
-					let conditions = linkstationConfig[json_stations[i].scode];
+					let conditions = linkstationConfig[json_stations_flat.data[i].scode];
 
-					if(conditions) {
+					if(conditions && json_stations_status[json_stations_flat.data[i].scode]) {
 						for (var ic = 0; ic < conditions.length; ic++) {
 							try {
 								var cond = conditions[ic]
-								let json_value = json_stations[i].sdatatypes[cond[1]];
+								let json_value = json_stations_status[json_stations_flat.data[i].scode].sdatatypes[cond[1]];
 								if (json_value)
 									for (let jc = 0; jc < json_value.tmeasurements.length; jc++) {
 										if (json_value.tmeasurements[jc].mperiod == cond[2]) {
@@ -965,7 +984,6 @@ async function map_start_promise()
 		return new Promise(function(success, fail)
 		{
 			var xhttp = new XMLHttpRequest()
-			console.log(url)
 			xhttp.open("GET", url , true);
 			if(authorisation_header) {
 				xhttp.setRequestHeader("Authorization", authorisation_header);
