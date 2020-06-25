@@ -625,7 +625,7 @@ async function map_start_promise()
 					}
 					query_where_datatypes += ")";
 					let json_stations_status_result = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType)
-						+ "/*/latest?limit=-1&distinct=true&where=and(sactive.eq.true," + encodeURIComponent(query_where_datatypes) + ")", AUTHORIZATION_TOKEN)
+						+ "/*/latest?limit=-1&distinct=true&select=tmeasurements,mvalue&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes), AUTHORIZATION_TOKEN)
 					json_stations_status = json_stations_status_result.data[layer_info.stationType]? json_stations_status_result.data[layer_info.stationType].stations: {};
 				}
 
@@ -880,7 +880,7 @@ async function map_start_promise()
 				});
 				query_where_datatypes += ")";
 				let json_stations_status_result = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType)
-					+ "/*/latest?limit=-1&distinct=true&where=sactive.eq.false," + encodeURIComponent(query_where_datatypes), AUTHORIZATION_TOKEN)
+					+ "/*/latest?limit=-1&distinct=true&select=tmeasurements,mvalue&where=sactive.eq.false," + encodeURIComponent(query_where_datatypes), AUTHORIZATION_TOKEN)
 				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
 
 				let allFeatures = [];
