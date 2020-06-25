@@ -7,11 +7,7 @@ $(document).ready(function () {
     let logoutuser = $('#logoutuser');
     let logout_button = $('#logout_button');
 
-    var keycloak = new Keycloak({
-        url: env.KEYCLOAK_AUTHORIZATION_URI,
-        realm: env.KEYCLOAK_REALM,
-        clientId: env.KEYCLOAK_CLIENT_ID
-    });
+    var keycloak = new Keycloak();
 
     let setupAuthenticated = function () {
         AUTHORIZATION_TOKEN = keycloak.authenticated && !keycloak.isTokenExpired() ? 'Bearer ' + keycloak.token : '';
@@ -26,9 +22,9 @@ $(document).ready(function () {
     }
 
     keycloak.init({
-        flow: 'implicit',
         onLoad: 'check-sso',
-        silentCheckSsoRedirectUri: env.KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI
+        silentCheckSsoRedirectUri:
+            window.location.origin + "/silent-check-sso.html",
     }).then(function (authenticated) {
         if (!authenticated) {
             setupNonAuthenticated();
@@ -45,19 +41,26 @@ $(document).ready(function () {
     keycloak.onAuthLogout = function () {
         setupNonAuthenticated();
     }
-    keycloak.onTokenExpired = function () {
-        setupNonAuthenticated();
-    }
 
     login_button.click(function () {
         keycloak.login({
-            redirectUri: env.KEYCLOAK_REDIRECT_URI
+            redirectUri: window.location.origin
         })
     })
     logout_button.click(function () {
         keycloak.logout({
-            redirectUri: env.KEYCLOAK_REDIRECT_URI
+            redirectUri: window.location.origin
         })
     })
+
+    setInterval(() => {
+        keycloak.updateToken(30).then(function() {
+            setupAuthenticated();
+        }).catch(function() {
+            if(!keycloak.authenticated || ! keycloak.isTokenExpired()) {
+                setupNonAuthenticated();
+            }
+        });
+    }, 60000)
 
 })
