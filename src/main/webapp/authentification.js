@@ -57,7 +57,7 @@ $(document).ready(function () {
         keycloak.updateToken(30).then(function() {
             setupAuthenticated();
         }).catch(function() {
-            if(!keycloak.authenticated || ! keycloak.isTokenExpired()) {
+            if(!keycloak.authenticated || keycloak.isTokenExpired()) {
                 setupNonAuthenticated();
             }
         });
