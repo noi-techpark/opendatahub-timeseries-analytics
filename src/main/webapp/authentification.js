@@ -26,7 +26,6 @@ $(document).ready(function () {
     }
 
     keycloak.init({
-        flow: 'implicit',
         onLoad: 'check-sso',
         silentCheckSsoRedirectUri: env.KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI
     }).then(function (authenticated) {
@@ -45,9 +44,6 @@ $(document).ready(function () {
     keycloak.onAuthLogout = function () {
         setupNonAuthenticated();
     }
-    keycloak.onTokenExpired = function () {
-        setupNonAuthenticated();
-    }
 
     login_button.click(function () {
         keycloak.login({
@@ -59,5 +55,15 @@ $(document).ready(function () {
             redirectUri: env.KEYCLOAK_REDIRECT_URI
         })
     })
+
+    setInterval(() => {
+        keycloak.updateToken(30).then(function() {
+            setupAuthenticated();
+        }).catch(function() {
+            if(!keycloak.authenticated || keycloak.isTokenExpired()) {
+                setupNonAuthenticated();
+            }
+        });
+    }, 60000)
 
 })
