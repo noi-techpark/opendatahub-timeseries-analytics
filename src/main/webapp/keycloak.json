@@ -1,8 +1,0 @@
-{
-    "realm": "noi",
-    "auth-server-url": "https://auth.opendatahub.testingmachine.eu/auth",
-    "ssl-required": "external",
-    "resource": "odh-mobility-analytics",
-    "public-client": true,
-    "confidential-port": 0
-}
