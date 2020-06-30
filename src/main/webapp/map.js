@@ -610,7 +610,8 @@ async function map_start_promise()
 				progressbar_line.style.display = "block";
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=scoordinate%2Cscode&where=sactive.eq.true", AUTHORIZATION_TOKEN)
+					"/?limit=-1&distinct=true&select=scoordinate%2Cscode&where=sactive.eq.true",
+					AUTHORIZATION_TOKEN, progressbar_line)
 				let json_stations_status = {};
 				if(layer_info.icons.length > 1) {
 					let datatype_period_duplicates = {};
@@ -619,13 +620,22 @@ async function map_start_promise()
 						let key = layer_info.icons[i][1] + ";" + layer_info.icons[i][2];
 						if(!datatype_period_duplicates[key]) {
 							datatype_period_duplicates[key] = true;
-							let query_datatype = "and(mperiod.eq." + layer_info.icons[i][2] + ",tname.eq." + layer_info.icons[i][1].replace(/(['"\\])/g, "\\$1") + ")";
+							let query_datatype = "and(mperiod.eq." + layer_info.icons[i][2] + ",tname.eq.\"" + layer_info.icons[i][1].replace(/(['"\\])/g, "\\$1") + "\")";
 							query_where_datatypes += (query_where_datatypes === ""? "or(": ",") + query_datatype;
 						}
 					}
 					query_where_datatypes += ")";
-					let json_stations_status_result = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType)
-						+ "/*/latest?limit=-1&distinct=true&select=tmeasurements,mvalue&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes), AUTHORIZATION_TOKEN)
+					let json_stations_status_result = await fetchJson_promise(
+						env.ODH_MOBILITY_API_URI +
+						"/tree" +
+						"/" + encodeURIComponent(layer_info.stationType)
+						+ "/*/latest" +
+						"?limit=-1" +
+						"&distinct=true" +
+						"&select=tmeasurements" +
+						"&showNull=true" +
+						"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
+						AUTHORIZATION_TOKEN, progressbar_line)
 					json_stations_status = json_stations_status_result.data[layer_info.stationType]? json_stations_status_result.data[layer_info.stationType].stations: {};
 				}
 
@@ -863,7 +873,8 @@ async function map_start_promise()
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=smetadata.coordinates%2Cscode&where=sactive.eq.false", AUTHORIZATION_TOKEN);
+					"/?limit=-1&distinct=true&select=smetadata.coordinates%2Cscode&where=sactive.eq.false",
+					AUTHORIZATION_TOKEN, progressbar_line);
 
 				let json_stations_status = {};
 				let datatype_period_duplicates = {};
@@ -873,14 +884,21 @@ async function map_start_promise()
 						let key = config[i][1];
 						if (!datatype_period_duplicates[key]) {
 							datatype_period_duplicates[key] = true;
-							let query_datatype = "and(tname.eq." + config[i][1].replace(/(['"\\])/g, "\\$1") + ")";
+							let query_datatype = "and(tname.eq.\"" + config[i][1].replace(/(['"\\])/g, "\\$1") + "\")";
 							query_where_datatypes += (query_where_datatypes === "" ? "or(" : ",") + query_datatype;
 						}
 					}
 				});
 				query_where_datatypes += ")";
-				let json_stations_status_result = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + encodeURIComponent(layer_info.stationType)
-					+ "/*/latest?limit=-1&distinct=true&select=tmeasurements,mvalue&where=sactive.eq.false," + encodeURIComponent(query_where_datatypes), AUTHORIZATION_TOKEN)
+				let json_stations_status_result = await fetchJson_promise(env.ODH_MOBILITY_API_URI +
+					"/tree" +
+					"/" + encodeURIComponent(layer_info.stationType)
+					+ "/*/latest" +
+					"?limit=-1" +
+					"&distinct=true" +
+					"&select=tmeasurements" +
+					"&where=sactive.eq.false," + encodeURIComponent(query_where_datatypes),
+					AUTHORIZATION_TOKEN, progressbar_line)
 				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
 
 				let allFeatures = [];
@@ -979,7 +997,7 @@ async function map_start_promise()
 
 	}
 
-	function fetchJson_promise(url, authorisation_header)
+	function fetchJson_promise(url, authorisation_header, spinnerItem)
 	{
 		return new Promise(function(success, fail)
 		{
@@ -999,6 +1017,9 @@ async function map_start_promise()
 					}
 					else
 					{
+						if(spinnerItem) {
+							spinnerItem.style.display = "none";
+						}
 						fail(url + ': ' + xhttp.status)
 					}
 				}
