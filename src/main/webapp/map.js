@@ -881,7 +881,7 @@ async function map_start_promise()
 						let key = config[i][1];
 						if (!datatype_period_duplicates[key]) {
 							datatype_period_duplicates[key] = true;
-							let query_datatype = "and(tname.eq." + config[i][1].replace(/(['"\\])/g, "\\$1") + ")";
+							let query_datatype = "and(tname.eq.\"" + config[i][1].replace(/(['"\\])/g, "\\$1") + "\")";
 							query_where_datatypes += (query_where_datatypes === "" ? "or(" : ",") + query_datatype;
 						}
 					}
