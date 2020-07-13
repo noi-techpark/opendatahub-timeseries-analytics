@@ -349,6 +349,13 @@ async function map_start_promise()
 				var scode = features[0].get("features")[0].getProperties()['scode'];
 				var stationType = features[0].get("features")[0].getProperties()['stationType'];
 				let station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*/latest?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
+				if(station_data_json.data == undefined
+					|| jQuery.isEmptyObject(station_data_json.data)
+					|| station_data_json.data[stationType] == undefined
+					|| station_data_json.data[stationType].stations == undefined
+					|| jQuery.isEmptyObject(station_data_json.data[stationType].stations)){
+					station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
+				}
 				var integreen_data = station_data_json.data[stationType].stations[scode];
 				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
 				let color = features[0].get("features")[0].getProperties()['color'];
@@ -397,7 +404,6 @@ async function map_start_promise()
 
 
 				let valuesDiv = document.createElement('div')
-				valuesDiv.textContent = 'loading ...'
 				details_content.appendChild(valuesDiv)
 				let mainValuesDiv = document.createElement('div')
 				let moreValuesDiv = document.createElement('div')
@@ -406,59 +412,72 @@ async function map_start_promise()
 				try
 				{
 					let json_datatypes = Object.values(integreen_data.sdatatypes)
+					if(json_datatypes === undefined) {
+						valuesDiv.textContent = 'Error! Not authorized?';
+					}
 
 					for (var dt = 0; dt < json_datatypes.length; dt++)
 					{
 						let value_datatype = json_datatypes[dt];
 						let value_datatype_messurments = value_datatype.tmeasurements;
 
-						for (var dtm = 0; dtm < value_datatype_messurments.length; dtm++) {
-							let value_datatype_messurment = value_datatype_messurments[dtm];
-							let currentValuesDiv = moreValuesDiv;
-							for (let mDi = 0; mDi < layer_info['main-data'].length; mDi++) {
-								let mainData = layer_info['main-data'][mDi];
-								if (value_datatype.tname == mainData[0] && (mainData[1] == null || value_datatype_messurment.mperiod == mainData[1])) {
-									currentValuesDiv = mainValuesDiv;
-									break;
+						if(value_datatype_messurments !== undefined)
+							for (var dtm = 0; dtm < value_datatype_messurments.length; dtm++) {
+								let value_datatype_messurment = value_datatype_messurments[dtm];
+								let currentValuesDiv = moreValuesDiv;
+								for (let mDi = 0; mDi < layer_info['main-data'].length; mDi++) {
+									let mainData = layer_info['main-data'][mDi];
+									if (value_datatype.tname == mainData[0] && (mainData[1] == null || value_datatype_messurment.mperiod == mainData[1])) {
+										currentValuesDiv = mainValuesDiv;
+										break;
+									}
 								}
+								let row = document.createElement('div')
+								row.className = "details-valueItem1"
+								currentValuesDiv.appendChild(row)
+								let rowAlink = document.createElement('a')
+								let rowText = value_datatype_messurment.mvalue + ' ' + value_datatype.tname + ' [' + value_datatype_messurment.mperiod + ']'
+								rowAlink.textContent = rowText.toUpperCase()
+								let state = {
+									active_tab: 0,
+									height: "400px",
+									auto_refresh: false,
+									scale: {
+										from: new Date(new Date(value_datatype_messurment.mvalidtime).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+										to: new Date(value_datatype_messurment.mvalidtime).toISOString().split('T')[0]
+									},
+									graphs: [
+										{
+											category: layer_info.id,
+											station: integreen_data.scode,
+											station_name: integreen_data.sname,
+											data_type: value_datatype.tname,
+											unit: value_datatype.tunit,
+											period: value_datatype_messurment.mperiod,
+											yaxis: 1,
+											color: 3
+										}
+									]
+								};
+								rowAlink.href = location.origin + location.pathname + "#" + encodeURI(JSON.stringify(state))
+								rowAlink.target = '_blank'
+								row.appendChild(rowAlink)
+								let row2 = document.createElement('div')
+								row2.textContent = ' (' + new Date(value_datatype_messurment.mvalidtime).toLocaleString() + ')'
+								row2.className = "details-valueItem2"
+								currentValuesDiv.appendChild(row2)
 							}
+						else {
 							let row = document.createElement('div')
 							row.className = "details-valueItem1"
-							currentValuesDiv.appendChild(row)
-							let rowAlink = document.createElement('a')
-							let rowText = value_datatype_messurment.mvalue + ' ' + value_datatype.tname + ' [' + value_datatype_messurment.mperiod + ']'
-							rowAlink.textContent = rowText.toUpperCase()
-//					rowAlink.href = '/#{"active_tab":0,"height":"400px","auto_refresh":false,"scale":{"from":1567375200000,"to":1567980000000},
-//					"graphs":[{"category":"Weather","station":"82910MS","station_name":"San Genesio","data_type":
-//					"precipitation","unit":"mm","period":"300","yaxis":1,"color":3}]}'
-							let state = {
-								active_tab: 0,
-								height: "400px",
-								auto_refresh: false,
-								scale: {
-									from: new Date(new Date(value_datatype_messurment.mvalidtime).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-									to: new Date(value_datatype_messurment.mvalidtime).toISOString().split('T')[0]
-								},
-								graphs: [
-									{
-										category: layer_info.id,
-										station: integreen_data.scode,
-										station_name: integreen_data.sname,
-										data_type: value_datatype.tname,
-										unit: value_datatype.tunit,
-										period: value_datatype_messurment.mperiod,
-										yaxis: 1,
-										color: 3
-									}
-								]
-							};
-							rowAlink.href = location.origin + location.pathname + "#" + encodeURI(JSON.stringify(state))
-							rowAlink.target = '_blank'
-							row.appendChild(rowAlink)
+							let rowText = value_datatype.tname
+							row.textContent = rowText.toUpperCase()
+							moreValuesDiv.appendChild(row)
 							let row2 = document.createElement('div')
-							row2.textContent = ' (' + new Date(value_datatype_messurment.mvalidtime).toLocaleString() + ')'
+							row2.textContent = 'Error! Not authorized?'
 							row2.className = "details-valueItem2"
-							currentValuesDiv.appendChild(row2)
+							moreValuesDiv.appendChild(row2)
+
 						}
 					}
 					valuesDiv.textContent = ''
