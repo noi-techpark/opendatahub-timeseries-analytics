@@ -1016,14 +1016,14 @@ async function map_start_promise()
 
 	}
 
-	function fetchJson_promise(url, authorisation_header, spinnerItem)
+	function fetchJson_promise(url, authorization_header, spinnerItem)
 	{
 		return new Promise(function(success, fail)
 		{
 			var xhttp = new XMLHttpRequest()
 			xhttp.open("GET", url , true);
-			if(authorisation_header) {
-				xhttp.setRequestHeader("Authorization", authorisation_header);
+			if(authorization_header) {
+				xhttp.setRequestHeader("Authorization", authorization_header);
 			}
 			xhttp.onreadystatechange = function(readystatechange)
 			{
@@ -1088,46 +1088,6 @@ async function map_start_promise()
 			pad0(d.getHours()) + ":" + pad0(d.getMinutes())   + ":" + pad0(d.getSeconds());
 	}
 
-	function setupLoginForm()
-	{
-		var form = document.getElementById('loginform');
-		var loginuser = document.getElementById('loginuser')
-		var loginpass = document.getElementById('loginpass')
-
-		let logout = document.getElementById('logout');
-		let logoutuser = document.getElementById('logoutuser');
-		let logout_button = document.getElementById('logout_button');
-
-		form.addEventListener('submit', async function(e)
-		{
-			e.preventDefault()
-			try
-			{
-				var resp = await fetchJsonLogin_promise('login','user=' + encodeURIComponent(loginuser.value) + '&pass=' + encodeURIComponent(loginpass.value))
-				form.style.display = 'none'
-				logout.style.display = 'flex';
-				logoutuser.textContent = loginuser.value
-			}
-			catch (e)
-			{
-				alert('Not autorized!')
-			}
-		})
-		logout_button.addEventListener('click', async function(e)
-		{
-			try
-			{
-				var resp = await fetchJson_promise('logout');
-				form.style.display = 'block';
-				logout.style.display = 'none';
-			}
-			catch (e)
-			{
-				alert('Logout error!')
-			}
-		})
-
-	}
 }
 
 
