@@ -9,7 +9,6 @@
 			["red.svg", "precipitation", 300, 10, 99999],
 			["red.svg", "precipitation", 900, 10, 99999]
 		],
-		"base_url": "data/integreen/meteorology/rest/",
 		"stationType": "MeteoStation",
 		"projection": "EPSG:4326",
 		"format": "integreen",
@@ -36,7 +35,6 @@
 				["yellow.svg", "Biossido di Azoto", 600, 40, 60],
 				["red.svg", "Biossido di Azoto", 600, 60, 99999]
 			],
-			"base_url": "data/integreen/environment/rest/",
 			"stationType": "EnvironmentStation",
 			"projection": "EPSG:4326",
 			"format": "integreen",
@@ -56,7 +54,6 @@
 				["yellow.svg", "free", 600, 10, 100],
 				["green.svg", "free", 600, 100, 99999]
 			],
-			"base_url": "data/integreen/parking/rest/",
 			"stationType": "ParkingStation",
 			"projection": "EPSG:4326",
 			"format": "integreen",
@@ -74,7 +71,6 @@
 				["yellow.svg", "Bluetooth Count record", 600, 75, 150],
 				["red.svg", "Bluetooth Count record", 600, 150, 99999]
 			],
-			"base_url": "data/integreen/bluetooth/rest/",
 			"stationType": "BluetoothStation",
 			"format": "integreen",
 			"projection": "EPSG:4326",
@@ -92,7 +88,6 @@
 				["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350],
 				["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]
 			],
-			"base_url": "data/integreen/sensors/rest/",
 			"stationType": "Trafficstation",
 			"format": "integreen",
 			"projection": "EPSG:4326",
@@ -111,7 +106,6 @@
 				["yellow.svg", "ground-surface-temperature", 600, -5, 0],
 				["red.svg", "ground-surface-temperature", 600, -99999, -5]
 			],
-			"base_url": "data/integreen/RWISFrontEnd/rest/",
 			"stationType": "RWISstation",
 			"format": "integreen",
 			"projection": "EPSG:4326",
@@ -131,7 +125,6 @@
 				["yellow.svg", "number-available", 600, 1, 2],
 				["green.svg", "number-available", 600, 2, 100]
 			],
-			"base_url": "data/integreen/carsharing/rest/",
 			"stationType": "CarsharingStation",
 			"format": "integreen",
 			"projection": "EPSG:4326",
@@ -145,7 +138,6 @@
 			"icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1],
 				["green.svg", "number-available", 600, 1, 100]
 			],
-			"base_url": "data/integreen/bikesharing/rest/bikes/",
 			"stationType": "BikesharingStation",
 			"format": "integreen",
 			"projection": "EPSG:4326",
@@ -160,7 +152,6 @@
 				["yellow.svg", "number-available", 600, 1, 2],
 				["green.svg", "number-available", 600, 2, 100]
 			],
-			"base_url": "data/integreen/emobility/rest/",
 			"stationType": "EChargingStation",
 			"format": "integreen",
 			"projection": "EPSG:4326",
@@ -173,7 +164,6 @@
 			"icons": ["A22VMS.svg", ["red.svg", "stato", 1, 0, 1],
 				["green.svg", "stato", 1, 1, 2]
 			],
-			"base_url": "data/integreen/vms/rest/",
 			"stationType": "VMS",
 			"projection": "EPSG:4326",
 			"format": "integreen",
@@ -188,7 +178,6 @@
 		"layers": [{
 			"id": "Vehicular Travel Time",
 			"icons": ["Journey_time.svg"],
-			"base_url": "data/integreen/origin-destination/rest/",
 			"stationType": "LinkStation",
 			"format": "integreen",
 			"projection": "xxx",
