@@ -6,7 +6,7 @@ pipeline {
         DOCKER_IMAGE = '755952719952.dkr.ecr.eu-west-1.amazonaws.com/opendatahub-analytics'
         DOCKER_TAG = "test-$BUILD_NUMBER"
 
-		SERVER_PORT = "1080"
+        SERVER_PORT = "1080"
         LOG_APPLICATION_NAME = "opendatahub-analytics"
 
         ENDPOINT_URL = "https://analytics.opendatahub.testingmachine.eu"
@@ -27,7 +27,7 @@ pipeline {
                     jq '.endpoints[0].url="${ENDPOINT_URL}"' src/main/webapp/WEB-INF/config.json > tmpFile && mv tmpFile src/main/webapp/WEB-INF/config.json
 
                     rm -rf .env
-                    echo 'DOCKER_PROJECT_NAME=${DOCKER_PROJECT_NAME}' >> .env
+                    echo 'COMPOSE_PROJECT_NAME=${DOCKER_PROJECT_NAME}' >> .env
                     echo 'DOCKER_IMAGE=${DOCKER_IMAGE}' >> .env
                     echo 'DOCKER_TAG=${DOCKER_TAG}' >> .env
 
