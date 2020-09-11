@@ -58,8 +58,7 @@ let   CAT_BACKENDS = {};    // leave empty, automatic from config
 const DEBUG = true;             // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
 
-// TODO: use the base url from env.ODH_MOBILITY_API_URI, not the hard coded one
-const BASE_URL = "https://mobility.api.opendatahub.bz.it/v2";
+const BASE_URL = env.ODH_MOBILITY_API_URI;
 
 
 // -----------------------------------------------------------------------------
@@ -659,11 +658,20 @@ const load_data = () => {
                 url += "&distinct=true";
                 url += "&where=and%28scode.eq.%22" + graph.station + "%22%2Csactive.eq.true%29";
 
-                // TODO fix showing of units
+                // TODO fix handling of periods
                 // url += "&period="  + graph.period;
 
+                let headers = {};
+                if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null) {
+                    headers["Authorization"] = AUTHORIZATION_TOKEN;
+                }
 
-                jQuery.getJSON(url)
+                // jQuery note: jQuery.getJSON() does not allow headers, so I use the equivalent $.ajax() here
+                $.ajax({
+                    dataType: "json",
+                    headers: headers,
+                    url: url
+                })
                     .done(data => { 
                         // download succeeded
                         statedata[ix]           = data.data;
@@ -687,6 +695,7 @@ const load_data = () => {
                             refresh_permalink();
                         }
                     });
+
                 break;
         }
         
