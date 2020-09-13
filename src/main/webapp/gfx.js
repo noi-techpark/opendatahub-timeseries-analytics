@@ -355,9 +355,11 @@ const init_tab_dataset = () => {
 
     qs("#gfx_selstation").style.display = "none";
     qs("#gfx_seldataset").style.display = "none";
+    qs("#gfx_selperiod").style.display  = "none";
     qs("#gfx_addset").style.display     = "none";
 
-    // initialize category select box ( gfx_selcategory ) and create global category -> backend URL hash
+    // initialize category select box: create global category -> backend URL hash and add event listener
+
     jQuery.getJSON(CAT_CONFIG_URL, (data) => {
         let opt = `<option value="">Select category...</option>`;
         data
@@ -379,7 +381,8 @@ const init_tab_dataset = () => {
 
         qs("#gfx_selstation").style.display = "none";
         qs("#gfx_seldataset").style.display = "none";
-        qs("#gfx_addset").style.display = "none";
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
 
         switch (cat) {
 
@@ -407,6 +410,8 @@ const init_tab_dataset = () => {
      
     });
 
+    // initialize station select box: add event listener
+
     qs("#gfx_selstation").addEventListener("change", (ev) => {
 
         let station = get_selval(ev.target);
@@ -416,7 +421,8 @@ const init_tab_dataset = () => {
         debug_log("event: #gfx_selstation change fired with station = " + station);
 
         qs("#gfx_seldataset").style.display = "none";
-        qs("#gfx_addset").style.display = "none";
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
 
         switch (station) {
 
@@ -457,26 +463,49 @@ const init_tab_dataset = () => {
      
     });
 
+    // initialize dataset select box: add event listener
+
     qs("#gfx_seldataset").addEventListener("change", (ev) => {
 
         let dataset = get_selval(ev.target);
         debug_log("event: #gfx_seldataset change fired with dataset = " + dataset);
 
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
+
         switch (dataset) {
 
             case "":
 
-                qs("#gfx_addset").style.display = "none";
                 break;
 
             default: 
-                let next = qs("#gfx_addset");
-                next.style.display = "inline-block";
+                qs("#gfx_selperiod").style.display = "inline-block";
+                qs("#gfx_addset").style.display = "inline-block";
                 break;
 
         }
      
     });
+
+    // initialize period select box: fill static values and add event listener
+
+    (() => {
+      let opt = `<option value="*">&rarr; preferred sample period is the smallest available</option>`;
+      [1, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 9000, 10800, 12600, 14400, 21600, 86400].forEach( p => {
+            opt += `<option value="${p}">&rarr; preferred sample period = ${p}s</option>`;
+      }); 
+      qs("#gfx_selperiod").innerHTML = opt;
+    })();
+
+    qs("#gfx_selperiod").addEventListener("change", (ev) => {
+
+        let period = get_selval(ev.target);
+        debug_log("event: #gfx_selperiod change fired with period = " + period);
+
+    });
+
+    // initialize add button: add event listener
 
     qs("#gfx_addset").addEventListener("click", (ev) => {
 
@@ -485,7 +514,7 @@ const init_tab_dataset = () => {
         let station_name = (get_selval(qs("#gfx_selstation")).split(";"))[1];
         let data_type    = (get_selval(qs("#gfx_seldataset")).split(";"))[0];
         let unit         = (get_selval(qs("#gfx_seldataset")).split(";"))[1];
-        let period       = (get_selval(qs("#gfx_seldataset")).split(";"))[2];
+        let period       = get_selval(qs("#gfx_selperiod"));
 
         let obj = { "category":     category,
                     "station":      station,
@@ -524,7 +553,8 @@ const init_tab_dataset = () => {
         qs("#gfx_selcategory").value = "";
         qs("#gfx_selstation").style.display = "none";
         qs("#gfx_seldataset").style.display = "none";
-        qs("#gfx_addset").style.display = "none";
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
         show_tab(0);
 
     });
@@ -658,9 +688,6 @@ const load_data = () => {
                 url += "&distinct=true";
                 url += "&where=and%28scode.eq.%22" + graph.station + "%22%2Csactive.eq.true%29";
 
-                // TODO fix handling of periods
-                // url += "&period="  + graph.period;
-
                 let headers = {};
                 if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null) {
                     headers["Authorization"] = AUTHORIZATION_TOKEN;
@@ -674,7 +701,37 @@ const load_data = () => {
                 })
                     .done(data => { 
                         // download succeeded
-                        statedata[ix]           = data.data;
+
+                        // filter matching periods
+                        debug_log("filter period for graphs[" + ix + "]:");
+                        let period_hash = {};
+                        data.data.forEach( d => {
+                            if (period_hash[d.mperiod] == undefined) {
+                                period_hash[d.mperiod] = 1;
+                            }
+                        });
+                        let period_list = Object.keys(period_hash).sort((a,b) => a-b);
+                        debug_log(" +- preferred period:              " + graph.period);
+                        debug_log(" +- effectively available periods: " + period_list.join(","));
+
+                        let filtered_data;
+                        if (period_list.length === 0 || period_list.length === 1) {
+                            debug_log(" +- no period filtering needed");
+                            filtered_data = data.data;
+                        } else {
+                            let closest_period = period_list[0];
+                            if ( graph.period !== "*") { // unless smallest period is preferred anyway
+                                period_list.forEach( p => {
+                                    if (Math.abs(p - graph.period) < Math.abs(closest_period - graph.period)) {
+                                        closest_period = p;
+                                    }
+                                });
+                            }
+                            filtered_data = data.data.filter( d => Number(d.mperiod) === Number(closest_period)); 
+                            debug_log(" +- closest match: " + closest_period + ", filtering reduced data points from " + data.data.length + " to " + filtered_data.length);
+                        } 
+
+                        statedata[ix]           = filtered_data;
                         statedata_status[ix]    = 200;
                         show_legend();
                         if (statedata.filter(el => el === undefined).length === 0) {
