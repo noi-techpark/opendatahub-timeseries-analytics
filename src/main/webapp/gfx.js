@@ -291,7 +291,7 @@ const show_legend = () => {
         html += "<td>" + graph.category + "</td>";
         html += "<td>" + graph.station_name + " (" + graph.station + ")</td>";
         html += "<td>" + graph.data_type + " " + graph.unit + "</td>";
-        html += "<td>" + graph.period + "s</td>";
+        html += "<td>" + (graph.period === "*" ? "(smallest available)" : graph.period)  + "s</td>";
         if (statedata[ix] === undefined) {
             html += '<td class="gfx_notice">loading&hellip;</td>';
         } else if (statedata[ix].length === 0 && statedata_status[ix] !== 200) {
@@ -711,16 +711,22 @@ const load_data = () => {
                             }
                         });
                         let period_list = Object.keys(period_hash).sort((a,b) => a-b);
-                        debug_log(" +- preferred period:              " + graph.period);
-                        debug_log(" +- effectively available periods: " + period_list.join(","));
+                        debug_log(" +- preferred or set from previous run: " + (graph.period === "*" ? "(smallest)" : graph.period));
+                        debug_log(" +- effectively available:              " + period_list.join(","));
 
                         let filtered_data;
-                        if (period_list.length === 0 || period_list.length === 1) {
-                            debug_log(" +- no period filtering needed");
+                        if (period_list.length === 0) {
                             filtered_data = data.data;
+                            debug_log(" +- no periods found - not filtering");
+                            debug_log(" +- the set period for this graph is the preferred period");
+                        } else if (period_list.length === 1) {
+                            filtered_data = data.data;
+                            state.graphs[ix].period = period_list[0];
+                            debug_log(" +- data only has one period (" + period_list[0] + ")");
+                            debug_log(" +- this is the new set period for this graph");
                         } else {
                             let closest_period = period_list[0];
-                            if ( graph.period !== "*") { // unless smallest period is preferred anyway
+                            if ( graph.period !== "*") {
                                 period_list.forEach( p => {
                                     if (Math.abs(p - graph.period) < Math.abs(closest_period - graph.period)) {
                                         closest_period = p;
@@ -728,9 +734,10 @@ const load_data = () => {
                                 });
                             }
                             filtered_data = data.data.filter( d => Number(d.mperiod) === Number(closest_period)); 
+                            state.graphs[ix].period = closest_period;
                             debug_log(" +- closest match: " + closest_period + ", filtering reduced data points from " + data.data.length + " to " + filtered_data.length);
+                            debug_log(" +- this is the new set period for this graph");
                         } 
-
                         statedata[ix]           = filtered_data;
                         statedata_status[ix]    = 200;
                         show_legend();
