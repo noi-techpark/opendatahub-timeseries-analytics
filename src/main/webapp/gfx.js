@@ -55,7 +55,7 @@ const CAT_CONFIG_URL = "layers-config.json";
 
 let   CAT_BACKENDS = {};    // leave empty, automatic from config
 
-const DEBUG = true;             // enable debug logging to the console
+const DEBUG = false;            // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
 
 const BASE_URL = env.ODH_MOBILITY_API_URI;
@@ -122,7 +122,7 @@ const get_csv = (ix) => {
         return;
     }
     return "time stamp," + (state.graphs[ix].station_name + " " + state.graphs[ix].data_type + " " + state.graphs[ix].unit).replace(/,/g, ";") + "\n" + 
-    statedata[ix].map( el => date_to_str(new Date(el.timestamp)) + "," + el.value ).join("\n");
+    statedata[ix].map( el => date_to_str(new Date(el.mvalidtime)) + "," + el.mvalue ).join("\n");
 };
 
 // we cycle through these colors for the graphs, as they're being added
@@ -291,7 +291,7 @@ const show_legend = () => {
         html += "<td>" + graph.category + "</td>";
         html += "<td>" + graph.station_name + " (" + graph.station + ")</td>";
         html += "<td>" + graph.data_type + " " + graph.unit + "</td>";
-        html += "<td>" + (graph.period === "*" ? "(smallest available)" : graph.period)  + "s</td>";
+        html += "<td>" + (graph.period === "*" ? "(smallest available)" : graph.period + "s")  + "</td>";
         if (statedata[ix] === undefined) {
             html += '<td class="gfx_notice">loading&hellip;</td>';
         } else if (statedata[ix].length === 0 && statedata_status[ix] !== 200) {
@@ -584,6 +584,9 @@ const init_state_from_permalink = () => {
             statedata = [];
             statedata_status = [];
             state.graphs.forEach( () => { statedata.push(undefined); statedata_status.push(undefined) } );
+
+            color_ix = state.graphs.length + 1;
+
         } catch (e) {
             debug_log("permalink: cannot parse state from location.hash - ignored");
         }     
@@ -689,7 +692,7 @@ const load_data = () => {
                 url += "&where=and%28scode.eq.%22" + graph.station + "%22%2Csactive.eq.true%29";
 
                 let headers = {};
-                if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null) {
+                if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN != "") {
                     headers["Authorization"] = AUTHORIZATION_TOKEN;
                 }
 
@@ -893,14 +896,25 @@ init_auto_refresh();
 show_legend();
 
 // the initial call to load_data() must wait for the category backend URLs
-// (loaded by init_tab_dataset()) to become available:
+// (loaded by init_tab_dataset()) to become available and for any ongoing
+// authentication to terminate (AUTHORIZATION_TOKEN === "" while authentication
+// is running and becomes either null or a string when ready)
+
 let conditionally_load_data = () => {
-    if (Object.keys(CAT_BACKENDS).length === 0) {   
+    let ready = true;
+    if (Object.keys(CAT_BACKENDS).length === 0) {
+        ready = false;
+    }
+    if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN === "") {
+        ready = false;
+    }
+    if (!ready) {
         setTimeout(conditionally_load_data, 100);
         return;
     }
     load_data();
 };
+
 conditionally_load_data();
 
 // call plot() when the chart is resized
