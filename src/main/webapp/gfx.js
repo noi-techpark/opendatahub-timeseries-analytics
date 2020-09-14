@@ -58,6 +58,8 @@ let   CAT_BACKENDS = {};    // leave empty, automatic from config
 const DEBUG = false;            // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
 
+const BASE_URL = env.ODH_MOBILITY_API_URI;
+
 
 // -----------------------------------------------------------------------------
 // --- SECTION_UTIL: basic utility functions -----------------------------------
@@ -120,7 +122,7 @@ const get_csv = (ix) => {
         return;
     }
     return "time stamp," + (state.graphs[ix].station_name + " " + state.graphs[ix].data_type + " " + state.graphs[ix].unit).replace(/,/g, ";") + "\n" + 
-    statedata[ix].map( el => date_to_str(new Date(el.timestamp)) + "," + el.value ).join("\n");
+    statedata[ix].map( el => date_to_str(new Date(el.mvalidtime)) + "," + el.mvalue ).join("\n");
 };
 
 // we cycle through these colors for the graphs, as they're being added
@@ -150,6 +152,8 @@ const init_range = () => {
     const refresh = () => {
         state.scale.from = Number(jQuery("#gfx_fromdate").datepicker( "getDate" ));
         state.scale.to   = Number(jQuery("#gfx_todate"  ).datepicker( "getDate" ));
+        debug_log("scale.from = " + state.scale.from + " = " + new Date(state.scale.from).toISOString());
+        debug_log("scale.to   = " + state.scale.to   + " = " + new Date(state.scale.to).toISOString());
         show_days();
         statedata.fill(undefined); 
         statedata_status.fill(undefined); 
@@ -286,8 +290,8 @@ const show_legend = () => {
         html += '<td style="text-align: center"><div style="display: inline-block; width: 20px; height: 9px; background-color: ' + colors[graph.color] + '"></div></td>';
         html += "<td>" + graph.category + "</td>";
         html += "<td>" + graph.station_name + " (" + graph.station + ")</td>";
-        html += "<td>" + graph.data_type + " [" + graph.unit + "]</td>";
-        html += "<td>" + graph.period + "s</td>";
+        html += "<td>" + graph.data_type + " " + graph.unit + "</td>";
+        html += "<td>" + (graph.period === "*" ? "(smallest available)" : graph.period + "s")  + "</td>";
         if (statedata[ix] === undefined) {
             html += '<td class="gfx_notice">loading&hellip;</td>';
         } else if (statedata[ix].length === 0 && statedata_status[ix] !== 200) {
@@ -351,9 +355,11 @@ const init_tab_dataset = () => {
 
     qs("#gfx_selstation").style.display = "none";
     qs("#gfx_seldataset").style.display = "none";
+    qs("#gfx_selperiod").style.display  = "none";
     qs("#gfx_addset").style.display     = "none";
 
-    // initialize category select box ( gfx_selcategory ) and create global category -> backend URL hash
+    // initialize category select box: create global category -> backend URL hash and add event listener
+
     jQuery.getJSON(CAT_CONFIG_URL, (data) => {
         let opt = `<option value="">Select category...</option>`;
         data
@@ -362,7 +368,7 @@ const init_tab_dataset = () => {
                     .filter( cat => cat.format === "integreen" )
                     .forEach( cat => {
                         opt += `<option value="${cat.id}">&rarr; ${cat.id}</option>\n`;
-                        CAT_BACKENDS[cat.id] = cat.base_url;
+                        CAT_BACKENDS[cat.id] = BASE_URL + "/flat/" + cat.stationType;
                     });
             });
         qs("#gfx_selcategory").innerHTML = opt;
@@ -373,23 +379,26 @@ const init_tab_dataset = () => {
         let cat = get_selval(ev.target);
         debug_log("event: #gfx_selcategory change fired with cat = " + cat);
 
+        qs("#gfx_selstation").style.display = "none";
+        qs("#gfx_seldataset").style.display = "none";
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
+
         switch (cat) {
 
             case "":
 
-                qs("#gfx_selstation").style.display = "none";
-                qs("#gfx_seldataset").style.display = "none";
-                qs("#gfx_addset").style.display = "none";
                 break;
 
             default:
 
-                jQuery.getJSON(CAT_BACKENDS[cat] + "get-station-details", (data) => {
+                jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=sactive.eq.true", (data) => {
+                    data = data.data;
                     debug_log("got station details -> length = " + data.length);
                     let opt = `<option value="">Select station...</option>`;
                     opt += data
-                            .sort( (a, b) => a.name > b.name? 1: -1 )
-                            .map( station => `<option value="${station.id};${station.name};">&rarr; ${station.name}</option>` )
+                            .sort( (a, b) => a.sname > b.sname? 1: -1 )
+                            .map( station => `<option value="${station.scode};${station.sname};">&rarr; ${station.sname}</option>` )
                             .join("\n");
                     let next = qs("#gfx_selstation");
                     next.innerHTML = opt;
@@ -401,6 +410,8 @@ const init_tab_dataset = () => {
      
     });
 
+    // initialize station select box: add event listener
+
     qs("#gfx_selstation").addEventListener("change", (ev) => {
 
         let station = get_selval(ev.target);
@@ -409,22 +420,37 @@ const init_tab_dataset = () => {
 
         debug_log("event: #gfx_selstation change fired with station = " + station);
 
+        qs("#gfx_seldataset").style.display = "none";
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
+
         switch (station) {
 
             case "":
 
-                qs("#gfx_seldataset").style.display = "none";
-                qs("#gfx_addset").style.display = "none";
                 break;
 
             default: 
 
-                jQuery.getJSON(CAT_BACKENDS[cat] + "get-data-types?station=" + station, (data) => {
+                jQuery.getJSON(CAT_BACKENDS[cat] + 
+                               "/*/?limit=-1&distinct=true&where=and%28scode.eq.%22" + station + "%22%2Csactive.eq.true%29",
+                               (data) => {
+                    data = data.data;
                     debug_log("got data types -> length = " + data.length);
                     let opt = `<option value="">Select dataset...</option>`;
                     opt += data
-                            .sort( (a, b) => a[0] > b[0]? 1: -1 )
-                            .map( type => `<option value="${type[0]};${type[1]};${type[3]}">&rarr; ${type[0]} [${type[1]}] (${type[3]}s)</option>` )
+                            .sort( (a, b) => a.tname > b.tname? 1: -1 )
+                            .map( type => { 
+                                    let units = "";
+                                    if (type.tunit !== undefined && type.tunit !== "") {
+                                        units = `${type.tunit}`.trim();
+                                        if (units.charAt(0) !== "[") {
+                                            units = `[${units}]`;
+                                        }
+                                    }
+                                    return `<option value="${type.tname};${units}">&rarr; ${type.tname} ${units}</option>`; 
+                                  }
+                                )
                             .join("\n");
                     let next = qs("#gfx_seldataset");
                     next.innerHTML = opt;
@@ -437,26 +463,49 @@ const init_tab_dataset = () => {
      
     });
 
+    // initialize dataset select box: add event listener
+
     qs("#gfx_seldataset").addEventListener("change", (ev) => {
 
         let dataset = get_selval(ev.target);
         debug_log("event: #gfx_seldataset change fired with dataset = " + dataset);
 
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
+
         switch (dataset) {
 
             case "":
 
-                qs("#gfx_addset").style.display = "none";
                 break;
 
             default: 
-                let next = qs("#gfx_addset");
-                next.style.display = "inline-block";
+                qs("#gfx_selperiod").style.display = "inline-block";
+                qs("#gfx_addset").style.display = "inline-block";
                 break;
 
         }
      
     });
+
+    // initialize period select box: fill static values and add event listener
+
+    (() => {
+      let opt = `<option value="*">&rarr; preferred sample period is the smallest available</option>`;
+      [1, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 9000, 10800, 12600, 14400, 21600, 86400].forEach( p => {
+            opt += `<option value="${p}">&rarr; preferred sample period = ${p}s</option>`;
+      }); 
+      qs("#gfx_selperiod").innerHTML = opt;
+    })();
+
+    qs("#gfx_selperiod").addEventListener("change", (ev) => {
+
+        let period = get_selval(ev.target);
+        debug_log("event: #gfx_selperiod change fired with period = " + period);
+
+    });
+
+    // initialize add button: add event listener
 
     qs("#gfx_addset").addEventListener("click", (ev) => {
 
@@ -465,7 +514,7 @@ const init_tab_dataset = () => {
         let station_name = (get_selval(qs("#gfx_selstation")).split(";"))[1];
         let data_type    = (get_selval(qs("#gfx_seldataset")).split(";"))[0];
         let unit         = (get_selval(qs("#gfx_seldataset")).split(";"))[1];
-        let period       = (get_selval(qs("#gfx_seldataset")).split(";"))[2];
+        let period       = get_selval(qs("#gfx_selperiod"));
 
         let obj = { "category":     category,
                     "station":      station,
@@ -504,7 +553,8 @@ const init_tab_dataset = () => {
         qs("#gfx_selcategory").value = "";
         qs("#gfx_selstation").style.display = "none";
         qs("#gfx_seldataset").style.display = "none";
-        qs("#gfx_addset").style.display = "none";
+        qs("#gfx_selperiod").style.display  = "none";
+        qs("#gfx_addset").style.display     = "none";
         show_tab(0);
 
     });
@@ -534,6 +584,9 @@ const init_state_from_permalink = () => {
             statedata = [];
             statedata_status = [];
             state.graphs.forEach( () => { statedata.push(undefined); statedata_status.push(undefined) } );
+
+            color_ix = state.graphs.length + 1;
+
         } catch (e) {
             debug_log("permalink: cannot parse state from location.hash - ignored");
         }     
@@ -630,27 +683,65 @@ const load_data = () => {
 
             default:
 
-                url += CAT_BACKENDS[graph.category] + "get-records-in-timeframe"; 
-                url += "?station=" + graph.station;
-                url += "&name="    + graph.data_type;
-                url += "&period="  + graph.period;
-                url += "&from="    + state.scale.from;
-                url += "&to="      + state.scale.to;
-                /*
-                jQuery.getJSON(url, data => { 
-                    statedata[ix] = data;
-                    show_legend();
-                    if (statedata.filter(el => el === undefined).length === 0) {
-                        debug_log("load_data() -> all downloads ready");
-                        plot();
-                        refresh_permalink();
-                    }
-                });
-                */
-                jQuery.getJSON(url)
+                url += CAT_BACKENDS[graph.category];
+                url += "/" + graph.data_type;
+                url += "/" + new Date(state.scale.from).toISOString();
+                url += "/" + new Date(state.scale.to).toISOString();
+                url += "?limit=-1";
+                url += "&distinct=true";
+                url += "&where=and%28scode.eq.%22" + graph.station + "%22%2Csactive.eq.true%29";
+
+                let headers = {};
+                if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN != "") {
+                    headers["Authorization"] = AUTHORIZATION_TOKEN;
+                }
+
+                // jQuery note: jQuery.getJSON() does not allow headers, so I use the equivalent $.ajax() here
+                $.ajax({
+                    dataType: "json",
+                    headers: headers,
+                    url: url
+                })
                     .done(data => { 
                         // download succeeded
-                        statedata[ix]           = data;
+
+                        // filter matching periods
+                        debug_log("filter period for graphs[" + ix + "]:");
+                        let period_hash = {};
+                        data.data.forEach( d => {
+                            if (period_hash[d.mperiod] == undefined) {
+                                period_hash[d.mperiod] = 1;
+                            }
+                        });
+                        let period_list = Object.keys(period_hash).sort((a,b) => a-b);
+                        debug_log(" +- preferred or set from previous run: " + (graph.period === "*" ? "(smallest)" : graph.period));
+                        debug_log(" +- effectively available:              " + period_list.join(","));
+
+                        let filtered_data;
+                        if (period_list.length === 0) {
+                            filtered_data = data.data;
+                            debug_log(" +- no periods found - not filtering");
+                            debug_log(" +- the set period for this graph is the preferred period");
+                        } else if (period_list.length === 1) {
+                            filtered_data = data.data;
+                            state.graphs[ix].period = period_list[0];
+                            debug_log(" +- data only has one period (" + period_list[0] + ")");
+                            debug_log(" +- this is the new set period for this graph");
+                        } else {
+                            let closest_period = period_list[0];
+                            if ( graph.period !== "*") {
+                                period_list.forEach( p => {
+                                    if (Math.abs(p - graph.period) < Math.abs(closest_period - graph.period)) {
+                                        closest_period = p;
+                                    }
+                                });
+                            }
+                            filtered_data = data.data.filter( d => Number(d.mperiod) === Number(closest_period)); 
+                            state.graphs[ix].period = closest_period;
+                            debug_log(" +- closest match: " + closest_period + ", filtering reduced data points from " + data.data.length + " to " + filtered_data.length);
+                            debug_log(" +- this is the new set period for this graph");
+                        } 
+                        statedata[ix]           = filtered_data;
                         statedata_status[ix]    = 200;
                         show_legend();
                         if (statedata.filter(el => el === undefined).length === 0) {
@@ -671,6 +762,7 @@ const load_data = () => {
                             refresh_permalink();
                         }
                     });
+
                 break;
         }
         
@@ -702,11 +794,12 @@ let plot = ()  => {
     let flot_data = [];
     statedata.forEach( (data, ix) => {
         if (data !== undefined) {
+
             flot_data.push(
-                { "data": data.map( el => [ el.timestamp, Number(el.value) ] ),
+                { "data": data.map( el => [ Number(new Date(el.mvalidtime)), Number(el.mvalue) ] ),
                   "label": state.graphs[ix].station_name + " - " +
-                           state.graphs[ix].data_type + " [" + 
-                           state.graphs[ix].unit + "] (" + 
+                           state.graphs[ix].data_type + " " + 
+                           state.graphs[ix].unit + " (" + 
                            state.graphs[ix].period + "s)",
                   "color": colors[state.graphs[ix].color],
                   "yaxis": state.graphs[ix].yaxis }
@@ -792,6 +885,8 @@ let plot = ()  => {
 // --- SECTION_INIT: initialization --------------------------------------------
 // -----------------------------------------------------------------------------
 
+debug_log("gfx.js start");
+
 init_tabs();
 init_range();
 init_tab_dataset();
@@ -801,18 +896,28 @@ init_auto_refresh();
 show_legend();
 
 // the initial call to load_data() must wait for the category backend URLs
-// (loaded by init_tab_dataset()) to become available:
+// (loaded by init_tab_dataset()) to become available and for any ongoing
+// authentication to terminate (AUTHORIZATION_TOKEN === "" while authentication
+// is running and becomes either null or a string when ready)
+
 let conditionally_load_data = () => {
-    if (Object.keys(CAT_BACKENDS).length === 0) {   
+    let ready = true;
+    if (Object.keys(CAT_BACKENDS).length === 0) {
+        ready = false;
+    }
+    if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN === "") {
+        ready = false;
+    }
+    if (!ready) {
         setTimeout(conditionally_load_data, 100);
         return;
     }
     load_data();
 };
+
 conditionally_load_data();
 
 // call plot() when the chart is resized
 window.addEventListener("resize", plot);
-
 
 })();
