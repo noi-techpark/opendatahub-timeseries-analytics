@@ -9,8 +9,6 @@ pipeline {
         AWS_ACCESS_KEY_ID = credentials('aws_secret_key_id')
         AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
 
-        LOG_APPLICATION_NAME = "opendatahub-analytics"
-
         ENDPOINT_URL = "https://analytics.opendatahub.bz.it"
         THUNDERFOREST_MAP_API_KEY = credentials('thunderforest_api_key')
         ODH_MOBILITY_API_URI = "https://mobility.api.opendatahub.bz.it/v2"
@@ -28,7 +26,6 @@ pipeline {
                 sh """
                     rm -rf .env
 
-                    echo 'LOG_APPLICATION_NAME=${LOG_APPLICATION_NAME}' >> .env                    
                     echo "ENDPOINT_URL=${ENDPOINT_URL}" >> .env
                     echo "THUNDERFOREST_MAP_API_KEY=${THUNDERFOREST_MAP_API_KEY}" >> .env
                     echo "ODH_MOBILITY_API_URI=${ODH_MOBILITY_API_URI}" >> .env
