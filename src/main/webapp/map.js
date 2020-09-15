@@ -719,10 +719,10 @@ async function map_start_promise()
 											let valore_attuale = json_value.tmeasurements[jc].mvalue;
 											let timestamp = json_value.tmeasurements[jc].mvalidtime;
 											if (cond[3] <= valore_attuale && valore_attuale < cond[4]) {
-//												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
-//													icona = 'gray.svg'
-//												else
-												icona = cond[0];
+												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+													icona = 'gray.svg'
+												else
+													icona = cond[0];
 												break;
 											}
 										}
@@ -953,10 +953,10 @@ async function map_start_promise()
 											let valore_attuale = json_value.tmeasurements[jc].mvalue;
 											let timestamp = json_value.tmeasurements[jc].mvalidtime;
 											if (cond[3] <= valore_attuale && valore_attuale < cond[4]) {
-//												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
-//													condColor = '#808080';
-//												else
-												condColor = cond[0];
+												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
+													condColor = '#808080';
+												else
+													condColor = cond[0];
 												break;
 											}
 										}
