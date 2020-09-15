@@ -1,5 +1,5 @@
 [{
-	"id": "Stazioni Puntuali",
+	"id": "Node Layer",
 	"layers": [{
 		"id": "Weather",
 		"icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 1],
@@ -174,7 +174,7 @@
 	]
 },
 	{
-		"id": "Stazioni lineari",
+		"id": "Edge Layer",
 		"layers": [{
 			"id": "Vehicular Travel Time",
 			"icons": ["Journey_time.svg"],

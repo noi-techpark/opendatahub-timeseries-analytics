@@ -216,11 +216,11 @@ async function map_start_promise()
 					{
 						case 'integreen':
 							switch (layer_group_id){
-								case "Stazioni Puntuali":
-									layer = await loadIntegreenLayerPuntuali(layer_info, layer_display.querySelector('.circle-spinner'))
+								case "Node Layer":
+									layer = await loadIntegreenNodeLayer(layer_info, layer_display.querySelector('.circle-spinner'))
 									break;
-								case "Stazioni lineari":
-									layer = await loadIntegreenLayerLineari(layer_info, layer_display.querySelector('.circle-spinner'))
+								case "Edge Layer":
+									layer = await loadIntegreenEdgeLayer(layer_info, layer_display.querySelector('.circle-spinner'))
 									break;
 								default:
 									// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
@@ -531,7 +531,7 @@ async function map_start_promise()
 
 	}
 
-	async function loadIntegreenLayerPuntuali(layer_info, progressbar_line)
+	async function loadIntegreenNodeLayer(layer_info, progressbar_line)
 	{
 		return new Promise(async function(ok,fail)
 		{
@@ -794,7 +794,7 @@ async function map_start_promise()
 
 	}
 
-	async function loadIntegreenLayerLineari(layer_info, progressbar_line)
+	async function loadIntegreenEdgeLayer(layer_info, progressbar_line)
 	{
 		return new Promise(async function(ok,fail)
 		{

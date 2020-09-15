@@ -223,7 +223,6 @@ const show_days = () => {
         qs("#gfx_todate"  ).style.backgroundColor = "#FFFFFF";
         qs("#gfx_update_range" ).style.textDecoration = "";
         qs("#gfx_update_range" ).disabled = false;
-        invalid = "";
     }
     qs("#gfx_days").innerHTML = "&nbsp;<span class=\"gfx_hi\">" + diff + " days</span>" + invalid + "&nbsp;";
 };
