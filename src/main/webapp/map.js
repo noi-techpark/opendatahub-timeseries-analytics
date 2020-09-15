@@ -888,7 +888,7 @@ async function map_start_promise()
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=egeometry.coordinates%2Cecode&where=eactive.eq.false",
+					"/?limit=-1&distinct=true&select=egeometry.coordinates%2Cecode&where=eactive.eq.true",
 					AUTHORIZATION_TOKEN, progressbar_line);
 
 				let json_stations_status = {};
@@ -912,7 +912,7 @@ async function map_start_promise()
 					"?limit=-1" +
 					"&distinct=true" +
 					"&select=tmeasurements" +
-					"&where=sactive.eq.false," + encodeURIComponent(query_where_datatypes),
+					"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
 					AUTHORIZATION_TOKEN, progressbar_line)
 				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
 
