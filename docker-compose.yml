@@ -1,18 +1,12 @@
 version: "3.4"
 
 services:
-  java:
-    build:
-      context: .
-      dockerfile: infrastructure/docker/Dockerfile
-      target: dev
+  app:
+    image: python:3-alpine
     volumes:
        - ./:/code
-    working_dir: /code
-    command: ["mvn tomcat7:run"]
-    environment:
-      SERVER_PORT: ${SERVER_PORT}
-      LOG_APPLICATION_NAME: ${LOG_APPLICATION_NAME}
-    ports: 
-      - "${SERVER_PORT}:${SERVER_PORT}"
+    working_dir: /code/src/main/webapp
+    command: ["python", "-m", "http.server"]
     tty: true
+    ports: 
+      - "8999:8000"
