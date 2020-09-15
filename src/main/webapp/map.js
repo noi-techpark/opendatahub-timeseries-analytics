@@ -284,8 +284,6 @@ async function map_start_promise()
 	{
 		var popup_element = document.getElementById('map-popup');
 		var popup_close = document.getElementById('map-popup-close');
-		var popup_content = document.getElementById('map-popup-content');
-		var popup_title = document.getElementById('map-popup-title');
 
 		var details_close = document.getElementById('details-close');
 		var details_content = document.getElementById('details-content');
@@ -344,7 +342,6 @@ async function map_start_promise()
 				details_title.textContent = '';
 				details_container.style.display = 'block';
 				map.updateSize();
-				var coords = features[0].getGeometry().getCoordinates();
 
 				var scode = features[0].get("features")[0].getProperties()['scode'];
 				var stationType = features[0].get("features")[0].getProperties()['stationType'];
@@ -362,7 +359,6 @@ async function map_start_promise()
 
 				details_title.textContent = integreen_data['sname'];
 				details_content.textContent = ''
-				let index = 0;
 
 				let createDetailsRow = function (name, value, highlited) {
 					var row = document.createElement('div')
@@ -891,8 +887,8 @@ async function map_start_promise()
 				progressbar_line.style.display = "block";
 
 
-				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=smetadata.coordinates%2Cscode&where=sactive.eq.false",
+				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
+					"/?limit=-1&distinct=true&select=egeometry.coordinates%2Cecode&where=eactive.eq.false",
 					AUTHORIZATION_TOKEN, progressbar_line);
 
 				let json_stations_status = {};
@@ -923,34 +919,34 @@ async function map_start_promise()
 				let allFeatures = [];
 
 				for (var i = 0; i < json_stations_flat.data.length; i++) {
-					if (!json_stations_flat.data[i]['smetadata.coordinates'])
+					if (!json_stations_flat.data[i]['egeometry.coordinates'])
 						continue;
 
-					let coordinates = json_stations_flat.data[i]['smetadata.coordinates'];
+					let coordinates = json_stations_flat.data[i]['egeometry.coordinates'];
 
 					let points = [];
 					for (let ci = 0; ci < coordinates.length; ci++) {
-						points.push(ol.proj.fromLonLat([coordinates[ci].lat, coordinates[ci].lon]))
+						points.push(ol.proj.fromLonLat([coordinates[ci][0], coordinates[ci][1]]))
 					}
 
 					var featurething = new ol.Feature({
 						geometry: new ol.geom.LineString(points),
 						stationType: layer_info.stationType,
-						scode: json_stations_flat.data[i].scode,
+						scode: json_stations_flat.data[i].ecode,
 						'layer_info': layer_info
 					});
-					featurething.setId(json_stations_flat.data[i].scode);
+					featurething.setId(json_stations_flat.data[i].ecode);
 					featurething.set('features', [featurething]);
 
 					var condColor = '#808080';
 
-					let conditions = linkstationConfig[json_stations_flat.data[i].scode];
+					let conditions = linkstationConfig[json_stations_flat.data[i].ecode];
 
-					if(conditions && json_stations_status[json_stations_flat.data[i].scode]) {
+					if(conditions && json_stations_status[json_stations_flat.data[i].ecode]) {
 						for (var ic = 0; ic < conditions.length; ic++) {
 							try {
 								var cond = conditions[ic]
-								let json_value = json_stations_status[json_stations_flat.data[i].scode].sdatatypes[cond[1]];
+								let json_value = json_stations_status[json_stations_flat.data[i].ecode].sdatatypes[cond[1]];
 								if (json_value)
 									for (let jc = 0; jc < json_value.tmeasurements.length; jc++) {
 										if (json_value.tmeasurements[jc].mperiod == cond[2]) {
