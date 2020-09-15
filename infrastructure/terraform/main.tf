@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "analytics_bucket_test" {
-  bucket = "it.bz.opendatahub.analytics-test"
+  bucket = "odh.analytics-test"
   acl    = "public-read"
   policy = file("test/policy.json")
 
@@ -14,7 +14,7 @@ resource "aws_s3_bucket" "analytics_bucket_test" {
 }
 
 resource "aws_s3_bucket" "analytics_bucket_prod" {
-  bucket = "it.bz.opendatahub.analytics-prod"
+  bucket = "odh.analytics-prod"
   acl    = "public-read"
   policy = file("prod/policy.json")
 

@@ -8,7 +8,7 @@
               "AWS": "*"
           },
           "Action": "s3:GetObject",
-          "Resource": "arn:aws:s3:::it.bz.opendatahub.analytics-prod/*"
+          "Resource": "arn:aws:s3:::odh.analytics-prod/*"
       }
   ]
 }
