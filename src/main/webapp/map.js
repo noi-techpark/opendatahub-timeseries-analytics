@@ -888,7 +888,7 @@ async function map_start_promise()
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=egeometry,ecode&where=eactive.eq.false",
+					"/?limit=-1&distinct=true&select=egeometry,ecode&where=eactive.eq.true",
 					AUTHORIZATION_TOKEN, progressbar_line);
 
 				let json_stations_status = {};
@@ -912,7 +912,7 @@ async function map_start_promise()
 					"?limit=-1" +
 					"&distinct=true" +
 					"&select=tmeasurements" +
-					"&where=sactive.eq.false," + encodeURIComponent(query_where_datatypes),
+					"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
 					AUTHORIZATION_TOKEN, progressbar_line)
 				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
 
@@ -951,7 +951,7 @@ async function map_start_promise()
 									for (let jc = 0; jc < json_value.tmeasurements.length; jc++) {
 										if (json_value.tmeasurements[jc].mperiod == cond[2]) {
 											let valore_attuale = json_value.tmeasurements[jc].mvalue;
-											// let timestamp = json_value.tmeasurements[jc].mvalidtime;
+											let timestamp = json_value.tmeasurements[jc].mvalidtime;
 											if (cond[3] <= valore_attuale && valore_attuale < cond[4]) {
 //												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
 //													condColor = '#808080';
