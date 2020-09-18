@@ -1,8 +1,9 @@
 # it.bz.opendatahub.analytics
 
-This is a web application to show data from the [Open Data
-Hub](https://opendatahub.bz.it) in various forms. It is also possible to
-download data to process it with your preferred tool on your machine.
+This is a web application hosted on https://analytics.opendatahub.bz.it to show
+data from the [Open Data Hub](https://opendatahub.bz.it) in various forms. It is
+also possible to download data to process it with your preferred tool on your
+machine.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
