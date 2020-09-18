@@ -15,6 +15,7 @@ machine.
   - [Start and stop the containers](#start-and-stop-the-containers)
   - [Running commands inside the container](#running-commands-inside-the-container)
   - [Map style](#map-style)
+- [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -62,7 +63,7 @@ Default map style uses openstreetmap. To use the
 [Thunderforest](https://www.thunderforest.com) map style, you can add your
 Thunderforest API key to the configuration file in src/main/webapp/config.js
 
-### License
+## License
 
 The code in this project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE
 Version 3 license. See the [LICENSE.md](LICENSE.md) file for more information.
