@@ -53,7 +53,7 @@ pipeline {
         }
         stage('Upload') {
             steps {
-                s3Upload(bucket: 'odh.analytics-test', acl: 'PublicRead', file: './src/main/webapp')
+                s3Upload(bucket: 'odh.analytics-prod', acl: 'PublicRead', file: './src/main/webapp')
             }
         }
     }
