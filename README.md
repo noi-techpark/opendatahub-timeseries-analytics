@@ -1,10 +1,27 @@
-# geobank-analytics
+# it.bz.opendatahub.analytics
+
+This is a web application to show data from the [Open Data
+Hub](https://opendatahub.bz.it) in various forms. It is also possible to
+download data to process it with your preferred tool on your machine.
+
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents** 
+
+- [Local development](#local-development)
+- [Docker environment (optional)](#docker-environment-optional)
+  - [Installation](#installation)
+  - [Start and stop the containers](#start-and-stop-the-containers)
+  - [Running commands inside the container](#running-commands-inside-the-container)
+  - [Map style](#map-style)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Local development
 
-Run the application with `SERVER_PORT=8999 mvn tomcat7:run`
+Run the application with `python3 -m http.server` and then check `localhost:8000` for results.
 
-## Docker environment
+## Docker environment (optional)
 
 For the project a Docker environment is already prepared and ready to use with all necessary prerequisites.
 
@@ -45,5 +62,6 @@ docker-compose exec java /bin/bash -c "mvn clean install"
 
 docker-compose exec java /bin/bash -c "mvn clean test"
 ```
+
 ### Map style
 Default map style uses openstreetmap. To use the [Thunderforest](https://www.thunderforest.com) map style, you can add your Thunderforest API key to the configuration file in src/main/webapp/config.js
