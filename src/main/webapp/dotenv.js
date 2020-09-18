@@ -6,8 +6,9 @@
  */
 window.env = {
 	SERVER_PORT: "8999",
-	ENDPOINT_URL: "http://localhost:8999/",
-	ODH_MOBILITY_API_URI: "https://mobility.api.opendatahub.testingmachine.eu",
+	ENDPOINT_URL: "https://analytics.opendatahub.testingmachine.eu/v2",
+	ODH_MOBILITY_API_URI: "https://mobility.api.opendatahub.testingmachine.eu/v2",
+	LOG_APPLICATION_NAME: "opendatahub-analytics",
 	THUNDERFOREST_MAP_API_KEY: "",
 	KEYCLOAK_AUTHORIZATION_URI: "https://auth.opendatahub.testingmachine.eu/auth",
 	KEYCLOAK_REALM: "noi",
