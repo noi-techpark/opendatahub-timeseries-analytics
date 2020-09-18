@@ -20,7 +20,8 @@ machine.
 
 ## Local development
 
-Run the application with `python3 -m http.server` and then check `localhost:8000` for results.
+Run the application inside the `src/main/webapp` folder with `python3 -m
+http.server` and then check `localhost:8000` for results.
 
 ## Docker environment (optional)
 
@@ -48,21 +49,20 @@ docker-compose stop
 
 ### Running commands inside the container
 
-When the containers are running, you can execute any command inside the environment. Just replace the dots `...` in the following example with the command you wish to execute:
+When the containers are running, you can execute any command inside the
+environment. Just replace the dots `...` in the following example with the
+command you wish to execute:
 
 ```bash
-docker-compose exec java /bin/bash -c "..."
-```
-
-Some examples are:
-
-```bash
-docker-compose exec java /bin/bash -c "mvn clean install"
-
-# or
-
-docker-compose exec java /bin/bash -c "mvn clean test"
+docker-compose exec app /bin/bash -c "..."
 ```
 
 ### Map style
-Default map style uses openstreetmap. To use the [Thunderforest](https://www.thunderforest.com) map style, you can add your Thunderforest API key to the configuration file in src/main/webapp/config.js
+Default map style uses openstreetmap. To use the
+[Thunderforest](https://www.thunderforest.com) map style, you can add your
+Thunderforest API key to the configuration file in src/main/webapp/config.js
+
+### License
+
+The code in this project is licensed under the GNU AFFERO GENERAL PUBLIC LICENSE
+Version 3 license. See the [LICENSE.md](LICENSE.md) file for more information.
