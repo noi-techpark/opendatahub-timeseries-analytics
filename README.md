@@ -22,7 +22,9 @@ machine.
 ## Local development
 
 Run the application inside the `src/main/webapp` folder with `python3 -m
-http.server` and then check `localhost:8000` for results.
+http.server 8999` and then check `localhost:8999` for results. Make sure to use
+the port `8999`, if you want to test authentication with our Keycloak test
+server, since the callback has been set to `localhost:8999`.
 
 ## Docker environment (optional)
 

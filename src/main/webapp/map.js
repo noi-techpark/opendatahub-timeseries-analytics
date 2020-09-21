@@ -888,7 +888,7 @@ async function map_start_promise()
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=egeometry.coordinates%2Cecode&where=eactive.eq.false",
+					"/?limit=-1&distinct=true&select=egeometry,ecode&where=eactive.eq.false",
 					AUTHORIZATION_TOKEN, progressbar_line);
 
 				let json_stations_status = {};
@@ -919,10 +919,10 @@ async function map_start_promise()
 				let allFeatures = [];
 
 				for (var i = 0; i < json_stations_flat.data.length; i++) {
-					if (!json_stations_flat.data[i]['egeometry.coordinates'])
+					if (!json_stations_flat.data[i]['egeometry'] || !json_stations_flat.data[i]['egeometry'].coordinates)
 						continue;
 
-					let coordinates = json_stations_flat.data[i]['egeometry.coordinates'];
+					let coordinates = json_stations_flat.data[i]['egeometry'].coordinates;
 
 					let points = [];
 					for (let ci = 0; ci < coordinates.length; ci++) {
@@ -951,7 +951,7 @@ async function map_start_promise()
 									for (let jc = 0; jc < json_value.tmeasurements.length; jc++) {
 										if (json_value.tmeasurements[jc].mperiod == cond[2]) {
 											let valore_attuale = json_value.tmeasurements[jc].mvalue;
-											let timestamp = json_value.tmeasurements[jc].mvalidtime;
+											// let timestamp = json_value.tmeasurements[jc].mvalidtime;
 											if (cond[3] <= valore_attuale && valore_attuale < cond[4]) {
 //												if (new Date(timestamp).getTime() < new Date().getTime() - 7 * 24 * 60 * 60 * 1000)
 //													condColor = '#808080';
