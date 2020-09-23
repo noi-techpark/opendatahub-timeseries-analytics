@@ -88,7 +88,7 @@
 				["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350],
 				["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]
 			],
-			"stationType": "Trafficstation",
+			"stationType": "TrafficSensor",
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
