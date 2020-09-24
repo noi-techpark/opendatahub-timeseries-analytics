@@ -688,6 +688,7 @@ const load_data = () => {
                 url += "/" + new Date(state.scale.to).toISOString();
                 url += "?limit=-1";
                 url += "&distinct=true";
+                url += "&select=mvalue,mvalidtime,mperiod";
                 url += "&where=and%28scode.eq.%22" + graph.station + "%22%2Csactive.eq.true%29";
 
                 let headers = {};
