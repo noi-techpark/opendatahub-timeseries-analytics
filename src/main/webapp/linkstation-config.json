@@ -1,112 +1,147 @@
 {
-	"40": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"339283": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"42": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"339284": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"44": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"339303": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 200],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 201, 400],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
-	"46": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"3393043": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 200],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 201, 400],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
-	"53": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342139": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"54": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342140": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 1000],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 1001, 2000],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 2001, 999999]
+	],	
+	"342141": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
+	],	
+	"342142": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 75],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 76, 175],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 176, 999999]
 	],
-	"55": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342143": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
 	],
-	"56": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342144": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
 	],
-	"57": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342144": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
 	],
-	"59": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342145": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"61": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342146": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"62": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342148": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"63": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342149": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"69": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342150": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 250],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 251, 400],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
-	"70": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342152": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"71": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342153": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
 	],
-	"72": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342154": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"73": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342156": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"75": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342157": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"76": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342158": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"77": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342159": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"78": [
-		["#00ff00", "velocita'", 900, 0, 20],
-		["#ffff00", "velocita'", 900, 20, 40],
-		["#ff0000", "velocita'", 900, 40, 999999]
+	"342171": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
+	],
+	"342172": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
+	],
+	"342173": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
+	],
+	"342174": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 75],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 76, 150],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 151, 999999]
+	],
+	"342176": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 200],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 201, 400],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
+	],
+	"342181": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	]
 }
