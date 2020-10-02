@@ -104,7 +104,10 @@
 			"id": "Road Weather",
 			"icons": ["Road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999],
 				["yellow.svg", "ground-surface-temperature", 600, -5, 0],
-				["red.svg", "ground-surface-temperature", 600, -99999, -5]
+				["red.svg", "ground-surface-temperature", 600, -99999, -5],
+				["green.svg", "temp_suolo", 600, 0, 99999],
+			        ["yellow.svg", "temp_suolo", 600, -5, 0],
+				["red.svg", "temp_suolo", 600, -99999, -5]
 			],
 			"stationType": "RWISstation",
 			"format": "integreen",
