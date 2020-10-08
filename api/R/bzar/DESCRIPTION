@@ -1,0 +1,9 @@
+Package: bzar
+Title: BZ Analytics for R
+Description: A set of functions to access BZ Analytics from R
+Version: 1.0
+Author: Chris Mair <chris@1006.org>
+Maintainer: Open Data Hub Team <help@opendatahub.bz.it>
+License: GNU Affero General Public License v3.0
+Depends: httr
+RoxygenNote: 7.1.1
