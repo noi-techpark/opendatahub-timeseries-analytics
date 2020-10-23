@@ -635,7 +635,7 @@ async function map_start_promise()
 						let key = layer_info.icons[i][1] + ";" + layer_info.icons[i][2];
 						if(!datatype_period_duplicates[key]) {
 							datatype_period_duplicates[key] = true;
-							let query_datatype = "and(mperiod.eq." + layer_info.icons[i][2] + ",tname.eq.\"" + layer_info.icons[i][1].replace(/(['"\\])/g, "\\$1") + "\")";
+							let query_datatype = "and(mperiod.eq." + layer_info.icons[i][2] + ",tname.eq.\"" + layer_info.icons[i][1].replace(/(['"\(\)\\])/g, "\\$1") + "\")";
 							query_where_datatypes += (query_where_datatypes === ""? "or(": ",") + query_datatype;
 						}
 					}
@@ -899,7 +899,7 @@ async function map_start_promise()
 						let key = config[i][1];
 						if (!datatype_period_duplicates[key]) {
 							datatype_period_duplicates[key] = true;
-							let query_datatype = "and(tname.eq.\"" + config[i][1].replace(/(['"\\])/g, "\\$1") + "\")";
+							let query_datatype = "and(tname.eq.\"" + config[i][1].replace(/(['"\(\)\\])/g, "\\$1") + "\")";
 							query_where_datatypes += (query_where_datatypes === "" ? "or(" : ",") + query_datatype;
 						}
 					}
