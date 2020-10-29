@@ -1,145 +1,140 @@
 {
-	"339283": [
+	"Agip_Einstein->meinstein": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"339284": [
+	"meinstein->Agip_Einstein": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"339303": [
+	"A22_ML103->A22_ML107": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 200],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 201, 400],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
-	"3393043": [
+	"A22_ML107->A22_ML103": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 200],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 201, 400],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
-	"342139": [
+	"Agip_Einstein->Torricelli": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"342140": [
+	"A22_ML103->Torricelli": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 1000],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 1001, 2000],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 2001, 999999]
 	],	
-	"342141": [
+	"Torricelli->siemens": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],	
-	"342142": [
+	"siemens->Galilei_Palermo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 75],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 76, 175],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 176, 999999]
 	],
-	"342143": [
+	"Galilei_Palermo->Galilei_Lancia": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
 	],
-	"342144": [
+	"Galilei_Lancia->Galilei_Virgolo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
 	],
-	"342144": [
-		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
-		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
-		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
-	],
-	"342145": [
+	"Galilei_Virgolo->Galleria_Virgolo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342146": [
+	"Galleria_Virgolo->P_Campiglio": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"342148": [
+	"meinstein->galvani": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342149": [
+	"galvani->meinstein": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342150": [
+	"galvani->Galilei_Lancia": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 250],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 251, 400],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
-	"342152": [
+	"caugusta->Maso_Pieve": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342153": [
+	"Galilei_Virgolo->Galilei_Roma": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 50],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 51, 100],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 101, 999999]
 	],
-	"342154": [
+	"Galilei_Roma->caugusta": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342156": [
+	"proma->Roma_Firenze": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"342157": [
+	"Roma_Firenze->proma": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"342158": [
+	"Roma_Firenze->druso-poste": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342159": [
+	"druso-poste->Roma_Firenze": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342171": [
+	"Druso_Palermo->druso-poste": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"342172": [
+	"P_Campiglio->Galleria_Virgolo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
-	"342173": [
+	"Galleria_Virgolo->Arginale_Palermo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 300],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 301, 999999]
 	],
-	"342174": [
+	"Arginale_Palermo->Arginale_Resia": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 75],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 76, 150],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 151, 999999]
 	],
-	"342176": [
+	"Arginale_Resia->Agip_Einstein": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 200],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 201, 400],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
-	"342181": [
+	"druso-poste->Druso_Palermo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
