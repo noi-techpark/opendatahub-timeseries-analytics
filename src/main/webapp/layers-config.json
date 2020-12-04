@@ -2,12 +2,12 @@
 	"id": "Node Layer",
 	"layers": [{
 		"id": "Weather",
-		"icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 1],
-			["green.svg", "precipitation", 900, 0, 1],
-			["yellow.svg", "precipitation", 300, 1, 10],
-			["yellow.svg", "precipitation", 900, 1, 10],
-			["red.svg", "precipitation", 300, 10, 99999],
-			["red.svg", "precipitation", 900, 10, 99999]
+		"icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 0.1],
+			["green.svg", "precipitation", 900, 0, 0.1],
+			["yellow.svg", "precipitation", 300, 0.1, 1],
+			["yellow.svg", "precipitation", 900, 0.1, 1],
+			["red.svg", "precipitation", 300, 1, 99999],
+			["red.svg", "precipitation", 900, 1, 99999]
 		],
 		"stationType": "MeteoStation",
 		"projection": "EPSG:4326",
@@ -33,7 +33,10 @@
 				["red.svg", "nitrogen-dioxide", 600, 60, 99999],
 				["green.svg", "Biossido di Azoto", 600, 0, 40],
 				["yellow.svg", "Biossido di Azoto", 600, 40, 60],
-				["red.svg", "Biossido di Azoto", 600, 60, 99999]
+				["red.svg", "Biossido di Azoto", 600, 60, 99999],
+				["green.svg", "NO2-Alphasense_processed", 3600, 0, 40],
+				["yellow.svg", "NO2-Alphasense_processed", 3600, 40, 60],
+				["red.svg", "NO2-Alphasense_processed", 3600, 60, 99999]
 			],
 			"stationType": "EnvironmentStation",
 			"projection": "EPSG:4326",
@@ -44,7 +47,8 @@
 				["nitrogen-dioxide", null],
 				["particulate-matter10", null],
 				["NO2 - Ossidi di azoto", null],
-				["Biossido di Azoto", null]
+				["Biossido di Azoto", null],
+				["NO2-Alphasense_processed", null]
 			]
 		},
 
@@ -61,6 +65,7 @@
 			"color": "#7FCBFA",
 			"main-data": [
 				["occupied", 600],
+				["free",600],
 				["parking-forecast-30", 1800],
 				["parking-forecast-60", 3600]
 			]
@@ -84,9 +89,9 @@
 
 		{
 			"id": "Traffic",
-			"icons": ["Traffic.svg", ["green.svg", "Nr. Equivalent Vehicles", 600, 0, 250],
-				["yellow.svg", "Nr. Equivalent Vehicles", 600, 250, 350],
-				["red.svg", "Nr. Equivalent Vehicles", 600, 350, 99999]
+			"icons": ["Traffic.svg", ["green.svg", "Average Speed Light Vehicles km/h", 600, 120, 99999],
+				["yellow.svg", "Average Speed Light Vehicles km/h", 600, 100, 120],
+				["red.svg", "Average Speed Light Vehicles km/h", 600, 0, 100]
 			],
 			"stationType": "TrafficSensor",
 			"format": "integreen",
