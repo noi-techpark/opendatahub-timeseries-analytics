@@ -4,6 +4,11 @@
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
 	],
+	"Arginale_Resia->A22_ML103": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 1000],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 1001, 1500],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 1501, 999999]
+	],
 	"meinstein->Agip_Einstein": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
