@@ -54,9 +54,9 @@
 
 		{
 			"id": "Parking",
-			"icons": ["Parking.svg", ["red.svg", "free", 600, 0, 10],
-				["yellow.svg", "free", 600, 10, 100],
-				["green.svg", "free", 600, 100, 99999]
+			"icons": ["Parking.svg", ["red.svg", "free", 300, 0, 10],
+				["yellow.svg", "free", 300, 10, 100],
+				["green.svg", "free", 300, 100, 99999]
 			],
 			"stationType": "ParkingStation",
 			"projection": "EPSG:4326",
@@ -64,8 +64,8 @@
 			"custom-function": null,
 			"color": "#7FCBFA",
 			"main-data": [
-				["occupied", 600],
-				["free",600],
+				["occupied", 300],
+				["free",300],
 				["parking-forecast-30", 1800],
 				["parking-forecast-60", 3600]
 			]
@@ -89,9 +89,12 @@
 
 		{
 			"id": "Traffic",
-			"icons": ["Traffic.svg", ["green.svg", "Average Speed Light Vehicles km/h", 600, 120, 99999],
-				["yellow.svg", "Average Speed Light Vehicles km/h", 600, 100, 120],
-				["red.svg", "Average Speed Light Vehicles km/h", 600, 0, 100]
+			"icons": ["Traffic.svg", ["green.svg", "Average Speed Light Vehicles", 600, 120, 99999],
+				["yellow.svg", "Average Speed Light Vehicles", 600, 100, 120],
+				["red.svg", "Average Speed Light Vehicles", 600, 0, 100],
+				["green.svg", "average-vehicle-speed", 600, 40, 99999],
+				["yellow.svg", "average-vehicle-speed", 600, 26, 40],
+				["red.svg", "average-vehicle-speed", 600, 0, 25]
 			],
 			"stationType": "TrafficSensor",
 			"format": "integreen",
@@ -123,7 +126,11 @@
 				["ground-surface-temperature", 600],
 				["air-temperature", 600],
 				["precipitation-intensity", 600],
-				["wind-speed", 600]
+				["wind-speed", 600],
+				["temp_suolo", 1],
+				["temp_aria", 1],
+				["prec_qta", 1],
+				["prec_tipo", 1]				
 			]
 		},
 
@@ -143,8 +150,8 @@
 
 		{
 			"id": "Bike Sharing",
-			"icons": ["Bike_sharing.svg", ["red.svg", "number-available", 600, 0, 1],
-				["green.svg", "number-available", 600, 1, 100]
+			"icons": ["Bike_sharing.svg", ["red.svg", "number-available", 300, 0, 1],
+				["green.svg", "number-available", 300, 1, 100]
 			],
 			"stationType": "BikesharingStation",
 			"format": "integreen",
