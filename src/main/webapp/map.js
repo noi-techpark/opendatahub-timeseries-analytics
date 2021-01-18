@@ -482,6 +482,10 @@ async function map_start_promise()
 													mvaluePartImg.style.height = '16px';
 													mvalueSpan.appendChild(mvaluePartImg);
 
+                                                    let mvaluePartSpan = document.createElement('span');
+                                                    mvaluePartSpan.textContent = ' ' + imgData[0].description.it.toUpperCase();
+                                                    mvalueSpan.appendChild(mvaluePartSpan);
+
 												} else {
 													let mvaluePartSpan = document.createElement('span');
 													mvaluePartSpan.textContent = value_parts[vp_i].toUpperCase();
