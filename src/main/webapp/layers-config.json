@@ -184,7 +184,15 @@
 			"format": "integreen",
 			"custom-function": null,
 			"color": "#C44921",
-			"main-data": []
+			"main-data": [],
+			"imageMapping": [
+				{
+					"dataType": "esposizione",
+					"dataTypeMetadata": "signal-codes",
+					"valueSeparator": "|",
+					"metaDataImgData": "signalAsBase64"
+				}
+			]
 		}
 	]
 },

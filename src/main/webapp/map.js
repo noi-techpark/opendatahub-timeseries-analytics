@@ -110,6 +110,7 @@ async function map_start_promise()
 
 	let json = await fetchJson_promise('layers-config.json')
 	let linkstationConfig = await fetchJson_promise('linkstation-config.json')
+	let imageMapping = {}
 
 	// for groups
 	/*
@@ -157,6 +158,31 @@ async function map_start_promise()
 			default:
 				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icon
 				break;
+		}
+
+		if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
+			layer_info.imageMapping.length > 0) {
+			for(let i = 0; i < layer_info.imageMapping.length; i++) {
+				let imagesCall =env.ODH_MOBILITY_API_URI +
+					"/flat/" +
+					encodeURIComponent(layer_info.stationType) +
+					"/" +
+					encodeURIComponent(layer_info.imageMapping[i].dataType) +
+					"/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
+				$.ajax({
+					url: imagesCall,
+					beforeSend: function (xhr) {
+						if(AUTHORIZATION_TOKEN) {
+							xhr.setRequestHeader("Authorization", "Bearer " + AUTHORIZATION_TOKEN);
+						}
+					},
+					success: function( images_metadata ) {
+						imageMapping[layer_info.stationType] = imageMapping[layer_info.stationType] || {};
+						imageMapping[layer_info.stationType][layer_info.imageMapping[i].dataType] =
+							images_metadata.data[0].tmetadata[layer_info.imageMapping[i].dataTypeMetadata];
+					}
+				});
+			}
 		}
 
 
@@ -432,8 +458,51 @@ async function map_start_promise()
 								row.className = "details-valueItem1"
 								currentValuesDiv.appendChild(row)
 								let rowAlink = document.createElement('a')
-								let rowText = value_datatype_messurment.mvalue + ' ' + value_datatype.tname + ' [' + value_datatype_messurment.mperiod + ']'
-								rowAlink.textContent = rowText.toUpperCase()
+
+								let mvalueSpan = document.createElement('span');
+								mvalueSpan.textContent = value_datatype_messurment.mvalue.toUpperCase();
+								rowAlink.appendChild(mvalueSpan)
+
+								if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
+									layer_info.imageMapping.length > 0) {
+									for(let is_i = 0; is_i < layer_info.imageMapping.length; is_i++) {
+										if(value_datatype.tname == layer_info.imageMapping[is_i].dataType) {
+											mvalueSpan.textContent = '';
+											let value_parts = value_datatype_messurment.mvalue.split(layer_info.imageMapping[is_i].valueSeparator);
+											for(let vp_i = 0; vp_i < value_parts.length; vp_i++) {
+												let imgData = imageMapping[stationType][value_datatype.tname]?
+													imageMapping[stationType][value_datatype.tname].filter(function (imgData) {
+													return imgData.id == value_parts[vp_i]
+												}): [];
+												if(imgData.length > 0) {
+													let mvaluePartImg = document.createElement('img');
+													mvaluePartImg.src = 'data:image/*;base64,' + imgData[0][layer_info.imageMapping[is_i].metaDataImgData];
+													mvaluePartImg.alt = imgData[0].description.it.toUpperCase();
+													mvaluePartImg.title = imgData[0].description.it.toUpperCase();
+													mvaluePartImg.style.height = '16px';
+													mvalueSpan.appendChild(mvaluePartImg);
+
+												} else {
+													let mvaluePartSpan = document.createElement('span');
+													mvaluePartSpan.textContent = value_parts[vp_i].toUpperCase();
+													mvalueSpan.appendChild(mvaluePartSpan);
+												}
+												if(vp_i != value_parts.length - 1) {
+													let mvaluePartSeparatorSpan = document.createElement('span');
+													mvaluePartSeparatorSpan .textContent = '|';
+													mvalueSpan.appendChild(mvaluePartSeparatorSpan );
+												}
+											}
+										}
+									}
+
+								}
+
+								let tnameMperiodSpan = document.createElement('span');
+								let tnameMperiodText = ' ' + value_datatype.tname + ' [' + value_datatype_messurment.mperiod + ']'
+								tnameMperiodSpan.textContent = tnameMperiodText.toUpperCase()
+								rowAlink.appendChild(tnameMperiodSpan)
+
 								let state = {
 									active_tab: 0,
 									height: "400px",
