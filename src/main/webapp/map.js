@@ -62,8 +62,14 @@ async function map_start_promise()
 	});
 
 	mapLayer = new ol.layer.Tile({
-		source : env.THUNDERFOREST_MAP_API_KEY ? sources[1] : sources[0]
+//		thunderforest tile disabled
+//		source : env.THUNDERFOREST_MAP_API_KEY ? sources[1] : sources[0]
+		source : sources[0]
 	})
+
+	var filter = new ol.filter.Colorize();
+	mapLayer.addFilter(filter);
+	filter.setFilter('grayscale');
 
 
 	let map = new ol.Map({
