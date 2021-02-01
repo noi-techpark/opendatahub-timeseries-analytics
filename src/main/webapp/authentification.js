@@ -3,7 +3,7 @@ let AUTHORIZATION_TOKEN = '';
 $(document).ready(function () {
 
     let login_button = $('#login_button');
-    let logout = $('#logout');
+    let logout = $('#logout-container');
     let logoutuser = $('#logoutuser');
     let logout_button = $('#logout_button');
 

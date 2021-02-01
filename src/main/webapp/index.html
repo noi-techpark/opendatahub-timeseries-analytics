@@ -30,11 +30,6 @@
             margin: 0px;
             background-color: #f5f7f4;
         }
-        #header > div
-        {
-            padding-left:  4px;
-            padding-right: 4px;
-        }
     </style>
 </head>
 
@@ -42,21 +37,23 @@
 
 <div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
     <img id="logo" src="logo.png">
-    <div style="flex-grow:1; display: flex; flex-shrink:0; flex-wrap: nowrap">
-        <div class="header_text" id="map_overview" onClick="showMapOverview()">MAP OVERVIEW</div>
-        <div class="header_text" id="headline"     onClick="showCharts()" style="color: #FFFFFF;">CHARTS</div>
+    <div class="header-nav">
+        <div class="header-nav-item"        id="map_overview" onClick="showMapOverview()">
+            <span>Map Overview</span>
+        </div>
+        <div class="header-nav-item active" id="headline"     onClick="showCharts()">
+            <span>Charts</span>
+        </div>
     </div>
-    <div style="padding-top:19px; padding-bottom:19px; padding-right:8px; display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden;">
-        <button id="login_button" class="loginout_button" style="display: none;">
-            Log in with&nbsp;<strong>NOI Authentication</strong>
-        </button>
-        <span id="logout" style="display: none; align-items: center">
-             <img src="icons/03_Icon_login/user .svg" style="height: 24px">
-             <span id="logoutuser" style="color: white; font-family: 'Roboto', sans-serif; min-width: 8em; display:inline-block; margin-left: 1em" >user</span>
-             <button id="logout_button" class="loginout_button">
+    <div class="header-login">
+        <a id="login_button" class="login_button" style="display: none;">Login <img src="img/login.svg"></a>
+        <div id="logout-container" class="logout-container" style="display: none;">
+             <img src="img/user.svg">
+             <span id="logoutuser">user</span>
+             <a id="logout_button" class="logout_button">
                  Logout
-             </button>
-          </span>
+             </a>
+          </div>
     </div>
 </div>
 
@@ -126,7 +123,7 @@
 
 <!-- *** GFX (CHARTS) ************************************************************************* -->
 
-<div id="section_gfx" style="display:block;">
+<div id="section_gfx" style="display:block; margin-top: 85px;">
 
     <div id="gfx">
 

@@ -1177,17 +1177,16 @@ function showMapOverview()
 	}
 	document.getElementById('section_map').style.display='flex';
 	bzanalytics_map.updateSize();
-	document.getElementById('headline').style.color='#919499';
-	document.getElementById('map_overview').style.color='#FFFFFF';
+	document.getElementById('headline').classList.remove("active");
+	document.getElementById('map_overview').classList.add("active");
 }
-
 
 function showCharts()
 {
 	document.getElementById('section_gfx').style.display='block';
 	document.getElementById('section_map').style.display='none';
-	document.getElementById('headline').style.color='#FFFFFF';
-	document.getElementById('map_overview').style.color='#919499';
+    document.getElementById('map_overview').classList.remove("active");
+    document.getElementById('headline').classList.add("active");
 }
 
 function generatePointsCircle(count, centerCoords) {
