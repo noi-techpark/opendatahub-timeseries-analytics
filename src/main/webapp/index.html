@@ -36,7 +36,7 @@
 <body style="display:flex; flex-direction:column; overflow-y:scroll;">
 
 <div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
-    <img id="logo" src="logo.png">
+    <img id="logo" src="img/logo.svg">
     <div class="header-nav">
         <div class="header-nav-item"        id="map_overview" onClick="showMapOverview()">
             <span>Map Overview</span>
@@ -58,28 +58,18 @@
 </div>
 
 <!-- *** MAPS ********************************************************************************* -->
-<div id="section_map" style="display:none; flex-direction:column; flex-grow:1; min-height:0px">
+<div id="section_map" style="display:none; flex-direction:column; flex-grow:1; min-height:0px; background-color: #ffffff;">
 
     <div style="display:flex; flex-grow:1; min-height:0px">
 
-        <div id="layers-container" class="layers" style="overflow-y:scroll;">
-            <div id="layer_template_id" class="layer_template">
-                <img class="icon" src=""></img>
-                <span class="label"></span>
-                <!--                <svg viewBox="0 0 36 36" class="circular-chart">
-                                  <path class="circle"
-                                    d="M18 2.0845
-                                      a 15.9155 15.9155 0 0 1 0 31.831
-                                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                                  />
-                                  <text x="18" y="20.35" class="percentage">0%</text>
-                                </svg> -->
-                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="circular-chart" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-                    <path class="circle-spinner" d="M12 50A38 38 0 0 0 88 50A38 47 0 0 1 12 50" fill="#578ce8" stroke="none" transform="rotate(79.9092 50 54.5)">
-                        <animateTransform attributeName="transform" type="rotate" dur="1s" repeatCount="indefinite" keyTimes="0;1" values="0 50 54.5;360 50 54.5"></animateTransform>
-                    </path>
-                </svg>
+        <div class="layers">
+            <div id="layers-container">
 
+            </div>
+            <div class="layers-footer">
+                <img src="img/logoMenu.png" alt="NOI" />
+                <img src="img/life.png" alt="life" />
+                <img src="img/brennerlec.png" alt="BRENNERLEC" />
             </div>
         </div>
 

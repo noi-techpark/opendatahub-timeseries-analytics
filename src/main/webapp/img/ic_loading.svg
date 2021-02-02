@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="circular-chart"
+     viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+    <path d="M12 50A38 38 0 0 0 88 50A38 47 0 0 1 12 50" fill="#ffffff" stroke="none"
+          transform="rotate(79.9092 50 54.5)">
+        <animateTransform attributeName="transform" type="rotate" dur="1s" repeatCount="indefinite" keyTimes="0;1"
+                          values="0 50 54.5;360 50 54.5"></animateTransform>
+    </path>
+</svg>

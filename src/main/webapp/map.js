@@ -12,9 +12,6 @@ async function map_start_promise()
 	let error_console = document.getElementById('error-console')
 
 	var layers_container = document.getElementById('layers-container')
-	var layer_template = document.getElementById('layer_template_id');
-	layer_template.removeAttribute('id')
-	layers_container.removeChild(layer_template)
 
 
 	let selectedFeature = null;
@@ -131,11 +128,14 @@ async function map_start_promise()
 
 	for (var layer_group of json)
 	{
-		setupLayerGroup_promise(layer_group)
+        let group_layer_div = document.createElement('div');
+        group_layer_div.style.display = 'none';
+		setupLayerGroup_promise(layer_group, group_layer_div);
+        layers_container.appendChild(group_layer_div);
 
 		for (var layer_info of layer_group.layers)
 		{
-			setupLayer_promise(layer_info, layer_group.id)
+			setupLayer_promise(layer_info, layer_group.id, group_layer_div)
 		}
 	}
 
@@ -147,153 +147,192 @@ async function map_start_promise()
 	// Functions
 	//////////////////////////////////////////////////////
 
-	async function setupLayer_promise(layer_info, layer_group_id)
+	async function setupLayer_promise(layer_info, layer_group_id, group_layer_div)
+    {
+        let layer_div = document.createElement('div');
+        layer_div.className = 'layer-div inactive';
+
+        let layer_div_svg = document.createElement('div');
+        layer_div_svg.style.display = 'flex';
+        layer_div_svg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="27px" height="27px">' +
+            '<ellipse style="fill: ' + layer_info.color + '" rx="13.5" ry="13.5" cx="13.5" cy="13.5">' +
+            '</ellipse>' +
+            '</svg>';
+        layer_div.appendChild(layer_div_svg);
+
+        let layer_label_div = document.createElement('div');
+        layer_label_div.className = 'layer-label-div';
+        layer_label_div.style.backgroundColor = layer_info.color;
+        layer_div.appendChild(layer_label_div);
+
+        let layer_label_div_span = document.createElement('span');
+        layer_label_div_span.textContent = layer_info.id;
+        layer_label_div.appendChild(layer_label_div_span);
+
+        let layer_label_div_img_hide = document.createElement('img');
+        layer_label_div_img_hide.className = 'img-hide';
+        layer_label_div_img_hide.src = 'img/ic_hide.svg';
+        layer_label_div.appendChild(layer_label_div_img_hide);
+
+        let layer_label_div_img_loading = document.createElement('img');
+        layer_label_div_img_loading.className = 'img-loading';
+        layer_label_div_img_loading.src = 'img/ic_loading.svg';
+        layer_label_div.appendChild(layer_label_div_img_loading);
+
+        group_layer_div.appendChild(layer_div);
+
+        if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
+            layer_info.imageMapping.length > 0) {
+            for(let i = 0; i < layer_info.imageMapping.length; i++) {
+                let imagesCall =env.ODH_MOBILITY_API_URI +
+                    "/flat/" +
+                    encodeURIComponent(layer_info.stationType) +
+                    "/" +
+                    encodeURIComponent(layer_info.imageMapping[i].dataType) +
+                    "/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
+                $.ajax({
+                    url: imagesCall,
+                    beforeSend: function (xhr) {
+                        if(AUTHORIZATION_TOKEN) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + AUTHORIZATION_TOKEN);
+                        }
+                    },
+                    success: function( images_metadata ) {
+                        imageMapping[layer_info.stationType] = imageMapping[layer_info.stationType] || {};
+                        imageMapping[layer_info.stationType][layer_info.imageMapping[i].dataType] =
+                            images_metadata.data[0].tmetadata[layer_info.imageMapping[i].dataTypeMetadata];
+                    }
+                });
+            }
+        }
+
+        let layer_selected = false;
+        let layer_loading = false;
+
+        var layer = null;
+
+
+        let refresh_function = async function()
+        {
+            // refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
+            if (!layer_selected || layer_loading)
+            {
+                return;
+            }
+            await toggle_layer_function()
+
+            if (layer_selected)
+            {
+                return;
+            }
+
+            await toggle_layer_function()
+        }
+
+        let toggle_layer_function = async function()
+        {
+            // se il layer sta caricando ignora il click
+            if (layer_loading)
+                return;
+
+            if (layer_selected)
+            {
+                // spegni layer
+                layer_selected = false;
+                layer_div.classList.add('inactive')
+                if(layer.get('routesLayer')) {
+                    map.removeLayer(layer.get('routesLayer'));
+                }
+                map.removeLayer(layer);
+
+                // rimuovi il timer di aggiornamento automatico
+                autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function),1)
+            }
+            else
+            {
+                // crea layer
+                // mostrare progress di caricamento
+                layer_loading = true;
+                layer_selected = true;
+                layer_div.classList.remove('inactive')
+
+                try
+                {
+
+                    let format = layer_info.format
+                    switch (format)
+                    {
+                        case 'integreen':
+                            switch (layer_group_id){
+                                case "Node Layer":
+                                    layer = await loadIntegreenNodeLayer(layer_info, layer_div)
+                                    break;
+                                case "Edge Layer":
+                                    layer = await loadIntegreenEdgeLayer(layer_info, layer_div)
+                                    break;
+                                default:
+                                    // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+                                    alert('Unknow layer group: ' + layer_group_id)
+                                    break;
+                            }
+                            break;
+                        case 'wms':
+                            layer = await loadWMSLayer(layer_info)
+                            break;
+                        default:
+                            // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+                            alert('Unknow format: ' + format)
+                            break;
+                    }
+                }
+                catch (e)
+                {
+                    error_console.textContent = format_time() + ': ' + e;
+                }
+                finally
+                {
+
+                    layer_loading = false;
+
+                    autorefresh_functions.push(refresh_function)
+                }
+
+            }
+        }
+
+        layer_div.addEventListener('click', toggle_layer_function)
+    }
+
+	async function setupLayerGroup_promise(layer_group, group_layer_div)
 	{
-		let layer_display = layer_template.cloneNode(true)
-		layer_display.style.paddingLeft = '40px'
-		layer_display.querySelector('.label').textContent = layer_info.id
-		layers_container.appendChild(layer_display)
+	    let layer_div = document.createElement('div');
+	    layer_div.className = 'layer-div';
 
-		let format = layer_info.format
+        let layer_div_span = document.createElement('span');
+        layer_div_span.textContent = layer_group.id;
+        layer_div.appendChild(layer_div_span);
 
-		switch (format)
-		{
-			case 'integreen':
-				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icons[0]
-				break;
-			default:
-				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icon
-				break;
-		}
+        let layer_div_img = document.createElement('img');
+        layer_div_img.src = 'img/ic_arrow_down.svg';
+        layer_div_img.style = 'margin-left: 28px';
+        layer_div.appendChild(layer_div_img);
 
-		if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
-			layer_info.imageMapping.length > 0) {
-			for(let i = 0; i < layer_info.imageMapping.length; i++) {
-				let imagesCall =env.ODH_MOBILITY_API_URI +
-					"/flat/" +
-					encodeURIComponent(layer_info.stationType) +
-					"/" +
-					encodeURIComponent(layer_info.imageMapping[i].dataType) +
-					"/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
-				$.ajax({
-					url: imagesCall,
-					beforeSend: function (xhr) {
-						if(AUTHORIZATION_TOKEN) {
-							xhr.setRequestHeader("Authorization", "Bearer " + AUTHORIZATION_TOKEN);
-						}
-					},
-					success: function( images_metadata ) {
-						imageMapping[layer_info.stationType] = imageMapping[layer_info.stationType] || {};
-						imageMapping[layer_info.stationType][layer_info.imageMapping[i].dataType] =
-							images_metadata.data[0].tmetadata[layer_info.imageMapping[i].dataTypeMetadata];
-					}
-				});
-			}
-		}
+        layers_container.appendChild(layer_div);
 
+        let groupVisivle = false;
 
-		let layer_selected = false;
-		let layer_loading = false;
+        let toggle_layer_function = async function()
+        {
+            if(groupVisivle) {
+                group_layer_div.style.display = 'none';
+                groupVisivle = false;
+            } else {
+                group_layer_div.style.display = 'block';
+                groupVisivle = true;
+            }
+        }
 
-		var layer = null;
-
-
-		let refresh_function = async function()
-		{
-			// refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
-			if (!layer_selected || layer_loading)
-			{
-				return;
-			}
-			await toggle_layer_function()
-
-			if (layer_selected)
-			{
-				return;
-			}
-
-			await toggle_layer_function()
-		}
-
-		let toggle_layer_function = async function()
-		{
-			// se il layer sta caricando ignora il click
-			if (layer_loading)
-				return;
-
-			if (layer_selected)
-			{
-				// spegni layer
-				layer_selected = false;
-				layer_display.classList.remove('selected')
-				if(layer.get('routesLayer')) {
-					map.removeLayer(layer.get('routesLayer'));
-				}
-				map.removeLayer(layer);
-
-				// rimuovi il timer di aggiornamento automatico
-				autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function),1)
-			}
-			else
-			{
-				// crea layer
-				// mostrare progress di caricamento
-				layer_loading = true;
-				layer_selected = true;
-				layer_display.classList.add('selected')
-
-				try
-				{
-					switch (format)
-					{
-						case 'integreen':
-							switch (layer_group_id){
-								case "Node Layer":
-									layer = await loadIntegreenNodeLayer(layer_info, layer_display.querySelector('.circle-spinner'))
-									break;
-								case "Edge Layer":
-									layer = await loadIntegreenEdgeLayer(layer_info, layer_display.querySelector('.circle-spinner'))
-									break;
-								default:
-									// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-									alert('Unknow layer group: ' + layer_group_id)
-									break;
-							}
-							break;
-						case 'wms':
-							layer = await loadWMSLayer(layer_info)
-							break;
-						default:
-							// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-							alert('Unknow format: ' + format)
-							break;
-					}
-				}
-				catch (e)
-				{
-					error_console.textContent = format_time() + ': ' + e;
-				}
-				finally
-				{
-
-					layer_loading = false;
-
-					autorefresh_functions.push(refresh_function)
-				}
-
-			}
-		}
-
-		layer_display.addEventListener('click', toggle_layer_function)
-
-	}
-
-	async function setupLayerGroup_promise(layer_group)
-	{
-		let layer_display = layer_template.cloneNode(true)
-		layer_display.querySelector('.label').classList.add('group_label')
-		layer_display.querySelector('.label').textContent = layer_group.id
-		layers_container.appendChild(layer_display)
+        layer_div.addEventListener('click', toggle_layer_function)
 	}
 
 
@@ -606,7 +645,7 @@ async function map_start_promise()
 
 	}
 
-	async function loadIntegreenNodeLayer(layer_info, progressbar_line)
+	async function loadIntegreenNodeLayer(layer_info, loadingItem)
 	{
 		return new Promise(async function(ok,fail)
 		{
@@ -701,11 +740,11 @@ async function map_start_promise()
 					layerRoute.setVisible(false);
 				}
 
-				progressbar_line.style.display = "block";
+                loadingItem.classList.add('loading');
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=scoordinate%2Cscode&where=sactive.eq.true",
-					AUTHORIZATION_TOKEN, progressbar_line)
+					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
 				if(layer_info.icons.length > 1) {
 					let datatype_period_duplicates = {};
@@ -729,7 +768,7 @@ async function map_start_promise()
 						"&select=tmeasurements" +
 						"&showNull=true" +
 						"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
-						AUTHORIZATION_TOKEN, progressbar_line)
+						AUTHORIZATION_TOKEN, loadingItem)
 					json_stations_status = json_stations_status_result.data[layer_info.stationType]? json_stations_status_result.data[layer_info.stationType].stations: {};
 				}
 
@@ -741,8 +780,6 @@ async function map_start_promise()
 
 				for (var i = 0; i < json_stations_flat.data.length; i++)
 				{
-
-					//progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
 
 					let lat = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.y: 0;
 					let lon = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.x: 0;
@@ -858,7 +895,7 @@ async function map_start_promise()
 				}
 				sourcevector.addFeatures(allFeatures);
 
-				progressbar_line.style.display = "none";
+                loadingItem.classList.remove('loading');
 				ok(layer)
 			}
 			catch(e)
@@ -869,7 +906,7 @@ async function map_start_promise()
 
 	}
 
-	async function loadIntegreenEdgeLayer(layer_info, progressbar_line)
+	async function loadIntegreenEdgeLayer(layer_info, loadingItem)
 	{
 		return new Promise(async function(ok,fail)
 		{
@@ -963,12 +1000,12 @@ async function map_start_promise()
 				map.addLayer(layer)
 
 
-				progressbar_line.style.display = "block";
+                loadingItem.classList.add('loading');
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=egeometry,ecode&where=eactive.eq.true",
-					AUTHORIZATION_TOKEN, progressbar_line);
+					AUTHORIZATION_TOKEN, loadingItem);
 
 				let json_stations_status = {};
 				let datatype_period_duplicates = {};
@@ -992,7 +1029,7 @@ async function map_start_promise()
 					"&distinct=true" +
 					"&select=tmeasurements" +
 					"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
-					AUTHORIZATION_TOKEN, progressbar_line)
+					AUTHORIZATION_TOKEN, loadingItem)
 				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
 
 				let allFeatures = [];
@@ -1053,7 +1090,7 @@ async function map_start_promise()
 				}
 				sourcevector.addFeatures(allFeatures);
 
-				progressbar_line.style.display = "none";
+                loadingItem.classList.remove('loading');
 				ok(layer)
 			}
 			catch(e)
@@ -1091,7 +1128,7 @@ async function map_start_promise()
 
 	}
 
-	function fetchJson_promise(url, authorization_header, spinnerItem)
+	function fetchJson_promise(url, authorization_header, loadingItem)
 	{
 		return new Promise(function(success, fail)
 		{
@@ -1111,8 +1148,8 @@ async function map_start_promise()
 					}
 					else
 					{
-						if(spinnerItem) {
-							spinnerItem.style.display = "none";
+						if(loadingItem) {
+                            loadingItem.classList.remove('loading');
 						}
 						fail(url + ': ' + xhttp.status)
 					}

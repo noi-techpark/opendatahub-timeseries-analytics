@@ -13,7 +13,7 @@
 		"projection": "EPSG:4326",
 		"format": "integreen",
 		"custom-function": null,
-		"color": "#EAC324",
+		"color": "#F7D25A",
 		"main-data": [
 			["air-temperature", null],
 			["precipitation", null]
@@ -21,7 +21,7 @@
 	},
 
 		{
-			"id": "Air Quality",
+			"id": "Air quality",
 			"icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40],
 				["yellow.svg", "nitrogen-dioxide", 3600, 40, 60],
 				["red.svg", "nitrogen-dioxide", 3600, 60, 99999],
@@ -42,7 +42,7 @@
 			"projection": "EPSG:4326",
 			"format": "integreen",
 			"custom-function": null,
-			"color": "#94A9BD",
+			"color": "#F0A050",
 			"main-data": [
 				["nitrogen-dioxide", null],
 				["particulate-matter10", null],
@@ -62,7 +62,7 @@
 			"projection": "EPSG:4326",
 			"format": "integreen",
 			"custom-function": null,
-			"color": "#7FCBFA",
+			"color": "#E86161",
 			"main-data": [
 				["occupied", 300],
 				["free",300],
@@ -80,7 +80,7 @@
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
-			"color": "#2C70B9",
+			"color": "#F0ABAB",
 			"main-data": [
 				["Bluetooth Count record", 600],
 				["Bluetooth Count record", 3600]
@@ -100,7 +100,7 @@
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
-			"color": "#996CBF",
+			"color": "#CB8BC3",
 			"main-data": [
 				["Nr. Equivalent Vehicles", 600],
 				["Average Flow", 600],
@@ -109,7 +109,7 @@
 		},
 
 		{
-			"id": "Road Weather",
+			"id": "Road weather",
 			"icons": ["Road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999],
 				["yellow.svg", "ground-surface-temperature", 600, -5, 0],
 				["red.svg", "ground-surface-temperature", 600, -99999, -5],
@@ -121,7 +121,7 @@
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
-			"color": "#896b3a",
+			"color": "#9399E5",
 			"main-data": [
 				["ground-surface-temperature", 600],
 				["air-temperature", 600],
@@ -135,7 +135,7 @@
 		},
 
 		{
-			"id": "Car Sharing",
+			"id": "Car sharing",
 			"icons": ["Car_sharing.svg", ["red.svg", "number-available", 600, 0, 1],
 				["yellow.svg", "number-available", 600, 1, 2],
 				["green.svg", "number-available", 600, 2, 100]
@@ -144,12 +144,12 @@
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
-			"color": "#930044",
+			"color": "#478DDD",
 			"main-data": []
 		},
 
 		{
-			"id": "Bike Sharing",
+			"id": "Bike sharing",
 			"icons": ["Bike_sharing.svg", ["red.svg", "number-available", 300, 0, 1],
 				["green.svg", "number-available", 300, 1, 100]
 			],
@@ -157,7 +157,7 @@
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
-			"color": "#E09011",
+			"color": "#8BD1E6",
 			"main-data": []
 		},
 
@@ -171,11 +171,11 @@
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
-			"color": "#477632",
+			"color": "#BFCE89",
 			"main-data": []
 		},
 		{
-			"id": "A22-VMS",
+			"id": "VMS",
 			"icons": ["A22VMS.svg", ["red.svg", "stato", 1, 0, 1],
 				["green.svg", "stato", 1, 1, 2]
 			],
@@ -183,7 +183,7 @@
 			"projection": "EPSG:4326",
 			"format": "integreen",
 			"custom-function": null,
-			"color": "#C44921",
+			"color": "#A3BC94",
 			"main-data": [],
 			"imageMapping": [
 				{
@@ -199,13 +199,13 @@
 	{
 		"id": "Edge Layer",
 		"layers": [{
-			"id": "Vehicular Travel Time",
+			"id": "Vehicular time",
 			"icons": ["Journey_time.svg"],
 			"stationType": "LinkStation",
 			"format": "integreen",
 			"projection": "xxx",
 			"custom-function": null,
-			"color": "#E09011",
+			"color": "#A5ABB7",
 			"main-data": []
 		}]
 	},

@@ -48,38 +48,26 @@ html, body
 
 .layers
 {
-    width: 326px;
+    display: flex;
+    flex-direction: column;
+    width: 376px;
     flex-shrink: 0;
-    background-color: #ffffff
-}
-
-.layers > *
-{
-    height: 2em;
-    line-height: 2em;
-    padding: 20px;
-    cursor: pointer;
-    xoverflow: hidden;
-    white-space: nowrap;
-    color: #FFFFFF;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
-    font-size: 18px;
+    background-color: #ffffff;
+    margin-top: 85px;
 }
 
 
-
-.layers > *.selected
-{
-    background-color: #3d4049;
-}
-
-
-.layers > * > img
+.layer_template > img
 {
     vertical-align:middle;
     height:2em;
     margin-right:4px;
+}
+
+#layers-container {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-top: 55px;
 }
 
 @keyframes example {
@@ -96,6 +84,79 @@ html, body
 .layers .spinner
 {
     visibility: hidden
+}
+
+.layer-div
+{
+    display: flex;
+    align-items: center;
+    font: normal normal normal 20px/27px 'Roboto', sans-serif;
+    color: #464545;
+    opacity: 1;
+    text-align: left;
+    padding: 12px 56px;
+    cursor: pointer;
+}
+
+.layer-div svg
+{
+    width: 27px;
+    height: 27px;
+    overflow: clip;
+}
+
+.layer-div.inactive svg ellipse
+{
+    fill: #A5ABB7 !important;
+}
+
+.layer-div .layer-label-div
+{
+    display: flex;
+    justify-content: space-between;
+    background: #F7D25A 0% 0% no-repeat padding-box;
+    color: #ffffff;
+    box-shadow: 0px 5px 7px #00000008;
+    border-radius: 10px 0px 10px 10px;
+    width: 100%;
+    margin-left: 18px;
+    padding: 5px 10px 5px 20px;
+    font: normal normal normal 18px/24px 'Roboto', sans-serif;
+}
+
+.layer-div .img-hide {
+    width: 24px;
+    height: 24px;
+}
+
+.layer-div.loading .img-hide {
+    display: none;
+}
+.layer-div.inactive .img-hide {
+    display: none;
+}
+
+.layer-div .img-loading {
+    width: 24px;
+    height: 24px;
+    display: none;
+}
+
+.layer-div.loading .img-loading {
+    display: block;
+}
+
+.layer-div.inactive .layer-label-div
+{
+    background: transparent !important;
+    box-shadow: 0px 0px 0px transparent;
+    color: #A5ABB7;
+    padding: 5px 0px;
+}
+
+.layer-div.inactive .layer-label-div .hide-img
+{
+    display: none;
 }
 
 .layer_template .error
@@ -122,7 +183,18 @@ html, body
     flex-direction: row;
 }
 
+.layers-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #F6F6F4 0% 0% no-repeat padding-box;
+    min-height: 91px;
+    border-radius: 45px 0px 0px 0px;
+}
 
+.layers-footer img {
+    margin: 0px 6px;
+}
 
 #details-container
 {
@@ -130,6 +202,7 @@ html, body
     flex-shrink: 0;
     padding: 10px;
     background-color: #f8f8f8;
+    z-index: 101;
     /*position: fixed;
     right:0px;*/
 }
@@ -192,9 +265,9 @@ html, body
 
 #logo
 {
-    height: 34px;
-    margin-left: 45px;
-    margin-top: 21px;
+    height: max-content;
+    margin-left: 39px;
+    margin-top: 45px;
     margin-right: 113px;
 }
 
@@ -382,12 +455,6 @@ html, body
     animation: progress 1s ease-out forwards;
     stroke-dasharray: 0, 100;
     stroke: #578ce8;
-    display: none;
-}
-
-.circle-spinner {
-    fill: #578ce8;
-    stroke: none;
     display: none;
 }
 
