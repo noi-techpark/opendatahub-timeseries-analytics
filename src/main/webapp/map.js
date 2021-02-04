@@ -505,7 +505,7 @@ async function map_start_promise()
 								let rowAlink = document.createElement('a')
 
 								let mvalueSpan = document.createElement('span');
-								mvalueSpan.textContent = value_datatype_messurment.mvalue.toUpperCase();
+								mvalueSpan.textContent = ('' + value_datatype_messurment.mvalue).toUpperCase();
 								rowAlink.appendChild(mvalueSpan)
 
 								if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
@@ -645,48 +645,113 @@ async function map_start_promise()
 
 	}
 
+	let raw_marker_svg = await fetchSvg_promise('img/marker/marker.svg');
+	let raw_marker_selected_svg = await fetchSvg_promise('img/marker/marker_selected.svg');
+	let raw_marker_cluster_svg = await fetchSvg_promise('img/marker/marker_cluster.svg');
+	let raw_marker_overlapping_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker.svg');
+	let raw_marker_overlapping_selected_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker_selected.svg');
+
 	async function loadIntegreenNodeLayer(layer_info, loadingItem)
 	{
 		return new Promise(async function(ok,fail)
 		{
 			try
 			{
-
+			    let marker_svg = raw_marker_svg.clone();
+				marker_svg.find('.marker-color').css('fill', layer_info.color);
+                let marker_selected_svg = raw_marker_selected_svg.clone();
+				marker_selected_svg.find('.marker-color').css('fill', layer_info.color);
+				marker_selected_svg.find('.layername-label').text(layer_info.id);
+                let marker_cluster_svg = raw_marker_cluster_svg.clone();
+				marker_cluster_svg.find('.marker-color').css('fill', layer_info.color);
+                let marker_overlapping_marker_svg = raw_marker_overlapping_marker_svg.clone();
+				marker_overlapping_marker_svg.find('.marker-color').css('fill', layer_info.color);
+                let marker_overlapping_selected_marker_svg = raw_marker_overlapping_selected_marker_svg.clone();
+				marker_overlapping_selected_marker_svg.find('.marker-color').css('fill', layer_info.color);
 				var iconStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [0.5, 1.0],
+						anchor: [0.5, 17],
+						anchorOrigin: 'bottom-left',
 						anchorXUnits: 'fraction',
-						anchorYUnits: 'fraction',
+						anchorYUnits: 'pixel',
 						opacity: 1,
-						src:  'icons/02_Icons_map/' + layer_info.icons[0],
+						src:  'data:image/svg+xml;base64,' + btoa(marker_svg[0].outerHTML),
 						scale: 0.6
 					})
 				});
 
-				var cluserStyle = new ol.style.Style({
+				var iconStyleSelected = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [-50, +320],
-						anchorXUnits: 'pixels',
-						anchorYUnits: 'pixels',
+						anchor: [0.5, 17],
+						anchorOrigin: 'bottom-left',
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'pixel',
 						opacity: 1,
-						src: 'icons/value-circle/cluster.svg',
-						scale: 0.20
+						src:  'data:image/svg+xml;base64,' + btoa(marker_selected_svg[0].outerHTML),
+						scale: 0.6
 					})
 				});
 
-				var selectedStyle = new ol.style.Style({
+                var iconStyleImage = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, +85],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+                        opacity: 1,
+                        src:  'img/marker/icons/' + layer_info.icons[0],
+                        scale: 0.6
+                    })
+                });
+
+                var iconSelectedStyleImage = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, +120],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+                        opacity: 1,
+                        src:  'img/marker/icons/' + layer_info.icons[0],
+                        scale: 0.6
+                    })
+                });
+
+				var iconOverlappingStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [0.5, 0.85],
+						anchor: [0.5, 0.5],
+						anchorOrigin: 'bottom-left',
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'fraction',
 						opacity: 1,
-						src: 'icons/Schatten.svg',
+						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_marker_svg[0].outerHTML),
+						scale: 0.6
+					})
+				});
+
+				var iconOverlappingSelectedStyle = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, 0.5],
+						anchorOrigin: 'bottom-left',
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'fraction',
+						opacity: 1,
+						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_selected_marker_svg[0].outerHTML),
 						scale: 0.6
 					})
 				});
 				var overlappingCenterCircleStyle = new ol.style.Style({
 					image: new ol.style.Circle({
-						radius: 7, fill: new ol.style.Fill({color:[255,255,255,1]}), stroke: new ol.style.Stroke({color: layer_info.color})
+						radius: 36.5 * 0.6, fill: new ol.style.Fill({color: layer_info.color}), stroke: new ol.style.Stroke({color: layer_info.color}),
+						scale: 0.6
+					})
+				});
+
+				var overlappingCenterCircleImageStyle = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, 0.5],
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'fraction',
+						opacity: 1,
+						src:  'img/marker/icons/' + layer_info.icons[0],
+						scale: 0.6
 					})
 				});
 
@@ -707,26 +772,58 @@ async function map_start_promise()
 						let valueStyle = features[0].get('valueStyle');
 						if (features.length == 1)
 						{
-							if (selectedFeature != null && selectedFeature === features[0])
-								return [selectedStyle, iconStyle, valueStyle]
-							else
-								return [iconStyle, valueStyle]
+							let isSelected = selectedFeature != null && selectedFeature === features[0];
+							if (features[0].overlapping) {
+								valueStyle.getImage().setScale(0.45);
+								if (isSelected) {
+									valueStyle.getImage().setAnchor([-10, +27]);
+									return [iconOverlappingSelectedStyle, valueStyle];
+								} else {
+									valueStyle.getImage().setAnchor([-10, +27]);
+									return [iconOverlappingStyle, valueStyle];
+								}
+							} else  {
+								valueStyle.getImage().setScale(0.6);
+								if (isSelected) {
+									valueStyle.getImage().setAnchor([-35, +190]);
+									return [iconStyleSelected, iconSelectedStyleImage, valueStyle];
+								} else {
+									valueStyle.getImage().setAnchor([-20, +95]);
+									return [iconStyle, iconStyleImage, valueStyle];
+								}
+							}
 						}
-						else
-							return [iconStyle, cluserStyle]
+						else {
+							marker_cluster_svg.find('.cluster-size').text(features.length)
+							var iconStyleCluster = new ol.style.Style({
+								image: new ol.style.Icon({
+									anchor: [0.5, 50],
+									anchorOrigin: 'bottom-left',
+									anchorXUnits: 'fraction',
+									anchorYUnits: 'pixel',
+									opacity: 1,
+									src:  'data:image/svg+xml;base64,' + btoa(marker_cluster_svg[0].outerHTML),
+									scale: 0.6
+								})
+							});
+							return [iconStyleCluster, iconStyleImage]
+						}
 					}
 				})
 
+				let hexColor = layer_info.color;
 				let layerRouteSourcevector = new ol.source.Vector({});
 				let layerRoute = new ol.layer.Vector({
 					source: layerRouteSourcevector,
 					style: [
 						new ol.style.Style({
-							stroke: new ol.style.Stroke({
-								width: 3,
-								color: layer_info.color
-								//lineDash: [1, 5]
-							}),
+							fill: new ol.style.Fill({
+								color: 'rgba(' +
+									parseInt(hexColor.slice(1, 3), 16) + ',' +
+									parseInt(hexColor.slice(3, 5), 16) + ',' +
+									parseInt(hexColor.slice(5, 7), 16) + ',' +
+									'0.3)'
+							})
 						})
 					],
 					layerUseType: 'route',
@@ -797,7 +894,8 @@ async function map_start_promise()
 						geometry : thing,
 						stationType: layer_info.stationType,
 						scode: json_stations_flat.data[i].scode,
-						'layer_info': layer_info
+						'layer_info': layer_info,
+						overlapping: false
 					});
 					featurething.setId(json_stations_flat.data[i].scode);
 
@@ -806,11 +904,13 @@ async function map_start_promise()
 						if(overlapping_points[key][1] == -1) {
 							let overlappingIndex = overlapping_groups.length;
 							overlapping_points[key][1] = overlappingIndex;
+							overlapping_points[key][2].overlapping = true;
 							overlapping_groups[overlappingIndex] = [overlapping_points[key][0]];
 							overlapping_star_features[overlappingIndex] = [overlapping_points[key][2]];
 						}
 						let overlappingIndex = overlapping_points[key][1];
 						overlapping_groups[overlappingIndex].push(i);
+						featurething.overlapping = true;
 						overlapping_star_features[overlappingIndex].push(featurething);
 					} else {
 						overlapping_points[key] = [i, -1, featurething];
@@ -852,12 +952,12 @@ async function map_start_promise()
 
 					var valueStyle = new ol.style.Style({
 						image: new ol.style.Icon({
-							anchor: [-50, +320],
+							anchor: [-20, +95],
 							anchorXUnits: 'pixels',
 							anchorYUnits: 'pixels',
 							opacity: 1,
-							src: 'icons/value-circle/' + icona,
-							scale: 0.20
+							src: 'img/marker/status/' + icona,
+							scale: 0.60
 						})
 					});
 
@@ -865,33 +965,33 @@ async function map_start_promise()
 
 					allFeatures.push(featurething);
 				}
-				for (var i = 0; i < overlapping_star_features.length; i++)
-				{
-					let coordinates = overlapping_star_features[i][0].getGeometry().flatCoordinates;
-					let points = generatePointsCircle(overlapping_star_features[i].length, coordinates);
+				if(overlapping_star_features.length > 0) {
 
-					let overlapping_star_feature = new ol.Feature({
-						geometry : new ol.geom.Point(coordinates)
-					});
-					overlapping_star_feature.setStyle(overlappingCenterCircleStyle);
-					layerRouteSourcevector.addFeature(overlapping_star_feature);
+					for (var i = 0; i < overlapping_star_features.length; i++) {
+						let coordinates = overlapping_star_features[i][0].getGeometry().flatCoordinates;
+						let points = generatePointsCircle(overlapping_star_features[i].length, coordinates);
 
-					let multiLineString = new ol.geom.MultiLineString([])
-					layerRouteSourcevector.addFeature(new ol.Feature({ geometry: multiLineString }));
+						let overlapping_star_feature = new ol.Feature({
+							geometry: new ol.geom.Point(coordinates)
+						});
+						overlapping_star_feature.setStyle([overlappingCenterCircleStyle, overlappingCenterCircleImageStyle]);
+						layerRouteSourcevector.addFeature(overlapping_star_feature);
 
+						let coordsFrom = ol.proj.transform(coordinates, 'EPSG:3857', layer_info.projection);
+						let coordsTo = ol.proj.transform(points[0], 'EPSG:3857', layer_info.projection);
+						let distance = distanceBetwennCoords(coordsFrom[0], coordsFrom[1], coordsTo[0], coordsTo[1]);
+						var circle = new ol.geom.Circle(coordinates, distance * 1.075);
+						var CircleFeature = new ol.Feature(circle);
+						layerRouteSourcevector.addFeature(CircleFeature);
 
-					multiLineString.setCoordinates([]);
+						for (let j = 0; j < overlapping_star_features[i].length; j++) {
+							let f = overlapping_star_features[i][j];
+							let fPoints = points[j];
 
-					for(let j = 0; j < overlapping_star_features[i].length; j++) {
-						let f = overlapping_star_features[i][j];
-						let fPoints = points[j];
+							f.setGeometry(new ol.geom.Point(fPoints));
+						}
 
-						multiLineString.appendLineString(
-							new ol.geom.LineString([coordinates, fPoints])
-						);
-						f.setGeometry(new ol.geom.Point(fPoints));
 					}
-
 				}
 				sourcevector.addFeatures(allFeatures);
 
@@ -1159,6 +1259,31 @@ async function map_start_promise()
 		})
 	}
 
+	function fetchSvg_promise(url)
+	{
+		return new Promise(function(success, fail)
+		{
+			var xhttp = new XMLHttpRequest()
+			xhttp.open("GET", url , true);
+			xhttp.onreadystatechange = function(readystatechange)
+			{
+				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
+				{
+					if (xhttp.status == 200)
+					{
+						var data = $(xhttp.responseText).filter(function (i, el) { return $(el).is('svg') });
+						success(data);
+					}
+					else
+					{
+						fail(url + ': ' + xhttp.status)
+					}
+				}
+			}
+			xhttp.send();
+		})
+	}
+
 	function fetchJsonLogin_promise(url, params)
 	{
 		return new Promise(function(success, fail)
@@ -1246,4 +1371,24 @@ function generatePointsCircle(count, centerCoords) {
 		];
 	}
 	return res;
+}
+
+
+function distanceBetwennCoords(lat1, lon1, lat2, lon2) {
+	let degreesToRadians = function(degrees) {
+		return degrees * Math.PI / 180;
+	}
+
+	var earthRadiusM = 6371000;
+
+	var dLat = degreesToRadians(lat2-lat1);
+	var dLon = degreesToRadians(lon2-lon1);
+
+	lat1 = degreesToRadians(lat1);
+	lat2 = degreesToRadians(lat2);
+
+	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	return earthRadiusM * c;
 }

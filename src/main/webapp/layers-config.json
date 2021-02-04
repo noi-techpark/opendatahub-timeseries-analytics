@@ -2,7 +2,7 @@
 	"id": "Node Layer",
 	"layers": [{
 		"id": "Weather",
-		"icons": ["Weather.svg", ["green.svg", "precipitation", 300, 0, 0.1],
+		"icons": ["weather.svg", ["green.svg", "precipitation", 300, 0, 0.1],
 			["green.svg", "precipitation", 900, 0, 0.1],
 			["yellow.svg", "precipitation", 300, 0.1, 1],
 			["yellow.svg", "precipitation", 900, 0.1, 1],
@@ -22,7 +22,7 @@
 
 		{
 			"id": "Air quality",
-			"icons": ["Air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40],
+			"icons": ["air_quality.svg", ["green.svg", "nitrogen-dioxide", 3600, 0, 40],
 				["yellow.svg", "nitrogen-dioxide", 3600, 40, 60],
 				["red.svg", "nitrogen-dioxide", 3600, 60, 99999],
 				["green.svg", "NO2 - Ossidi di azoto", 3600, 0, 40],
@@ -54,7 +54,7 @@
 
 		{
 			"id": "Parking",
-			"icons": ["Parking.svg", ["red.svg", "free", 300, 0, 10],
+			"icons": ["parking.svg", ["red.svg", "free", 300, 0, 10],
 				["yellow.svg", "free", 300, 10, 100],
 				["green.svg", "free", 300, 100, 99999]
 			],
@@ -72,7 +72,7 @@
 		},
 		{
 			"id": "Bluetooth",
-			"icons": ["Bluetooth.svg", ["green.svg", "Bluetooth Count record", 600, 0, 75],
+			"icons": ["bluetooth.svg", ["green.svg", "Bluetooth Count record", 600, 0, 75],
 				["yellow.svg", "Bluetooth Count record", 600, 75, 150],
 				["red.svg", "Bluetooth Count record", 600, 150, 99999]
 			],
@@ -89,7 +89,7 @@
 
 		{
 			"id": "Traffic",
-			"icons": ["Traffic.svg", ["green.svg", "Average Speed Light Vehicles", 600, 120, 99999],
+			"icons": ["traffic.svg", ["green.svg", "Average Speed Light Vehicles", 600, 120, 99999],
 				["yellow.svg", "Average Speed Light Vehicles", 600, 100, 120],
 				["red.svg", "Average Speed Light Vehicles", 600, 0, 100],
 				["green.svg", "average-vehicle-speed", 600, 40, 99999],
@@ -110,7 +110,7 @@
 
 		{
 			"id": "Road weather",
-			"icons": ["Road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999],
+			"icons": ["road_weather.svg", ["green.svg", "ground-surface-temperature", 600, 0, 99999],
 				["yellow.svg", "ground-surface-temperature", 600, -5, 0],
 				["red.svg", "ground-surface-temperature", 600, -99999, -5],
 				["green.svg", "temp_suolo", 1, 0, 99999],
@@ -136,7 +136,7 @@
 
 		{
 			"id": "Car sharing",
-			"icons": ["Car_sharing.svg", ["red.svg", "number-available", 600, 0, 1],
+			"icons": ["car_sharing.svg", ["red.svg", "number-available", 600, 0, 1],
 				["yellow.svg", "number-available", 600, 1, 2],
 				["green.svg", "number-available", 600, 2, 100]
 			],
@@ -150,7 +150,7 @@
 
 		{
 			"id": "Bike sharing",
-			"icons": ["Bike_sharing.svg", ["red.svg", "number-available", 300, 0, 1],
+			"icons": ["bike_sharing.svg", ["red.svg", "number-available", 300, 0, 1],
 				["green.svg", "number-available", 300, 1, 100]
 			],
 			"stationType": "BikesharingStation",
@@ -163,7 +163,7 @@
 
 		{
 			"id": "E-Mobility",
-			"icons": ["E-Mobility.svg", ["red.svg", "number-available", 600, 0, 1],
+			"icons": ["e_mobility.svg", ["red.svg", "number-available", 600, 0, 1],
 				["yellow.svg", "number-available", 600, 1, 2],
 				["green.svg", "number-available", 600, 2, 100]
 			],
@@ -176,7 +176,7 @@
 		},
 		{
 			"id": "VMS",
-			"icons": ["A22VMS.svg", ["red.svg", "stato", 1, 0, 1],
+			"icons": ["vms.svg", ["red.svg", "stato", 1, 0, 1],
 				["green.svg", "stato", 1, 1, 2]
 			],
 			"stationType": "VMS",
@@ -200,7 +200,7 @@
 		"id": "Edge Layer",
 		"layers": [{
 			"id": "Vehicular time",
-			"icons": ["Journey_time.svg"],
+			"icons": ["vehicular_times.svg"],
 			"stationType": "LinkStation",
 			"format": "integreen",
 			"projection": "xxx",
