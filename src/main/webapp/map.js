@@ -64,9 +64,13 @@ async function map_start_promise()
 		source : sources[0]
 	})
 
-	var filter = new ol.filter.Colorize();
-	mapLayer.addFilter(filter);
-	filter.setFilter('grayscale');
+	var filterGrayscale = new ol.filter.Colorize();
+	mapLayer.addFilter(filterGrayscale);
+    filterGrayscale.setFilter('grayscale');
+
+    var filterLuminosity = new ol.filter.Colorize();
+    mapLayer.addFilter(filterLuminosity);
+    filterLuminosity.setFilter({ operation: 'luminosity', value: 0.75});
 
 
 	let map = new ol.Map({
@@ -358,6 +362,8 @@ async function map_start_promise()
 
 		var details_close = document.getElementById('details-close');
 		var details_content = document.getElementById('details-content');
+		var details_header = document.getElementById('details-header');
+		var details_icon = document.getElementById('details-icon');
 		var details_title = document.getElementById('details-title');
 		var details_container = document.getElementById('details-container');
 		details_container.style.display = "none";
@@ -370,7 +376,7 @@ async function map_start_promise()
 		details_close.addEventListener('click', function()
 		{
 			details_content.textContent  = '';
-			details_title.textContent = '';
+            details_title.textContent = '';
 			details_container.style.display = "none";
 			if (selectedFeature != null)
 				selectedFeature.changed();
@@ -409,8 +415,14 @@ async function map_start_promise()
 				selectedFeature = features[0].get("features")[0];
 				selectedFeature.changed();
 
+                let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
+                let color = features[0].get("features")[0].getProperties()['color'];
+
 				details_content.textContent  = 'loading ...';
 				details_title.textContent = '';
+                details_header.style.backgroundColor = color;
+                details_icon.src = "img/marker/icons/" + layer_info.icons[0];
+                details_content.style.marginTop = details_header.clientHeight + 'px';
 				details_container.style.display = 'block';
 				map.updateSize();
 
@@ -425,16 +437,16 @@ async function map_start_promise()
 					station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
 				}
 				var integreen_data = station_data_json.data[stationType].stations[scode];
-				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
-				let color = features[0].get("features")[0].getProperties()['color'];
 
-				details_title.textContent = integreen_data['sname'];
+                details_title.textContent = integreen_data['sname'];
+                console.log(details_header)
+                details_content.style.marginTop = details_header.clientHeight + 'px';
 				details_content.textContent = ''
 
 				let createDetailsRow = function (name, value, highlited) {
 					var row = document.createElement('div')
 					row.className = "valuesDiv"
-					row.style = "display:flex;"
+					row.style = "display:flex;align-items:center;"
 					var nameDiv = document.createElement('div')
 					nameDiv.textContent = name.toUpperCase();
 					nameDiv.className = "details-name"
@@ -446,8 +458,8 @@ async function map_start_promise()
 					row.appendChild(valueDiv);
 
 					if(highlited){
-						nameDiv.style = "color: " + color + "; font-size: 20px; font-weight: 500; margin-bottom: 20px; padding-top: 5px;";
-						valueDiv.style = "background-color: " + color + "; color: #FFFFFF; font-size: 18px; font-weight: 500;margin-bottom: 20px; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; border-radius: 5px;";
+                        valueDiv.className += ' highlited';
+						valueDiv.style = "background-color: " + color;
 					}
 
 					details_content.appendChild(row)
