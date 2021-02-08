@@ -107,7 +107,7 @@ html, body
 
 .layer-div.inactive svg ellipse
 {
-    fill: #A5ABB7 !important;
+    fill: #E9E9E7 !important;
 }
 
 .layer-div .layer-label-div
@@ -498,4 +498,46 @@ html, body
 
 .layer_template .label.group_label {
     font-weight: bold;
+}
+
+.ol-zoom, .ol-zoom:hover, .ol-zoom:focus {
+    bottom: 57px;
+    right: 40px;
+    left: auto;
+    top: auto;
+    background: #464545 0% 0% no-repeat padding-box;
+    box-shadow: 0px 5px 7px #00000008;
+    border-radius: 10px 0px 10px 10px;
+    opacity: 1;
+}
+
+.ol-zoom .ol-zoom-in, .ol-zoom .ol-zoom-out  {
+    font: normal normal normal 18px/24px 'Roboto', sans-serif;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.ol-zoom .ol-zoom-in {
+    border-bottom: 1px solid #FFFFFF;
+}
+
+.unsee-all {
+    position: absolute;
+    left: 69px;
+    bottom: 57px;
+    background: #464545 0% 0% no-repeat padding-box;
+    box-shadow: 0px 5px 7px #00000008;
+    border-radius: 10px 0px 10px 10px;
+    opacity: 1;
+    padding: 10px 13px;
+    text-align: left;
+    font: normal normal normal 18px/24px 'Roboto', sans-serif;
+    letter-spacing: 0px;
+    color: #FFFFFF;
+    cursor: pointer;
+}
+
+.unsee-all span {
+    margin: 13px;
 }

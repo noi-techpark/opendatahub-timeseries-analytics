@@ -4,6 +4,7 @@
 async function map_start_promise()
 {
 	let autorefresh_functions = []
+	let unsee_functions = []
 	var disableClusteringZoomLevel = 18;
 	var clusterDistance = 80;
 
@@ -143,6 +144,13 @@ async function map_start_promise()
 		}
 	}
 
+	let unseeAll = document.getElementById('unsee-all');
+	unseeAll.addEventListener('click', function (ev) {
+		for(let i = unsee_functions.length - 1; i >= 0; i--) {
+			unsee_functions[i]();
+		}
+	});
+
 	setupFeatureClickPopup()
 
 //	setupLoginForm()
@@ -233,6 +241,17 @@ async function map_start_promise()
             await toggle_layer_function()
         }
 
+
+        let unsee_function = async function()
+        {
+            // refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
+            if (!layer_selected || layer_loading)
+            {
+                return;
+            }
+            await toggle_layer_function()
+        }
+
         let toggle_layer_function = async function()
         {
             // se il layer sta caricando ignora il click
@@ -251,6 +270,7 @@ async function map_start_promise()
 
                 // rimuovi il timer di aggiornamento automatico
                 autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function),1)
+                unsee_functions.splice(unsee_functions.indexOf(unsee_function),1)
             }
             else
             {
@@ -299,6 +319,7 @@ async function map_start_promise()
                     layer_loading = false;
 
                     autorefresh_functions.push(refresh_function)
+                    unsee_functions.push(unsee_function)
                 }
 
             }
@@ -469,7 +490,7 @@ async function map_start_promise()
 				if(!!integreen_data['scoordinate']) {
 					createDetailsRow('latitude', integreen_data['scoordinate']['x'], false);
 					createDetailsRow('longitude', integreen_data['scoordinate']['y'], false);
-					createDetailsRow('COORDINATEREFERENCESYSTEM', integreen_data['scoordinate']['srid'], false);
+					createDetailsRow('EPSG', integreen_data['scoordinate']['srid'], false);
 				}
 				createDetailsRow('origin', integreen_data['sorigin'], false);
 				createDetailsRow('type', integreen_data['stype'], false);
@@ -682,26 +703,37 @@ async function map_start_promise()
 				marker_overlapping_selected_marker_svg.find('.marker-color').css('fill', layer_info.color);
 				var iconStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [0.5, 17],
+						anchor: [0.5, 27],
 						anchorOrigin: 'bottom-left',
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
 						src:  'data:image/svg+xml;base64,' + btoa(marker_svg[0].outerHTML),
 						scale: 0.6
-					})
+					}),
+					zIndex: 110
+				});
+
+
+				var shadowStyle = new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: 'rgba(0,0,0,0.5)',
+						width: 6
+					}),
+					zIndex: 112
 				});
 
 				var iconStyleSelected = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [0.5, 17],
+						anchor: [0.5, 31],
 						anchorOrigin: 'bottom-left',
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
 						src:  'data:image/svg+xml;base64,' + btoa(marker_selected_svg[0].outerHTML),
 						scale: 0.6
-					})
+					}),
+					zIndex: 111
 				});
 
                 var iconStyleImage = new ol.style.Style({
@@ -712,7 +744,8 @@ async function map_start_promise()
                         opacity: 1,
                         src:  'img/marker/icons/' + layer_info.icons[0],
                         scale: 0.6
-                    })
+                    }),
+					zIndex: 112
                 });
 
                 var iconSelectedStyleImage = new ol.style.Style({
@@ -723,7 +756,8 @@ async function map_start_promise()
                         opacity: 1,
                         src:  'img/marker/icons/' + layer_info.icons[0],
                         scale: 0.6
-                    })
+                    }),
+					zIndex: 113
                 });
 
 				var iconOverlappingStyle = new ol.style.Style({
@@ -735,7 +769,8 @@ async function map_start_promise()
 						opacity: 1,
 						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_marker_svg[0].outerHTML),
 						scale: 0.6
-					})
+					}),
+					zIndex: 114
 				});
 
 				var iconOverlappingSelectedStyle = new ol.style.Style({
@@ -747,8 +782,10 @@ async function map_start_promise()
 						opacity: 1,
 						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_selected_marker_svg[0].outerHTML),
 						scale: 0.6
-					})
+					}),
+					zIndex: 115
 				});
+
 				var overlappingCenterCircleStyle = new ol.style.Style({
 					image: new ol.style.Circle({
 						radius: 36.5 * 0.6, fill: new ol.style.Fill({color: layer_info.color}), stroke: new ol.style.Stroke({color: layer_info.color}),
@@ -789,19 +826,19 @@ async function map_start_promise()
 								valueStyle.getImage().setScale(0.45);
 								if (isSelected) {
 									valueStyle.getImage().setAnchor([-10, +27]);
-									return [iconOverlappingSelectedStyle, valueStyle];
+									return [shadowStyle, iconOverlappingSelectedStyle, valueStyle];
 								} else {
 									valueStyle.getImage().setAnchor([-10, +27]);
-									return [iconOverlappingStyle, valueStyle];
+									return [shadowStyle, iconOverlappingStyle, valueStyle];
 								}
 							} else  {
 								valueStyle.getImage().setScale(0.6);
 								if (isSelected) {
-									valueStyle.getImage().setAnchor([-35, +190]);
-									return [iconStyleSelected, iconSelectedStyleImage, valueStyle];
+									valueStyle.getImage().setAnchor([-40, +190]);
+									return [shadowStyle, iconStyleSelected, iconSelectedStyleImage, valueStyle];
 								} else {
 									valueStyle.getImage().setAnchor([-20, +95]);
-									return [iconStyle, iconStyleImage, valueStyle];
+									return [shadowStyle, iconStyle, iconStyleImage, valueStyle];
 								}
 							}
 						}
@@ -970,7 +1007,8 @@ async function map_start_promise()
 							opacity: 1,
 							src: 'img/marker/status/' + icona,
 							scale: 0.60
-						})
+						}),
+						zIndex: 116
 					});
 
 					featurething.setProperties({'iconStyle': iconStyle, 'valueStyle': valueStyle, 'color': layer_info.color})
