@@ -4,6 +4,7 @@
 async function map_start_promise()
 {
 	let autorefresh_functions = []
+	let unsee_functions = []
 	var disableClusteringZoomLevel = 18;
 	var clusterDistance = 80;
 
@@ -12,9 +13,6 @@ async function map_start_promise()
 	let error_console = document.getElementById('error-console')
 
 	var layers_container = document.getElementById('layers-container')
-	var layer_template = document.getElementById('layer_template_id');
-	layer_template.removeAttribute('id')
-	layers_container.removeChild(layer_template)
 
 
 	let selectedFeature = null;
@@ -62,8 +60,18 @@ async function map_start_promise()
 	});
 
 	mapLayer = new ol.layer.Tile({
-		source : env.THUNDERFOREST_MAP_API_KEY ? sources[1] : sources[0]
+//		thunderforest tile disabled
+//		source : env.THUNDERFOREST_MAP_API_KEY ? sources[1] : sources[0]
+		source : sources[0]
 	})
+
+	var filterGrayscale = new ol.filter.Colorize();
+	mapLayer.addFilter(filterGrayscale);
+    filterGrayscale.setFilter('grayscale');
+
+    var filterLuminosity = new ol.filter.Colorize();
+    mapLayer.addFilter(filterLuminosity);
+    filterLuminosity.setFilter({ operation: 'luminosity', value: 0.75});
 
 
 	let map = new ol.Map({
@@ -125,13 +133,23 @@ async function map_start_promise()
 
 	for (var layer_group of json)
 	{
-		setupLayerGroup_promise(layer_group)
+        let group_layer_div = document.createElement('div');
+        group_layer_div.style.display = 'none';
+		setupLayerGroup_promise(layer_group, group_layer_div);
+        layers_container.appendChild(group_layer_div);
 
 		for (var layer_info of layer_group.layers)
 		{
-			setupLayer_promise(layer_info, layer_group.id)
+			setupLayer_promise(layer_info, layer_group.id, group_layer_div)
 		}
 	}
+
+	let unseeAll = document.getElementById('unsee-all');
+	unseeAll.addEventListener('click', function (ev) {
+		for(let i = unsee_functions.length - 1; i >= 0; i--) {
+			unsee_functions[i]();
+		}
+	});
 
 	setupFeatureClickPopup()
 
@@ -141,153 +159,205 @@ async function map_start_promise()
 	// Functions
 	//////////////////////////////////////////////////////
 
-	async function setupLayer_promise(layer_info, layer_group_id)
+	async function setupLayer_promise(layer_info, layer_group_id, group_layer_div)
+    {
+        let layer_div = document.createElement('div');
+        layer_div.className = 'layer-div inactive';
+
+        let layer_div_svg = document.createElement('div');
+        layer_div_svg.style.display = 'flex';
+        layer_div_svg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="27px" height="27px">' +
+            '<ellipse style="fill: ' + layer_info.color + '" rx="13.5" ry="13.5" cx="13.5" cy="13.5">' +
+            '</ellipse>' +
+            '</svg>';
+        layer_div.appendChild(layer_div_svg);
+
+        let layer_label_div = document.createElement('div');
+        layer_label_div.className = 'layer-label-div';
+        layer_label_div.style.backgroundColor = layer_info.color;
+        layer_div.appendChild(layer_label_div);
+
+        let layer_label_div_span = document.createElement('span');
+        layer_label_div_span.textContent = layer_info.id;
+        layer_label_div.appendChild(layer_label_div_span);
+
+        let layer_label_div_img_hide = document.createElement('img');
+        layer_label_div_img_hide.className = 'img-hide';
+        layer_label_div_img_hide.src = 'img/ic_hide.svg';
+        layer_label_div.appendChild(layer_label_div_img_hide);
+
+        let layer_label_div_img_loading = document.createElement('img');
+        layer_label_div_img_loading.className = 'img-loading';
+        layer_label_div_img_loading.src = 'img/ic_loading.svg';
+        layer_label_div.appendChild(layer_label_div_img_loading);
+
+        group_layer_div.appendChild(layer_div);
+
+        if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
+            layer_info.imageMapping.length > 0) {
+            for(let i = 0; i < layer_info.imageMapping.length; i++) {
+                let imagesCall =env.ODH_MOBILITY_API_URI +
+                    "/flat/" +
+                    encodeURIComponent(layer_info.stationType) +
+                    "/" +
+                    encodeURIComponent(layer_info.imageMapping[i].dataType) +
+                    "/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
+                $.ajax({
+                    url: imagesCall,
+                    beforeSend: function (xhr) {
+                        if(AUTHORIZATION_TOKEN) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + AUTHORIZATION_TOKEN);
+                        }
+                    },
+                    success: function( images_metadata ) {
+                        imageMapping[layer_info.stationType] = imageMapping[layer_info.stationType] || {};
+                        imageMapping[layer_info.stationType][layer_info.imageMapping[i].dataType] =
+                            images_metadata.data[0].tmetadata[layer_info.imageMapping[i].dataTypeMetadata];
+                    }
+                });
+            }
+        }
+
+        let layer_selected = false;
+        let layer_loading = false;
+
+        var layer = null;
+
+
+        let refresh_function = async function()
+        {
+            // refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
+            if (!layer_selected || layer_loading)
+            {
+                return;
+            }
+            await toggle_layer_function()
+
+            if (layer_selected)
+            {
+                return;
+            }
+
+            await toggle_layer_function()
+        }
+
+
+        let unsee_function = async function()
+        {
+            // refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
+            if (!layer_selected || layer_loading)
+            {
+                return;
+            }
+            await toggle_layer_function()
+        }
+
+        let toggle_layer_function = async function()
+        {
+            // se il layer sta caricando ignora il click
+            if (layer_loading)
+                return;
+
+            if (layer_selected)
+            {
+                // spegni layer
+                layer_selected = false;
+                layer_div.classList.add('inactive')
+                if(layer.get('routesLayer')) {
+                    map.removeLayer(layer.get('routesLayer'));
+                }
+                map.removeLayer(layer);
+
+                // rimuovi il timer di aggiornamento automatico
+                autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function),1)
+                unsee_functions.splice(unsee_functions.indexOf(unsee_function),1)
+            }
+            else
+            {
+                // crea layer
+                // mostrare progress di caricamento
+                layer_loading = true;
+                layer_selected = true;
+                layer_div.classList.remove('inactive')
+
+                try
+                {
+
+                    let format = layer_info.format
+                    switch (format)
+                    {
+                        case 'integreen':
+                            switch (layer_group_id){
+                                case "Node Layer":
+                                    layer = await loadIntegreenNodeLayer(layer_info, layer_div)
+                                    break;
+                                case "Edge Layer":
+                                    layer = await loadIntegreenEdgeLayer(layer_info, layer_div)
+                                    break;
+                                default:
+                                    // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+                                    alert('Unknow layer group: ' + layer_group_id)
+                                    break;
+                            }
+                            break;
+                        case 'wms':
+                            layer = await loadWMSLayer(layer_info)
+                            break;
+                        default:
+                            // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+                            alert('Unknow format: ' + format)
+                            break;
+                    }
+                }
+                catch (e)
+                {
+                    error_console.textContent = format_time() + ': ' + e;
+                }
+                finally
+                {
+
+                    layer_loading = false;
+
+                    autorefresh_functions.push(refresh_function)
+                    unsee_functions.push(unsee_function)
+                }
+
+            }
+        }
+
+        layer_div.addEventListener('click', toggle_layer_function)
+    }
+
+	async function setupLayerGroup_promise(layer_group, group_layer_div)
 	{
-		let layer_display = layer_template.cloneNode(true)
-		layer_display.style.paddingLeft = '40px'
-		layer_display.querySelector('.label').textContent = layer_info.id
-		layers_container.appendChild(layer_display)
+	    let layer_div = document.createElement('div');
+	    layer_div.className = 'layer-div';
 
-		let format = layer_info.format
+        let layer_div_span = document.createElement('span');
+        layer_div_span.textContent = layer_group.id;
+        layer_div.appendChild(layer_div_span);
 
-		switch (format)
-		{
-			case 'integreen':
-				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icons[0]
-				break;
-			default:
-				layer_display.querySelector('.icon').src = 'icons/01_Icons_navi/' + layer_info.icon
-				break;
-		}
+        let layer_div_img = document.createElement('img');
+        layer_div_img.src = 'img/ic_arrow_down.svg';
+        layer_div_img.style = 'margin-left: 28px';
+        layer_div.appendChild(layer_div_img);
 
-		if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
-			layer_info.imageMapping.length > 0) {
-			for(let i = 0; i < layer_info.imageMapping.length; i++) {
-				let imagesCall =env.ODH_MOBILITY_API_URI +
-					"/flat/" +
-					encodeURIComponent(layer_info.stationType) +
-					"/" +
-					encodeURIComponent(layer_info.imageMapping[i].dataType) +
-					"/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
-				$.ajax({
-					url: imagesCall,
-					beforeSend: function (xhr) {
-						if(AUTHORIZATION_TOKEN) {
-							xhr.setRequestHeader("Authorization", "Bearer " + AUTHORIZATION_TOKEN);
-						}
-					},
-					success: function( images_metadata ) {
-						imageMapping[layer_info.stationType] = imageMapping[layer_info.stationType] || {};
-						imageMapping[layer_info.stationType][layer_info.imageMapping[i].dataType] =
-							images_metadata.data[0].tmetadata[layer_info.imageMapping[i].dataTypeMetadata];
-					}
-				});
-			}
-		}
+        layers_container.appendChild(layer_div);
 
+        let groupVisivle = false;
 
-		let layer_selected = false;
-		let layer_loading = false;
+        let toggle_layer_function = async function()
+        {
+            if(groupVisivle) {
+                group_layer_div.style.display = 'none';
+                groupVisivle = false;
+            } else {
+                group_layer_div.style.display = 'block';
+                groupVisivle = true;
+            }
+        }
 
-		var layer = null;
-
-
-		let refresh_function = async function()
-		{
-			// refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
-			if (!layer_selected || layer_loading)
-			{
-				return;
-			}
-			await toggle_layer_function()
-
-			if (layer_selected)
-			{
-				return;
-			}
-
-			await toggle_layer_function()
-		}
-
-		let toggle_layer_function = async function()
-		{
-			// se il layer sta caricando ignora il click
-			if (layer_loading)
-				return;
-
-			if (layer_selected)
-			{
-				// spegni layer
-				layer_selected = false;
-				layer_display.classList.remove('selected')
-				if(layer.get('routesLayer')) {
-					map.removeLayer(layer.get('routesLayer'));
-				}
-				map.removeLayer(layer);
-
-				// rimuovi il timer di aggiornamento automatico
-				autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function),1)
-			}
-			else
-			{
-				// crea layer
-				// mostrare progress di caricamento
-				layer_loading = true;
-				layer_selected = true;
-				layer_display.classList.add('selected')
-
-				try
-				{
-					switch (format)
-					{
-						case 'integreen':
-							switch (layer_group_id){
-								case "Node Layer":
-									layer = await loadIntegreenNodeLayer(layer_info, layer_display.querySelector('.circle-spinner'))
-									break;
-								case "Edge Layer":
-									layer = await loadIntegreenEdgeLayer(layer_info, layer_display.querySelector('.circle-spinner'))
-									break;
-								default:
-									// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-									alert('Unknow layer group: ' + layer_group_id)
-									break;
-							}
-							break;
-						case 'wms':
-							layer = await loadWMSLayer(layer_info)
-							break;
-						default:
-							// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-							alert('Unknow format: ' + format)
-							break;
-					}
-				}
-				catch (e)
-				{
-					error_console.textContent = format_time() + ': ' + e;
-				}
-				finally
-				{
-
-					layer_loading = false;
-
-					autorefresh_functions.push(refresh_function)
-				}
-
-			}
-		}
-
-		layer_display.addEventListener('click', toggle_layer_function)
-
-	}
-
-	async function setupLayerGroup_promise(layer_group)
-	{
-		let layer_display = layer_template.cloneNode(true)
-		layer_display.querySelector('.label').classList.add('group_label')
-		layer_display.querySelector('.label').textContent = layer_group.id
-		layers_container.appendChild(layer_display)
+        layer_div.addEventListener('click', toggle_layer_function)
 	}
 
 
@@ -313,6 +383,8 @@ async function map_start_promise()
 
 		var details_close = document.getElementById('details-close');
 		var details_content = document.getElementById('details-content');
+		var details_header = document.getElementById('details-header');
+		var details_icon = document.getElementById('details-icon');
 		var details_title = document.getElementById('details-title');
 		var details_container = document.getElementById('details-container');
 		details_container.style.display = "none";
@@ -325,7 +397,7 @@ async function map_start_promise()
 		details_close.addEventListener('click', function()
 		{
 			details_content.textContent  = '';
-			details_title.textContent = '';
+            details_title.textContent = '';
 			details_container.style.display = "none";
 			if (selectedFeature != null)
 				selectedFeature.changed();
@@ -364,8 +436,14 @@ async function map_start_promise()
 				selectedFeature = features[0].get("features")[0];
 				selectedFeature.changed();
 
+                let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
+                let color = features[0].get("features")[0].getProperties()['color'];
+
 				details_content.textContent  = 'loading ...';
 				details_title.textContent = '';
+                details_header.style.backgroundColor = color;
+                details_icon.src = "img/marker/icons/" + layer_info.icons[0];
+                details_content.style.marginTop = details_header.clientHeight + 'px';
 				details_container.style.display = 'block';
 				map.updateSize();
 
@@ -380,16 +458,16 @@ async function map_start_promise()
 					station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
 				}
 				var integreen_data = station_data_json.data[stationType].stations[scode];
-				let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
-				let color = features[0].get("features")[0].getProperties()['color'];
 
-				details_title.textContent = integreen_data['sname'];
+                details_title.textContent = integreen_data['sname'];
+                console.log(details_header)
+                details_content.style.marginTop = details_header.clientHeight + 'px';
 				details_content.textContent = ''
 
 				let createDetailsRow = function (name, value, highlited) {
 					var row = document.createElement('div')
 					row.className = "valuesDiv"
-					row.style = "display:flex;"
+					row.style = "display:flex;align-items:center;"
 					var nameDiv = document.createElement('div')
 					nameDiv.textContent = name.toUpperCase();
 					nameDiv.className = "details-name"
@@ -401,8 +479,8 @@ async function map_start_promise()
 					row.appendChild(valueDiv);
 
 					if(highlited){
-						nameDiv.style = "color: " + color + "; font-size: 20px; font-weight: 500; margin-bottom: 20px; padding-top: 5px;";
-						valueDiv.style = "background-color: " + color + "; color: #FFFFFF; font-size: 18px; font-weight: 500;margin-bottom: 20px; padding-left: 20px; padding-right: 20px; padding-top: 5px; padding-bottom: 5px; border-radius: 5px;";
+                        valueDiv.className += ' highlited';
+						valueDiv.style = "background-color: " + color;
 					}
 
 					details_content.appendChild(row)
@@ -412,7 +490,7 @@ async function map_start_promise()
 				if(!!integreen_data['scoordinate']) {
 					createDetailsRow('latitude', integreen_data['scoordinate']['x'], false);
 					createDetailsRow('longitude', integreen_data['scoordinate']['y'], false);
-					createDetailsRow('COORDINATEREFERENCESYSTEM', integreen_data['scoordinate']['srid'], false);
+					createDetailsRow('EPSG', integreen_data['scoordinate']['srid'], false);
 				}
 				createDetailsRow('origin', integreen_data['sorigin'], false);
 				createDetailsRow('type', integreen_data['stype'], false);
@@ -460,7 +538,7 @@ async function map_start_promise()
 								let rowAlink = document.createElement('a')
 
 								let mvalueSpan = document.createElement('span');
-								mvalueSpan.textContent = value_datatype_messurment.mvalue.toUpperCase();
+								mvalueSpan.textContent = ('' + value_datatype_messurment.mvalue).toUpperCase();
 								rowAlink.appendChild(mvalueSpan)
 
 								if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
@@ -600,48 +678,129 @@ async function map_start_promise()
 
 	}
 
-	async function loadIntegreenNodeLayer(layer_info, progressbar_line)
+	let raw_marker_svg = await fetchSvg_promise('img/marker/marker.svg');
+	let raw_marker_selected_svg = await fetchSvg_promise('img/marker/marker_selected.svg');
+	let raw_marker_cluster_svg = await fetchSvg_promise('img/marker/marker_cluster.svg');
+	let raw_marker_overlapping_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker.svg');
+	let raw_marker_overlapping_selected_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker_selected.svg');
+
+	async function loadIntegreenNodeLayer(layer_info, loadingItem)
 	{
 		return new Promise(async function(ok,fail)
 		{
 			try
 			{
-
+			    let marker_svg = raw_marker_svg.clone();
+				marker_svg.find('.marker-color').css('fill', layer_info.color);
+                let marker_selected_svg = raw_marker_selected_svg.clone();
+				marker_selected_svg.find('.marker-color').css('fill', layer_info.color);
+				marker_selected_svg.find('.layername-label').text(layer_info.id);
+                let marker_cluster_svg = raw_marker_cluster_svg.clone();
+				marker_cluster_svg.find('.marker-color').css('fill', layer_info.color);
+                let marker_overlapping_marker_svg = raw_marker_overlapping_marker_svg.clone();
+				marker_overlapping_marker_svg.find('.marker-color').css('fill', layer_info.color);
+                let marker_overlapping_selected_marker_svg = raw_marker_overlapping_selected_marker_svg.clone();
+				marker_overlapping_selected_marker_svg.find('.marker-color').css('fill', layer_info.color);
 				var iconStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [0.5, 1.0],
+						anchor: [0.5, 27],
+						anchorOrigin: 'bottom-left',
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'pixel',
+						opacity: 1,
+						src:  'data:image/svg+xml;base64,' + btoa(marker_svg[0].outerHTML),
+						scale: 0.6
+					}),
+					zIndex: 110
+				});
+
+
+				var shadowStyle = new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: 'rgba(0,0,0,0.5)',
+						width: 6
+					}),
+					zIndex: 112
+				});
+
+				var iconStyleSelected = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, 31],
+						anchorOrigin: 'bottom-left',
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'pixel',
+						opacity: 1,
+						src:  'data:image/svg+xml;base64,' + btoa(marker_selected_svg[0].outerHTML),
+						scale: 0.6
+					}),
+					zIndex: 111
+				});
+
+                var iconStyleImage = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, +85],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+                        opacity: 1,
+                        src:  'img/marker/icons/' + layer_info.icons[0],
+                        scale: 0.6
+                    }),
+					zIndex: 112
+                });
+
+                var iconSelectedStyleImage = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [0.5, +120],
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'pixels',
+                        opacity: 1,
+                        src:  'img/marker/icons/' + layer_info.icons[0],
+                        scale: 0.6
+                    }),
+					zIndex: 113
+                });
+
+				var iconOverlappingStyle = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, 0.5],
+						anchorOrigin: 'bottom-left',
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'fraction',
 						opacity: 1,
-						src:  'icons/02_Icons_map/' + layer_info.icons[0],
+						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_marker_svg[0].outerHTML),
 						scale: 0.6
-					})
+					}),
+					zIndex: 114
 				});
 
-				var cluserStyle = new ol.style.Style({
+				var iconOverlappingSelectedStyle = new ol.style.Style({
 					image: new ol.style.Icon({
-						anchor: [-50, +320],
-						anchorXUnits: 'pixels',
-						anchorYUnits: 'pixels',
-						opacity: 1,
-						src: 'icons/value-circle/cluster.svg',
-						scale: 0.20
-					})
-				});
-
-				var selectedStyle = new ol.style.Style({
-					image: new ol.style.Icon({
-						anchor: [0.5, 0.85],
+						anchor: [0.5, 0.5],
+						anchorOrigin: 'bottom-left',
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'fraction',
 						opacity: 1,
-						src: 'icons/Schatten.svg',
+						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_selected_marker_svg[0].outerHTML),
 						scale: 0.6
-					})
+					}),
+					zIndex: 115
 				});
+
 				var overlappingCenterCircleStyle = new ol.style.Style({
 					image: new ol.style.Circle({
-						radius: 7, fill: new ol.style.Fill({color:[255,255,255,1]}), stroke: new ol.style.Stroke({color: layer_info.color})
+						radius: 36.5 * 0.6, fill: new ol.style.Fill({color: layer_info.color}), stroke: new ol.style.Stroke({color: layer_info.color}),
+						scale: 0.6
+					})
+				});
+
+				var overlappingCenterCircleImageStyle = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, 0.5],
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'fraction',
+						opacity: 1,
+						src:  'img/marker/icons/' + layer_info.icons[0],
+						scale: 0.6
 					})
 				});
 
@@ -662,26 +821,58 @@ async function map_start_promise()
 						let valueStyle = features[0].get('valueStyle');
 						if (features.length == 1)
 						{
-							if (selectedFeature != null && selectedFeature === features[0])
-								return [selectedStyle, iconStyle, valueStyle]
-							else
-								return [iconStyle, valueStyle]
+							let isSelected = selectedFeature != null && selectedFeature === features[0];
+							if (features[0].overlapping) {
+								valueStyle.getImage().setScale(0.45);
+								if (isSelected) {
+									valueStyle.getImage().setAnchor([-10, +27]);
+									return [shadowStyle, iconOverlappingSelectedStyle, valueStyle];
+								} else {
+									valueStyle.getImage().setAnchor([-10, +27]);
+									return [shadowStyle, iconOverlappingStyle, valueStyle];
+								}
+							} else  {
+								valueStyle.getImage().setScale(0.6);
+								if (isSelected) {
+									valueStyle.getImage().setAnchor([-40, +190]);
+									return [shadowStyle, iconStyleSelected, iconSelectedStyleImage, valueStyle];
+								} else {
+									valueStyle.getImage().setAnchor([-20, +95]);
+									return [shadowStyle, iconStyle, iconStyleImage, valueStyle];
+								}
+							}
 						}
-						else
-							return [iconStyle, cluserStyle]
+						else {
+							marker_cluster_svg.find('.cluster-size').text(features.length)
+							var iconStyleCluster = new ol.style.Style({
+								image: new ol.style.Icon({
+									anchor: [0.5, 50],
+									anchorOrigin: 'bottom-left',
+									anchorXUnits: 'fraction',
+									anchorYUnits: 'pixel',
+									opacity: 1,
+									src:  'data:image/svg+xml;base64,' + btoa(marker_cluster_svg[0].outerHTML),
+									scale: 0.6
+								})
+							});
+							return [iconStyleCluster, iconStyleImage]
+						}
 					}
 				})
 
+				let hexColor = layer_info.color;
 				let layerRouteSourcevector = new ol.source.Vector({});
 				let layerRoute = new ol.layer.Vector({
 					source: layerRouteSourcevector,
 					style: [
 						new ol.style.Style({
-							stroke: new ol.style.Stroke({
-								width: 3,
-								color: layer_info.color
-								//lineDash: [1, 5]
-							}),
+							fill: new ol.style.Fill({
+								color: 'rgba(' +
+									parseInt(hexColor.slice(1, 3), 16) + ',' +
+									parseInt(hexColor.slice(3, 5), 16) + ',' +
+									parseInt(hexColor.slice(5, 7), 16) + ',' +
+									'0.3)'
+							})
 						})
 					],
 					layerUseType: 'route',
@@ -695,11 +886,11 @@ async function map_start_promise()
 					layerRoute.setVisible(false);
 				}
 
-				progressbar_line.style.display = "block";
+                loadingItem.classList.add('loading');
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=scoordinate%2Cscode&where=sactive.eq.true",
-					AUTHORIZATION_TOKEN, progressbar_line)
+					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
 				if(layer_info.icons.length > 1) {
 					let datatype_period_duplicates = {};
@@ -723,7 +914,7 @@ async function map_start_promise()
 						"&select=tmeasurements" +
 						"&showNull=true" +
 						"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
-						AUTHORIZATION_TOKEN, progressbar_line)
+						AUTHORIZATION_TOKEN, loadingItem)
 					json_stations_status = json_stations_status_result.data[layer_info.stationType]? json_stations_status_result.data[layer_info.stationType].stations: {};
 				}
 
@@ -735,8 +926,6 @@ async function map_start_promise()
 
 				for (var i = 0; i < json_stations_flat.data.length; i++)
 				{
-
-					//progressbar_line.style.width = '' + ((i+1)*100/json_stations.length) + '%'
 
 					let lat = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.y: 0;
 					let lon = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.x: 0;
@@ -754,7 +943,8 @@ async function map_start_promise()
 						geometry : thing,
 						stationType: layer_info.stationType,
 						scode: json_stations_flat.data[i].scode,
-						'layer_info': layer_info
+						'layer_info': layer_info,
+						overlapping: false
 					});
 					featurething.setId(json_stations_flat.data[i].scode);
 
@@ -763,11 +953,13 @@ async function map_start_promise()
 						if(overlapping_points[key][1] == -1) {
 							let overlappingIndex = overlapping_groups.length;
 							overlapping_points[key][1] = overlappingIndex;
+							overlapping_points[key][2].overlapping = true;
 							overlapping_groups[overlappingIndex] = [overlapping_points[key][0]];
 							overlapping_star_features[overlappingIndex] = [overlapping_points[key][2]];
 						}
 						let overlappingIndex = overlapping_points[key][1];
 						overlapping_groups[overlappingIndex].push(i);
+						featurething.overlapping = true;
 						overlapping_star_features[overlappingIndex].push(featurething);
 					} else {
 						overlapping_points[key] = [i, -1, featurething];
@@ -809,50 +1001,51 @@ async function map_start_promise()
 
 					var valueStyle = new ol.style.Style({
 						image: new ol.style.Icon({
-							anchor: [-50, +320],
+							anchor: [-20, +95],
 							anchorXUnits: 'pixels',
 							anchorYUnits: 'pixels',
 							opacity: 1,
-							src: 'icons/value-circle/' + icona,
-							scale: 0.20
-						})
+							src: 'img/marker/status/' + icona,
+							scale: 0.60
+						}),
+						zIndex: 116
 					});
 
 					featurething.setProperties({'iconStyle': iconStyle, 'valueStyle': valueStyle, 'color': layer_info.color})
 
 					allFeatures.push(featurething);
 				}
-				for (var i = 0; i < overlapping_star_features.length; i++)
-				{
-					let coordinates = overlapping_star_features[i][0].getGeometry().flatCoordinates;
-					let points = generatePointsCircle(overlapping_star_features[i].length, coordinates);
+				if(overlapping_star_features.length > 0) {
 
-					let overlapping_star_feature = new ol.Feature({
-						geometry : new ol.geom.Point(coordinates)
-					});
-					overlapping_star_feature.setStyle(overlappingCenterCircleStyle);
-					layerRouteSourcevector.addFeature(overlapping_star_feature);
+					for (var i = 0; i < overlapping_star_features.length; i++) {
+						let coordinates = overlapping_star_features[i][0].getGeometry().flatCoordinates;
+						let points = generatePointsCircle(overlapping_star_features[i].length, coordinates);
 
-					let multiLineString = new ol.geom.MultiLineString([])
-					layerRouteSourcevector.addFeature(new ol.Feature({ geometry: multiLineString }));
+						let overlapping_star_feature = new ol.Feature({
+							geometry: new ol.geom.Point(coordinates)
+						});
+						overlapping_star_feature.setStyle([overlappingCenterCircleStyle, overlappingCenterCircleImageStyle]);
+						layerRouteSourcevector.addFeature(overlapping_star_feature);
 
+						let coordsFrom = ol.proj.transform(coordinates, 'EPSG:3857', layer_info.projection);
+						let coordsTo = ol.proj.transform(points[0], 'EPSG:3857', layer_info.projection);
+						let distance = distanceBetwennCoords(coordsFrom[0], coordsFrom[1], coordsTo[0], coordsTo[1]);
+						var circle = new ol.geom.Circle(coordinates, distance * 1.075);
+						var CircleFeature = new ol.Feature(circle);
+						layerRouteSourcevector.addFeature(CircleFeature);
 
-					multiLineString.setCoordinates([]);
+						for (let j = 0; j < overlapping_star_features[i].length; j++) {
+							let f = overlapping_star_features[i][j];
+							let fPoints = points[j];
 
-					for(let j = 0; j < overlapping_star_features[i].length; j++) {
-						let f = overlapping_star_features[i][j];
-						let fPoints = points[j];
+							f.setGeometry(new ol.geom.Point(fPoints));
+						}
 
-						multiLineString.appendLineString(
-							new ol.geom.LineString([coordinates, fPoints])
-						);
-						f.setGeometry(new ol.geom.Point(fPoints));
 					}
-
 				}
 				sourcevector.addFeatures(allFeatures);
 
-				progressbar_line.style.display = "none";
+                loadingItem.classList.remove('loading');
 				ok(layer)
 			}
 			catch(e)
@@ -863,7 +1056,7 @@ async function map_start_promise()
 
 	}
 
-	async function loadIntegreenEdgeLayer(layer_info, progressbar_line)
+	async function loadIntegreenEdgeLayer(layer_info, loadingItem)
 	{
 		return new Promise(async function(ok,fail)
 		{
@@ -957,12 +1150,12 @@ async function map_start_promise()
 				map.addLayer(layer)
 
 
-				progressbar_line.style.display = "block";
+                loadingItem.classList.add('loading');
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=egeometry,ecode&where=eactive.eq.true",
-					AUTHORIZATION_TOKEN, progressbar_line);
+					AUTHORIZATION_TOKEN, loadingItem);
 
 				let json_stations_status = {};
 				let datatype_period_duplicates = {};
@@ -986,7 +1179,7 @@ async function map_start_promise()
 					"&distinct=true" +
 					"&select=tmeasurements" +
 					"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
-					AUTHORIZATION_TOKEN, progressbar_line)
+					AUTHORIZATION_TOKEN, loadingItem)
 				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
 
 				let allFeatures = [];
@@ -1047,7 +1240,7 @@ async function map_start_promise()
 				}
 				sourcevector.addFeatures(allFeatures);
 
-				progressbar_line.style.display = "none";
+                loadingItem.classList.remove('loading');
 				ok(layer)
 			}
 			catch(e)
@@ -1085,7 +1278,7 @@ async function map_start_promise()
 
 	}
 
-	function fetchJson_promise(url, authorization_header, spinnerItem)
+	function fetchJson_promise(url, authorization_header, loadingItem)
 	{
 		return new Promise(function(success, fail)
 		{
@@ -1105,9 +1298,34 @@ async function map_start_promise()
 					}
 					else
 					{
-						if(spinnerItem) {
-							spinnerItem.style.display = "none";
+						if(loadingItem) {
+                            loadingItem.classList.remove('loading');
 						}
+						fail(url + ': ' + xhttp.status)
+					}
+				}
+			}
+			xhttp.send();
+		})
+	}
+
+	function fetchSvg_promise(url)
+	{
+		return new Promise(function(success, fail)
+		{
+			var xhttp = new XMLHttpRequest()
+			xhttp.open("GET", url , true);
+			xhttp.onreadystatechange = function(readystatechange)
+			{
+				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
+				{
+					if (xhttp.status == 200)
+					{
+						var data = $(xhttp.responseText).filter(function (i, el) { return $(el).is('svg') });
+						success(data);
+					}
+					else
+					{
 						fail(url + ': ' + xhttp.status)
 					}
 				}
@@ -1171,17 +1389,16 @@ function showMapOverview()
 	}
 	document.getElementById('section_map').style.display='flex';
 	bzanalytics_map.updateSize();
-	document.getElementById('headline').style.color='#919499';
-	document.getElementById('map_overview').style.color='#FFFFFF';
+	document.getElementById('headline').classList.remove("active");
+	document.getElementById('map_overview').classList.add("active");
 }
-
 
 function showCharts()
 {
 	document.getElementById('section_gfx').style.display='block';
 	document.getElementById('section_map').style.display='none';
-	document.getElementById('headline').style.color='#FFFFFF';
-	document.getElementById('map_overview').style.color='#919499';
+    document.getElementById('map_overview').classList.remove("active");
+    document.getElementById('headline').classList.add("active");
 }
 
 function generatePointsCircle(count, centerCoords) {
@@ -1204,4 +1421,24 @@ function generatePointsCircle(count, centerCoords) {
 		];
 	}
 	return res;
+}
+
+
+function distanceBetwennCoords(lat1, lon1, lat2, lon2) {
+	let degreesToRadians = function(degrees) {
+		return degrees * Math.PI / 180;
+	}
+
+	var earthRadiusM = 6371000;
+
+	var dLat = degreesToRadians(lat2-lat1);
+	var dLon = degreesToRadians(lon2-lon1);
+
+	lat1 = degreesToRadians(lat1);
+	lat2 = degreesToRadians(lat2);
+
+	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+		Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	return earthRadiusM * c;
 }

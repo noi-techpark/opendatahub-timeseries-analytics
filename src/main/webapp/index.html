@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
 
     <link rel="stylesheet" href="vendor/openlayers/v5.3.0-dist/ol.css">
+    <link rel="stylesheet" href="vendor/ol-ext/3.1.17/ol-ext.css">
     <link rel="stylesheet" href="map.css">
     <link rel="stylesheet" href="gfx.css">
     <link rel="stylesheet" href="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.css">
@@ -13,6 +14,7 @@
 
     <script src="vendor/openlayers/v5.3.0-dist/ol.js"></script>
     <script src="vendor/jquery/3.3.1/jquery.js"></script>
+    <script src="vendor/ol-ext/3.1.17/ol-ext.js"></script>
     <script src="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.js"></script>
     <script src="vendor/flot/0.8.3/jquery.flot.js"></script>
     <script src="vendor/flot/0.8.3/jquery.flot.time.js"></script>
@@ -28,59 +30,46 @@
             margin: 0px;
             background-color: #f5f7f4;
         }
-        #header > div
-        {
-            padding-left:  4px;
-            padding-right: 4px;
-        }
     </style>
 </head>
 
 <body style="display:flex; flex-direction:column; overflow-y:scroll;">
 
 <div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
-    <img id="logo" src="logo.png">
-    <div style="flex-grow:1; display: flex; flex-shrink:0; flex-wrap: nowrap">
-        <div class="header_text" id="map_overview" onClick="showMapOverview()">MAP OVERVIEW</div>
-        <div class="header_text" id="headline"     onClick="showCharts()" style="color: #FFFFFF;">CHARTS</div>
+    <img id="logo" src="img/logo.svg">
+    <div class="header-nav">
+        <div class="header-nav-item"        id="map_overview" onClick="showMapOverview()">
+            <span>Map Overview</span>
+        </div>
+        <div class="header-nav-item active" id="headline"     onClick="showCharts()">
+            <span>Charts</span>
+        </div>
     </div>
-    <div style="padding-top:19px; padding-bottom:19px; padding-right:8px; display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden;">
-        <button id="login_button" class="loginout_button" style="display: none;">
-            Log in with&nbsp;<strong>NOI Authentication</strong>
-        </button>
-        <span id="logout" style="display: none; align-items: center">
-             <img src="icons/03_Icon_login/user .svg" style="height: 24px">
-             <span id="logoutuser" style="color: white; font-family: 'Roboto', sans-serif; min-width: 8em; display:inline-block; margin-left: 1em" >user</span>
-             <button id="logout_button" class="loginout_button">
+    <div class="header-login">
+        <a id="login_button" class="login_button" style="display: none;">Login <img src="img/login.svg"></a>
+        <div id="logout-container" class="logout-container" style="display: none;">
+             <img src="img/user.svg">
+             <span id="logoutuser">user</span>
+             <a id="logout_button" class="logout_button">
                  Logout
-             </button>
-          </span>
+             </a>
+          </div>
     </div>
 </div>
 
 <!-- *** MAPS ********************************************************************************* -->
-<div id="section_map" style="display:none; flex-direction:column; flex-grow:1; min-height:0px">
+<div id="section_map" style="display:none; flex-direction:column; flex-grow:1; min-height:0px; background-color: #ffffff;">
 
     <div style="display:flex; flex-grow:1; min-height:0px">
 
-        <div id="layers-container" class="layers" style="overflow-y:scroll;">
-            <div id="layer_template_id" class="layer_template">
-                <img class="icon" src=""></img>
-                <span class="label"></span>
-                <!--                <svg viewBox="0 0 36 36" class="circular-chart">
-                                  <path class="circle"
-                                    d="M18 2.0845
-                                      a 15.9155 15.9155 0 0 1 0 31.831
-                                      a 15.9155 15.9155 0 0 1 0 -31.831"
-                                  />
-                                  <text x="18" y="20.35" class="percentage">0%</text>
-                                </svg> -->
-                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="circular-chart" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-                    <path class="circle-spinner" d="M12 50A38 38 0 0 0 88 50A38 47 0 0 1 12 50" fill="#578ce8" stroke="none" transform="rotate(79.9092 50 54.5)">
-                        <animateTransform attributeName="transform" type="rotate" dur="1s" repeatCount="indefinite" keyTimes="0;1" values="0 50 54.5;360 50 54.5"></animateTransform>
-                    </path>
-                </svg>
+        <div class="layers">
+            <div id="layers-container">
 
+            </div>
+            <div class="layers-footer">
+                <img src="img/logoMenu.png" alt="NOI" />
+                <img src="img/life.png" alt="life" />
+                <img src="img/brennerlec.png" alt="BRENNERLEC" />
             </div>
         </div>
 
@@ -88,13 +77,25 @@
             <!--
             <div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
              -->
-            <div id="map" style="width:100%; height:100%"></div>
+            <div id="map" style="width:100%; height:100%">
+            </div>
+            <div id="unsee-all" class="unsee-all">
+                <img src="img/ic_hide.svg">
+                <span>Unsee All</span>
+            </div>
         </div>
 
         <div id="details-container" style="overflow-y:scroll;">
-            <div id="details-close">X</div>
-            <div id="details-title">title</div>
-            <hr id="details-line">
+            <div id="details-header" class="details-header">
+                <div class="ic-container">
+                    <img id="details-icon" src="img/marker/icons/bike_sharing.svg">
+                </div>
+                <span id="details-title">title</span>
+                <div style="align-self: start; width: 12px">
+                    <img id="details-close" src="img/close.svg"/>
+                </div>
+            </div>
+
             <div id="details-content"></div>
         </div>
 
@@ -124,7 +125,7 @@
 
 <!-- *** GFX (CHARTS) ************************************************************************* -->
 
-<div id="section_gfx" style="display:block;">
+<div id="section_gfx" style="display:block; margin-top: 85px;">
 
     <div id="gfx">
 
