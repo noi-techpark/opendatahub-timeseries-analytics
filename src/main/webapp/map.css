@@ -519,7 +519,12 @@ html, body
 }
 
 .ol-zoom .ol-zoom-in {
-    border-bottom: 1px solid #FFFFFF;
+    background: #464545 0% 0% no-repeat padding-box;
+}
+
+.ol-zoom .ol-zoom-in, .ol-zoom .ol-zoom-in:hover, .ol-zoom .ol-zoom-in:focus,
+.ol-zoom .ol-zoom-out, .ol-zoom .ol-zoom-out:hover, .ol-zoom .ol-zoom-out:focus {
+    background: #464545 0% 0% no-repeat padding-box;
 }
 
 .unsee-all {
