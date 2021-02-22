@@ -18,17 +18,17 @@
     </defs>
     <g transform="translate(-587.4,-336.1)">
         <g transform="translate(16991,21308)">
-            <circle cx="49" cy="49" r="49" transform="translate(-16390,-20915)" style="opacity:0.3;" class="marker-color"/>
+            <circle cx="49" cy="49" r="49" transform="translate(-16390,-20915)" style="opacity:0.3;fill:#BFCE89" class="marker-color"/>
         </g>
         <g transform="translate(25150,24274)">
             <g transform="translate(-24556,-23958)" style="filter:url(#Ellipse_34)">
                 <circle cx="17" cy="17" r="17" transform="translate(39,109)"
                         style="fill:#ffffff"/>
             </g>
-            <circle cx="6" cy="6" r="6" transform="translate(-24506,-23838)" class="marker-color"/>
+            <circle cx="6" cy="6" r="6" transform="translate(-24506,-23838)" class="marker-color" style="fill: #BFCE89"/>
             <g transform="translate(-24556,-23958)" style="filter:url(#Vereinigungsmenge_3)">
                 <path d="m -4233.939,-1914.117 a 36.505,36.505 0 0 1 -33.061,-36.34 36.5,36.5 0 0 1 36.5,-36.5 36.5,36.5 0 0 1 36.5,36.5 36.5,36.5 0 0 1 -33.476,36.376 l -3.86,23.567 z"
-                      transform="translate(4287,2016.96)"  class="marker-color"/>
+                      transform="translate(4287,2016.96)"  class="marker-color" style="fill: #BFCE89"/>
             </g>
         </g>
         <g transform="translate(-234.051,-246.051)">

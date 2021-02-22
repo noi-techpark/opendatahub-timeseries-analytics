@@ -678,9 +678,8 @@ async function map_start_promise()
 
 	}
 
-	let raw_marker_svg = await fetchSvg_promise('img/marker/marker.svg');
 	let raw_marker_selected_svg = await fetchSvg_promise('img/marker/marker_selected.svg');
-	let raw_marker_cluster_svg = await fetchSvg_promise('img/marker/marker_cluster.svg');
+	let raw_marker_cluster_size_svg = await fetchSvg_promise('img/marker/marker_cluster_size.svg');
 	let raw_marker_overlapping_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker.svg');
 	let raw_marker_overlapping_selected_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker_selected.svg');
 
@@ -690,13 +689,10 @@ async function map_start_promise()
 		{
 			try
 			{
-			    let marker_svg = raw_marker_svg.clone();
-				marker_svg.find('.marker-color').css('fill', layer_info.color);
                 let marker_selected_svg = raw_marker_selected_svg.clone();
 				marker_selected_svg.find('.marker-color').css('fill', layer_info.color);
 				marker_selected_svg.find('.layername-label').text(layer_info.id);
-                let marker_cluster_svg = raw_marker_cluster_svg.clone();
-				marker_cluster_svg.find('.marker-color').css('fill', layer_info.color);
+				let marker_cluster_size_svg = raw_marker_cluster_size_svg.clone();
                 let marker_overlapping_marker_svg = raw_marker_overlapping_marker_svg.clone();
 				marker_overlapping_marker_svg.find('.marker-color').css('fill', layer_info.color);
                 let marker_overlapping_selected_marker_svg = raw_marker_overlapping_selected_marker_svg.clone();
@@ -708,7 +704,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
-						src:  'data:image/svg+xml;base64,' + btoa(marker_svg[0].outerHTML),
+						src:  'img/marker/marker-base/' + layer_info.icons[0],
 						scale: 0.6
 					}),
 					zIndex: 110
@@ -734,6 +730,18 @@ async function map_start_promise()
 						scale: 0.6
 					}),
 					zIndex: 111
+				});
+
+				var iconStyleCluster = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, 50],
+						anchorOrigin: 'bottom-left',
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'pixel',
+						opacity: 1,
+						src:  'img/marker/marker-cluster/' + layer_info.icons[0],
+						scale: 0.6
+					})
 				});
 
                 var iconStyleImage = new ol.style.Style({
@@ -843,19 +851,19 @@ async function map_start_promise()
 							}
 						}
 						else {
-							marker_cluster_svg.find('.cluster-size').text(features.length)
-							var iconStyleCluster = new ol.style.Style({
+							marker_cluster_size_svg.find('.cluster-size').text(features.length)
+							console.log(btoa(marker_cluster_size_svg[0].outerHTML))
+							var iconStyleClusterSize = new ol.style.Style({
 								image: new ol.style.Icon({
-									anchor: [0.5, 50],
-									anchorOrigin: 'bottom-left',
-									anchorXUnits: 'fraction',
-									anchorYUnits: 'pixel',
+									anchor: [-20, +95],
+									anchorXUnits: 'pixels',
+									anchorYUnits: 'pixels',
 									opacity: 1,
-									src:  'data:image/svg+xml;base64,' + btoa(marker_cluster_svg[0].outerHTML),
+									src:  'data:image/svg+xml;base64,' + btoa(marker_cluster_size_svg[0].outerHTML),
 									scale: 0.6
 								})
 							});
-							return [iconStyleCluster, iconStyleImage]
+							return [iconStyleCluster, iconStyleClusterSize, iconStyleImage]
 						}
 					}
 				})

@@ -39,7 +39,7 @@
             <text font-size="15"
                   style="font-size:15px;font-family:SegoeUI, 'Segoe UI';text-align:center;text-anchor:middle;fill:#ffffff"
                   x="861.26501" y="509">
-                <tspan x="825.95508" y="509" style="text-align:center;text-anchor:middle"
+                <tspan x="825.95508" y="509" style="text-align:center;text-anchor:middle; font: normal normal normal 18px/24px 'Roboto', sans-serif"
                        class="layername-label"></tspan>
             </text>
         </g>
