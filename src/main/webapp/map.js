@@ -7,6 +7,7 @@ async function map_start_promise()
 	let unsee_functions = []
 	var disableClusteringZoomLevel = 18;
 	var clusterDistance = 80;
+	var clusterNumberIconsCache = {};
 
 	startAutoRefresh();
 
@@ -289,6 +290,7 @@ async function map_start_promise()
                         case 'integreen':
                             switch (layer_group_id){
                                 case "Node Layer":
+
                                     layer = await loadIntegreenNodeLayer(layer_info, layer_div)
                                     break;
                                 case "Edge Layer":
@@ -387,7 +389,6 @@ async function map_start_promise()
 		var details_icon = document.getElementById('details-icon');
 		var details_title = document.getElementById('details-title');
 		var details_container = document.getElementById('details-container');
-		details_container.style.display = "none";
 
 		popup_close.addEventListener('click', function()
 		{
@@ -488,8 +489,8 @@ async function map_start_promise()
 				createDetailsRow('code', integreen_data['scode'], true);
 				createDetailsRow('name', integreen_data['sname'], false);
 				if(!!integreen_data['scoordinate']) {
-					createDetailsRow('latitude', integreen_data['scoordinate']['x'], false);
-					createDetailsRow('longitude', integreen_data['scoordinate']['y'], false);
+					createDetailsRow('latitude', integreen_data['scoordinate']['y'], false);
+					createDetailsRow('longitude', integreen_data['scoordinate']['x'], false);
 					createDetailsRow('EPSG', integreen_data['scoordinate']['srid'], false);
 				}
 				createDetailsRow('origin', integreen_data['sorigin'], false);
@@ -678,24 +679,54 @@ async function map_start_promise()
 
 	}
 
-	let raw_marker_selected_svg = await fetchSvg_promise('img/marker/marker_selected.svg');
-	let raw_marker_cluster_size_svg = await fetchSvg_promise('img/marker/marker_cluster_size.svg');
-	let raw_marker_overlapping_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker.svg');
-	let raw_marker_overlapping_selected_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker_selected.svg');
+	let raw_marker_svg = null;
+	let raw_marker_selected_svg = null;
+	let raw_marker_cluster_svg = null;
+	let raw_marker_cluster_size_svg = null;
+	let raw_marker_overlapping_marker_svg = null;
+	let raw_marker_overlapping_selected_marker_svg = null;
 
 	async function loadIntegreenNodeLayer(layer_info, loadingItem)
 	{
 		return new Promise(async function(ok,fail)
 		{
+            loadingItem.classList.add('loading');
 			try
 			{
-                let marker_selected_svg = raw_marker_selected_svg.clone();
+				if(raw_marker_svg == null || raw_marker_svg == undefined){
+					raw_marker_svg = await fetchSvg_promise('img/marker/marker.svg');
+				}
+				let marker_svg = raw_marker_svg.clone();
+				marker_svg.find('.marker-color').css('fill', layer_info.color);
+
+                if(raw_marker_selected_svg == null || raw_marker_selected_svg == undefined) {
+					raw_marker_selected_svg = await fetchSvg_promise('img/marker/marker_selected.svg')
+				}
+				let marker_selected_svg = raw_marker_selected_svg.clone();
 				marker_selected_svg.find('.marker-color').css('fill', layer_info.color);
 				marker_selected_svg.find('.layername-label').text(layer_info.id);
+
+				if(raw_marker_cluster_svg == null || raw_marker_cluster_svg == undefined) {
+					raw_marker_cluster_svg = await fetchSvg_promise('img/marker/marker_cluster.svg');
+				}
+				let marker_cluster_svg = raw_marker_cluster_svg.clone();
+				marker_cluster_svg.find('.marker-color').css('fill', layer_info.color);
+
+				if(raw_marker_cluster_size_svg == null || raw_marker_cluster_size_svg == undefined) {
+					raw_marker_cluster_size_svg = await fetchSvg_promise('img/marker/marker_cluster_size.svg');
+				}
 				let marker_cluster_size_svg = raw_marker_cluster_size_svg.clone();
-                let marker_overlapping_marker_svg = raw_marker_overlapping_marker_svg.clone();
+
+				if(raw_marker_overlapping_marker_svg == null || raw_marker_overlapping_marker_svg == undefined) {
+					raw_marker_overlapping_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker.svg')
+				}
+				let marker_overlapping_marker_svg = raw_marker_overlapping_marker_svg.clone();
 				marker_overlapping_marker_svg.find('.marker-color').css('fill', layer_info.color);
-                let marker_overlapping_selected_marker_svg = raw_marker_overlapping_selected_marker_svg.clone();
+
+				if(raw_marker_overlapping_selected_marker_svg == null || raw_marker_overlapping_selected_marker_svg == undefined) {
+					raw_marker_overlapping_selected_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker_selected.svg');
+				}
+				let marker_overlapping_selected_marker_svg = raw_marker_overlapping_selected_marker_svg.clone();
 				marker_overlapping_selected_marker_svg.find('.marker-color').css('fill', layer_info.color);
 				var iconStyle = new ol.style.Style({
 					image: new ol.style.Icon({
@@ -704,7 +735,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
-						src:  'img/marker/marker-base/' + layer_info.icons[0],
+						src:  'data:image/svg+xml;base64,' + btoa(marker_svg[0].outerHTML),
 						scale: 0.6
 					}),
 					zIndex: 110
@@ -739,7 +770,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
-						src:  'img/marker/marker-cluster/' + layer_info.icons[0],
+						src:  'data:image/svg+xml;base64,' + btoa(marker_cluster_svg[0].outerHTML),
 						scale: 0.6
 					})
 				});
@@ -851,19 +882,20 @@ async function map_start_promise()
 							}
 						}
 						else {
-							marker_cluster_size_svg.find('.cluster-size').text(features.length)
-							console.log(btoa(marker_cluster_size_svg[0].outerHTML))
-							var iconStyleClusterSize = new ol.style.Style({
-								image: new ol.style.Icon({
-									anchor: [-20, +95],
-									anchorXUnits: 'pixels',
-									anchorYUnits: 'pixels',
-									opacity: 1,
-									src:  'data:image/svg+xml;base64,' + btoa(marker_cluster_size_svg[0].outerHTML),
-									scale: 0.6
-								})
-							});
-							return [iconStyleCluster, iconStyleClusterSize, iconStyleImage]
+							if (clusterNumberIconsCache[features.length] == undefined || clusterNumberIconsCache[features.length] == null) {
+								marker_cluster_size_svg.find('.cluster-size').text(features.length)
+								clusterNumberIconsCache[features.length] = new ol.style.Style({
+									image: new ol.style.Icon({
+										anchor: [-20, +95],
+										anchorXUnits: 'pixels',
+										anchorYUnits: 'pixels',
+										opacity: 1,
+										src: 'data:image/svg+xml;base64,' + btoa(marker_cluster_size_svg[0].outerHTML),
+										scale: 0.6
+									})
+								});
+							}
+							return [iconStyleCluster, clusterNumberIconsCache[features.length], iconStyleImage]
 						}
 					}
 				})
@@ -893,8 +925,6 @@ async function map_start_promise()
 				if(map.getView().getZoom() < disableClusteringZoomLevel) {
 					layerRoute.setVisible(false);
 				}
-
-                loadingItem.classList.add('loading');
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=scoordinate%2Cscode&where=sactive.eq.true",
@@ -1014,7 +1044,7 @@ async function map_start_promise()
 							anchorYUnits: 'pixels',
 							opacity: 1,
 							src: 'img/marker/status/' + icona,
-							scale: 0.60
+							scale: 0.6
 						}),
 						zIndex: 116
 					});
@@ -1058,6 +1088,7 @@ async function map_start_promise()
 			}
 			catch(e)
 			{
+                loadingItem.classList.remove('loading');
 				fail(e)
 			}
 		})
