@@ -489,8 +489,8 @@ async function map_start_promise()
 				createDetailsRow('code', integreen_data['scode'], true);
 				createDetailsRow('name', integreen_data['sname'], false);
 				if(!!integreen_data['scoordinate']) {
-					createDetailsRow('latitude', integreen_data['scoordinate']['x'], false);
-					createDetailsRow('longitude', integreen_data['scoordinate']['y'], false);
+					createDetailsRow('latitude', integreen_data['scoordinate']['y'], false);
+					createDetailsRow('longitude', integreen_data['scoordinate']['x'], false);
 					createDetailsRow('EPSG', integreen_data['scoordinate']['srid'], false);
 				}
 				createDetailsRow('origin', integreen_data['sorigin'], false);
