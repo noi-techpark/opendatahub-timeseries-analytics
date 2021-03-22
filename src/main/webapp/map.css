@@ -234,6 +234,8 @@ html, body
     letter-spacing: 0px;
     color: #464545;
     flex-grow: 1;
+    word-wrap: anywhere;
+    margin-right: 24px;
 }
 
 #details-content
