@@ -307,7 +307,7 @@ const show_legend = () => {
             html += `<td><button class="gfx_nsel" id="gfx_ytoggle${ix}">&lt;</button>&nbsp;<button class="gfx_sel" disabled>&gt;</button></td>`;
         }
         html += `<td><button id="gfx_prepcsv${ix}">prepare CSV</button></td>`;
-        html += `<td><input style="width: 10px;" type="image" id="gfx_remove${ix}" src="icons/04_other_icons/remove.svg" alt="remove"></td>`;
+        html += `<td><input style="width: 10px;" type="image" id="gfx_remove${ix}" src="img/ic_remove.svg" alt="remove"></td>`;
         html += "</tr>";
 
     });
