@@ -367,7 +367,7 @@ const init_tab_dataset = () => {
                     .filter( cat => cat.format === "integreen" )
                     .forEach( cat => {
                         opt += `<option value="${cat.id}">&rarr; ${cat.id}</option>\n`;
-                        CAT_BACKENDS[cat.id] = BASE_URL + "/flat/" + cat.stationType;
+                        CAT_BACKENDS[cat.id] = BASE_URL + "/flat/" + encodeURIComponent(cat.stationType);
                     });
             });
         qs("#gfx_selcategory").innerHTML = opt;

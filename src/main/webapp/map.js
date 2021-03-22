@@ -927,7 +927,7 @@ async function map_start_promise()
 				}
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=scoordinate%2Cscode&where=sactive.eq.true",
+					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=sactive.eq.true",
 					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
 				if(layer_info.icons.length > 1) {
@@ -953,7 +953,12 @@ async function map_start_promise()
 						"&showNull=true" +
 						"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
 						AUTHORIZATION_TOKEN, loadingItem)
-					json_stations_status = json_stations_status_result.data[layer_info.stationType]? json_stations_status_result.data[layer_info.stationType].stations: {};
+					json_stations_status = {};
+					for( let m_stype of layer_info.stationType) {
+						if(json_stations_status_result.data[m_stype]) {
+							json_stations_status = {...json_stations_status, ...(json_stations_status_result.data[m_stype].stations)};
+						}
+					}
 				}
 
 
@@ -979,7 +984,7 @@ async function map_start_promise()
 
 					var featurething = new ol.Feature({
 						geometry : thing,
-						stationType: layer_info.stationType,
+						stationType: json_stations_flat.data[i].stype,
 						scode: json_stations_flat.data[i].scode,
 						'layer_info': layer_info,
 						overlapping: false
@@ -1193,7 +1198,7 @@ async function map_start_promise()
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=egeometry,ecode&where=eactive.eq.true",
+					"/?limit=-1&distinct=true&select=egeometry,ecode,etype&where=eactive.eq.true",
 					AUTHORIZATION_TOKEN, loadingItem);
 
 				let json_stations_status = {};
@@ -1219,7 +1224,12 @@ async function map_start_promise()
 					"&select=tmeasurements" +
 					"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
 					AUTHORIZATION_TOKEN, loadingItem)
-				json_stations_status = json_stations_status_result.data[layer_info.stationType] ? json_stations_status_result.data[layer_info.stationType].stations : {};
+				json_stations_status = {};
+				for( let m_stype of layer_info.stationType) {
+					if(json_stations_status_result.data[m_stype]) {
+						json_stations_status = {...json_stations_status, ...(json_stations_status_result.data[m_stype].stations)};
+					}
+				}
 
 				let allFeatures = [];
 
@@ -1236,7 +1246,7 @@ async function map_start_promise()
 
 					var featurething = new ol.Feature({
 						geometry: new ol.geom.LineString(points),
-						stationType: layer_info.stationType,
+						stationType: json_stations_flat.data[i].etype,
 						scode: json_stations_flat.data[i].ecode,
 						'layer_info': layer_info
 					});
