@@ -158,6 +158,7 @@
               "BikesharingStation",
 				"Bicycle"
             ],
+			"apiWhere": "or(and(stype.eq.\"Bicycle\",sorigin.eq.\"BIKE_SHARING_MERANO\"),stype.neq.\"Bicycle\")",
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,

@@ -54,6 +54,7 @@ let statedata_status = [];
 const CAT_CONFIG_URL = "layers-config.json";
 
 let   CAT_BACKENDS = {};    // leave empty, automatic from config
+let   CAT_API_WHERE = {};
 
 const DEBUG = false;            // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
@@ -368,6 +369,7 @@ const init_tab_dataset = () => {
                     .forEach( cat => {
                         opt += `<option value="${cat.id}">&rarr; ${cat.id}</option>\n`;
                         CAT_BACKENDS[cat.id] = BASE_URL + "/flat/" + encodeURIComponent(cat.stationType);
+                        CAT_API_WHERE[cat.id] = cat.apiWhere;
                     });
             });
         qs("#gfx_selcategory").innerHTML = opt;
@@ -391,7 +393,8 @@ const init_tab_dataset = () => {
 
             default:
 
-                jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=sactive.eq.true", (data) => {
+                jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=sactive.eq.true" +
+                    (CAT_API_WHERE[cat]? "," + encodeURIComponent(CAT_API_WHERE[cat]): ""), (data) => {
                     data = data.data;
                     debug_log("got station details -> length = " + data.length);
                     let opt = `<option value="">Select station...</option>`;

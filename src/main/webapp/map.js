@@ -927,7 +927,8 @@ async function map_start_promise()
 				}
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=sactive.eq.true",
+					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=sactive.eq.true" +
+					(layer_info.apiWhere? "," + encodeURIComponent(layer_info.apiWhere): ""),
 					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
 				if(layer_info.icons.length > 1) {
@@ -951,7 +952,9 @@ async function map_start_promise()
 						"&distinct=true" +
 						"&select=tmeasurements" +
 						"&showNull=true" +
-						"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
+						"&where=sactive.eq.true," +
+							(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere) + ",": "") +
+							encodeURIComponent(query_where_datatypes),
 						AUTHORIZATION_TOKEN, loadingItem)
 					json_stations_status = {};
 					for( let m_stype of layer_info.stationType) {
@@ -1198,7 +1201,8 @@ async function map_start_promise()
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=egeometry,ecode,etype&where=eactive.eq.true",
+					"/?limit=-1&distinct=true&select=egeometry,ecode,etype&where=eactive.eq.true" +
+					(layer_info.apiWhere? "," + encodeURIComponent(layer_info.apiWhere): ""),
 					AUTHORIZATION_TOKEN, loadingItem);
 
 				let json_stations_status = {};
@@ -1222,7 +1226,9 @@ async function map_start_promise()
 					"?limit=-1" +
 					"&distinct=true" +
 					"&select=tmeasurements" +
-					"&where=sactive.eq.true," + encodeURIComponent(query_where_datatypes),
+					"&where=sactive.eq.true," +
+						(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere) + ",": "") +
+						encodeURIComponent(query_where_datatypes),
 					AUTHORIZATION_TOKEN, loadingItem)
 				json_stations_status = {};
 				for( let m_stype of layer_info.stationType) {
