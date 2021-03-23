@@ -9,7 +9,7 @@
 			["red.svg", "precipitation", 300, 1, 99999],
 			["red.svg", "precipitation", 900, 1, 99999]
 		],
-		"stationType": "MeteoStation",
+		"stationType": ["MeteoStation"],
 		"projection": "EPSG:4326",
 		"format": "integreen",
 		"custom-function": null,
@@ -38,7 +38,7 @@
 				["yellow.svg", "NO2-Alphasense_processed", 3600, 40, 60],
 				["red.svg", "NO2-Alphasense_processed", 3600, 60, 99999]
 			],
-			"stationType": "EnvironmentStation",
+			"stationType": ["EnvironmentStation"],
 			"projection": "EPSG:4326",
 			"format": "integreen",
 			"custom-function": null,
@@ -58,7 +58,7 @@
 				["yellow.svg", "free", 300, 10, 100],
 				["green.svg", "free", 300, 100, 99999]
 			],
-			"stationType": "ParkingStation",
+			"stationType": ["ParkingStation"],
 			"projection": "EPSG:4326",
 			"format": "integreen",
 			"custom-function": null,
@@ -76,7 +76,7 @@
 				["yellow.svg", "Bluetooth Count record", 600, 75, 150],
 				["red.svg", "Bluetooth Count record", 600, 150, 99999]
 			],
-			"stationType": "BluetoothStation",
+			"stationType": ["BluetoothStation"],
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
@@ -96,7 +96,7 @@
 				["yellow.svg", "average-vehicle-speed", 600, 26, 40],
 				["red.svg", "average-vehicle-speed", 600, 0, 25]
 			],
-			"stationType": "TrafficSensor",
+			"stationType": ["TrafficSensor"],
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
@@ -117,7 +117,7 @@
 			        ["yellow.svg", "temp_suolo", 1, -5, 0],
 				["red.svg", "temp_suolo", 1, -99999, -5]
 			],
-			"stationType": "RWISstation",
+			"stationType": ["RWISstation"],
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
@@ -130,7 +130,7 @@
 				["temp_suolo", 1],
 				["temp_aria", 1],
 				["prec_qta", 1],
-				["prec_tipo", 1]				
+				["prec_tipo", 1]
 			]
 		},
 
@@ -140,7 +140,7 @@
 				["yellow.svg", "number-available", 600, 1, 2],
 				["green.svg", "number-available", 600, 2, 100]
 			],
-			"stationType": "CarsharingStation",
+			"stationType": ["CarsharingStation"],
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
@@ -151,9 +151,14 @@
 		{
 			"id": "Bike sharing",
 			"icons": ["bike_sharing.svg", ["red.svg", "number-available", 300, 0, 1],
-				["green.svg", "number-available", 300, 1, 100]
+				["green.svg", "number-available", 300, 1, 100],
+				["green.svg", "availability", 300, 1, 100]
 			],
-			"stationType": "BikesharingStation",
+			"stationType": [
+              "BikesharingStation",
+				"Bicycle"
+            ],
+			"apiWhere": "or(and(stype.eq.\"Bicycle\",sorigin.eq.\"BIKE_SHARING_MERANO\"),stype.neq.\"Bicycle\")",
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
@@ -167,7 +172,7 @@
 				["yellow.svg", "number-available", 600, 1, 2],
 				["green.svg", "number-available", 600, 2, 100]
 			],
-			"stationType": "EChargingStation",
+			"stationType": ["EChargingStation"],
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
@@ -179,7 +184,7 @@
 			"icons": ["vms.svg", ["red.svg", "stato", 1, 0, 1],
 				["green.svg", "stato", 1, 1, 2]
 			],
-			"stationType": "VMS",
+			"stationType": ["VMS"],
 			"projection": "EPSG:4326",
 			"format": "integreen",
 			"custom-function": null,
@@ -201,7 +206,7 @@
 		"layers": [{
 			"id": "Vehicular time",
 			"icons": ["vehicular_times.svg"],
-			"stationType": "LinkStation",
+			"stationType": ["LinkStation"],
 			"format": "integreen",
 			"projection": "xxx",
 			"custom-function": null,

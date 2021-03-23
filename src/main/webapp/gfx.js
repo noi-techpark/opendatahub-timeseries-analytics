@@ -54,6 +54,7 @@ let statedata_status = [];
 const CAT_CONFIG_URL = "layers-config.json";
 
 let   CAT_BACKENDS = {};    // leave empty, automatic from config
+let   CAT_API_WHERE = {};
 
 const DEBUG = false;            // enable debug logging to the console
 const T0 = Number(new Date());  // for debug timing
@@ -306,7 +307,7 @@ const show_legend = () => {
             html += `<td><button class="gfx_nsel" id="gfx_ytoggle${ix}">&lt;</button>&nbsp;<button class="gfx_sel" disabled>&gt;</button></td>`;
         }
         html += `<td><button id="gfx_prepcsv${ix}">prepare CSV</button></td>`;
-        html += `<td><input style="width: 10px;" type="image" id="gfx_remove${ix}" src="icons/04_other_icons/remove.svg" alt="remove"></td>`;
+        html += `<td><input style="width: 10px;" type="image" id="gfx_remove${ix}" src="img/ic_remove.svg" alt="remove"></td>`;
         html += "</tr>";
 
     });
@@ -367,7 +368,8 @@ const init_tab_dataset = () => {
                     .filter( cat => cat.format === "integreen" )
                     .forEach( cat => {
                         opt += `<option value="${cat.id}">&rarr; ${cat.id}</option>\n`;
-                        CAT_BACKENDS[cat.id] = BASE_URL + "/flat/" + cat.stationType;
+                        CAT_BACKENDS[cat.id] = BASE_URL + "/flat/" + encodeURIComponent(cat.stationType);
+                        CAT_API_WHERE[cat.id] = cat.apiWhere;
                     });
             });
         qs("#gfx_selcategory").innerHTML = opt;
@@ -391,7 +393,8 @@ const init_tab_dataset = () => {
 
             default:
 
-                jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=sactive.eq.true", (data) => {
+                jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=sactive.eq.true" +
+                    (CAT_API_WHERE[cat]? "," + encodeURIComponent(CAT_API_WHERE[cat]): ""), (data) => {
                     data = data.data;
                     debug_log("got station details -> length = " + data.length);
                     let opt = `<option value="">Select station...</option>`;

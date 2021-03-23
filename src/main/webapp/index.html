@@ -38,10 +38,10 @@
 <div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
     <img id="logo" src="img/logo.svg">
     <div class="header-nav">
-        <div class="header-nav-item"        id="map_overview" onClick="showMapOverview()">
+        <div class="header-nav-item" id="map_overview" onClick="showMapOverview()">
             <span>Map Overview</span>
         </div>
-        <div class="header-nav-item active" id="headline"     onClick="showCharts()">
+        <div class="header-nav-item" id="headline"     onClick="showCharts()">
             <span>Charts</span>
         </div>
     </div>
@@ -58,7 +58,7 @@
 </div>
 
 <!-- *** MAPS ********************************************************************************* -->
-<div id="section_map" style="display:none; flex-direction:column; flex-grow:1; min-height:0px; background-color: #ffffff;">
+<div id="section_map" style="display: none; flex-direction:column; flex-grow:1; min-height:0px; background-color: #ffffff;">
 
     <div style="display:flex; flex-grow:1; min-height:0px">
 
@@ -117,6 +117,14 @@
 
     <script type="text/javascript">
         map_start_promise()
+        $(document).ready(function () {
+            let hash = location.hash;
+            if (hash !== undefined && hash !== "") {
+                showCharts();
+            } else {
+                showMapOverview();
+            }
+        })
     </script>
 
     <div style="flex-shrink:0; background-color:#dddddd">(C) 2018 :::: ::: :::</div>
@@ -125,7 +133,7 @@
 
 <!-- *** GFX (CHARTS) ************************************************************************* -->
 
-<div id="section_gfx" style="display:block; margin-top: 85px;">
+<div id="section_gfx" style="display:none; margin-top: 85px;">
 
     <div id="gfx">
 
@@ -144,7 +152,7 @@
             <div style="width: 360px; float:left;">
                 <p>OR SELECT A CUSTOM DATE RANGE</p>
                 <input id="gfx_fromdate" type="text" size="12">
-                <img src="icons//04_other_icons/arrow-forward.svg" alt="to" style="width: 10px; margin-left: 10px; margin-right: 10px">
+                <img src="img/ic_arrow_forward.svg" alt="to" style="width: 10px; margin-left: 10px; margin-right: 10px">
                 <input id="gfx_todate"   type="text" size="12">
                 (<span id="gfx_days"></span>)
             </div>
