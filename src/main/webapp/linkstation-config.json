@@ -139,6 +139,47 @@
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 201, 400],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 401, 999999]
 	],
+	"TN-Cadino->TN-Nord": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 500],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 501, 1000],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 1001, 999999]
+	],
+	"TN-Nord->TN-Cadino": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 500],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 501, 1000],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 1001, 999999]
+	],
+	"TN-Nord->TN-Maccani": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 350],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 351, 800],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 801, 999999]
+	],
+	"TN-Maccani->TN-Nord": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 350],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 351, 800],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 801, 999999]
+	],
+	"TN-Maccani->TN-Sud": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 350],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 351, 800],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 801, 999999]
+	],
+	"TN-Sud->TN-Maccani": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 350],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 351, 800],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 801, 999999]
+	],
+	"TN-Acquaviva->TN-Sud": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 450],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 451, 800],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 801, 999999]
+	],
+	"TN-Sud->TN-Acquaviva": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 450],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 451, 800],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 801, 999999]
+	],
+	
 	"druso-poste->Druso_Palermo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
