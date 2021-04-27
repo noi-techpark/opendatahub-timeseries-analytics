@@ -56,9 +56,11 @@
 			"id": "Parking",
 			"icons": ["parking.svg", ["red.svg", "free", 300, 0, 10],
 				["yellow.svg", "free", 300, 10, 100],
-				["green.svg", "free", 300, 100, 99999]
+				["green.svg", "free", 300, 100, 99999],
+				["red.svg", "free", 1, 0, 1],
+				["green.svg", "free", 1, 1, 99999]
 			],
-			"stationType": ["ParkingStation"],
+			"stationType": ["ParkingStation", "ParkingSensor"],
 			"projection": "EPSG:4326",
 			"format": "integreen",
 			"custom-function": null,
@@ -152,6 +154,7 @@
 			"id": "Bike sharing",
 			"icons": ["bike_sharing.svg", ["red.svg", "number-available", 300, 0, 1],
 				["green.svg", "number-available", 300, 1, 100],
+				["red.svg", "availability", 300, 0, 1],
 				["green.svg", "availability", 300, 1, 100]
 			],
 			"stationType": [
