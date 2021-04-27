@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="vendor/ol-ext/3.1.17/ol-ext.css">
     <link rel="stylesheet" href="map.css">
     <link rel="stylesheet" href="gfx.css">
+    <link rel="stylesheet" href="cookies.css">
     <link rel="stylesheet" href="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.css">
     <link href="https://fonts.googleapis.com/css?family=Roboto:200,400,500,700" rel="stylesheet">
 
@@ -20,10 +21,20 @@
     <script src="vendor/flot/0.8.3/jquery.flot.time.js"></script>
     <script src="vendor/flot-axislabels/2.0.1/jquery.flot.axislabels.js"></script>
     <script src="vendor/keycloak-js/keycloak.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag("js", new Date());
+    </script>
     <script src="dotenv.js"></script>
     <script src="authentification.js"></script>
     <script src="map.js"></script>
     <script src="gfx.js" defer></script>
+    <script src="cookies.js"></script>
 
     <style>
         body {
@@ -265,6 +276,21 @@
     </div>
 
 
+</div>
+
+<div class="alert alert-cookie" style="display: none;">
+    <span class="alert-title">We use cookies and other technologies.</span>
+    <p class="alert-content">
+        This website uses cookies, web beacons, JavaScript and similar
+        technologies. I agree that companies associated with this website
+        and third parties create pseudonymized user profiles for website
+        personalization, market research and advertising. Although the
+        generated information can be forwarded to third parties, it can not
+        be combined with personal information. Detailed information and how
+        to withdraw your consent can be found in the privacy policy of the
+        site.
+    </p>
+    <div class="accept-button-container">        <span>Accept</span>      </div>
 </div>
 
 </body>
