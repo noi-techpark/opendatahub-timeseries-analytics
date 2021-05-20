@@ -18,6 +18,8 @@ pipeline {
         KEYCLOAK_CLIENT_ID = "odh-mobility-analytics"
         KEYCLOAK_REDIRECT_URI = "https://analytics.opendatahub.bz.it/"
         KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI = "https://analytics.opendatahub.bz.it/callback.html"
+
+        GOOGLE_ANALYTICS_ID = credentials('google_analytics_id')
     }
 
     stages {
@@ -35,6 +37,8 @@ pipeline {
                     echo "KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}" >> .env
                     echo "KEYCLOAK_REDIRECT_URI=${KEYCLOAK_REDIRECT_URI}" >> .env
                     echo "KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI=${KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI}" >> .env
+
+                    echo "GOOGLE_ANALYTICS_ID=${GOOGLE_ANALYTICS_ID}" >> .env
 
                     cd infrastructure
                     ./dotenv-sed.sh
