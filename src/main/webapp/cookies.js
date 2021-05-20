@@ -3,7 +3,18 @@ $(document).ready(function()
 
     function activate_ga()
     {
-        gtag('config', env.GOOGLE_ANALYTICS_ID, { 'anonymize_ip': true, 'send_page_view': true });
+        let script = document.createElement('script');
+        script.setAttribute('src','https://www.googletagmanager.com/gtag/js?id=' + env.GOOGLE_ANALYTICS_ID);
+        script.setAttribute('async','true')
+        document.head.appendChild(script)
+        
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+           dataLayer.push(arguments);
+        }
+
+        gtag("js", new Date());
+        gtag('config', env.GOOGLE_ANALYTICS_ID, { 'anonymize_ip': true });
     }
 
     function checkCookieUserPreferences()
@@ -19,7 +30,12 @@ $(document).ready(function()
                     e.preventDefault();
                     document.cookie = 'banner=accepted; max-age=' + (60 * 60 * 24 * 365)
                     banner_div.style.display = 'none'
+                    activate_ga()
                 })
+            }
+            else
+            {
+               activate_ga()
             }
         }
         catch (e)
@@ -27,8 +43,8 @@ $(document).ready(function()
             console.log(e)
         }
     }
-
-    activate_ga()
-    checkCookieUserPreferences()
+    
+    if (env.GOOGLE_ANALYTICS_ID != '')
+       checkCookieUserPreferences()
 
 })
