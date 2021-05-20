@@ -19,7 +19,7 @@ pipeline {
         KEYCLOAK_REDIRECT_URI = "https://analytics.opendatahub.bz.it/"
         KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI = "https://analytics.opendatahub.bz.it/callback.html"
 
-        GOOGLE_ANALYTICS_ID = credentials('google_analytics_id')
+        GOOGLE_ANALYTICS_ID = 'G-NR6DZ2C7MX'
     }
 
     stages {
