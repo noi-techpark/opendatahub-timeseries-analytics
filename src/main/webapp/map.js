@@ -457,6 +457,13 @@ async function map_start_promise()
 					|| station_data_json.data[stationType].stations == undefined
 					|| jQuery.isEmptyObject(station_data_json.data[stationType].stations)){
 					station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
+						if(station_data_json.data == undefined
+							|| jQuery.isEmptyObject(station_data_json.data)
+							|| station_data_json.data[stationType] == undefined
+							|| station_data_json.data[stationType].stations == undefined
+							|| jQuery.isEmptyObject(station_data_json.data[stationType].stations)){
+							station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
+						}
 				}
 				var integreen_data = station_data_json.data[stationType].stations[scode];
 
@@ -512,138 +519,139 @@ async function map_start_promise()
 
 				try
 				{
-					let json_datatypes = Object.values(integreen_data.sdatatypes)
-					if(json_datatypes === undefined) {
-						valuesDiv.textContent = 'Error! Not authorized?';
-					}
+					if(integreen_data.sdatatypes == undefined || integreen_data.sdatatypes == null) {
+						valuesDiv.textContent = 'Error! No data type available';
+					} else {
+						let json_datatypes = Object.values(integreen_data.sdatatypes)
+						if (json_datatypes === undefined) {
+							valuesDiv.textContent = 'Error! Not authorized?';
+						}
 
-					for (var dt = 0; dt < json_datatypes.length; dt++)
-					{
-						let value_datatype = json_datatypes[dt];
-						let value_datatype_messurments = value_datatype.tmeasurements;
+						for (var dt = 0; dt < json_datatypes.length; dt++) {
+							let value_datatype = json_datatypes[dt];
+							let value_datatype_messurments = value_datatype.tmeasurements;
 
-						if(value_datatype_messurments !== undefined)
-							for (var dtm = 0; dtm < value_datatype_messurments.length; dtm++) {
-								let value_datatype_messurment = value_datatype_messurments[dtm];
-								let currentValuesDiv = moreValuesDiv;
-								for (let mDi = 0; mDi < layer_info['main-data'].length; mDi++) {
-									let mainData = layer_info['main-data'][mDi];
-									if (value_datatype.tname == mainData[0] && (mainData[1] == null || value_datatype_messurment.mperiod == mainData[1])) {
-										currentValuesDiv = mainValuesDiv;
-										break;
+							if (value_datatype_messurments !== undefined)
+								for (var dtm = 0; dtm < value_datatype_messurments.length; dtm++) {
+									let value_datatype_messurment = value_datatype_messurments[dtm];
+									let currentValuesDiv = moreValuesDiv;
+									for (let mDi = 0; mDi < layer_info['main-data'].length; mDi++) {
+										let mainData = layer_info['main-data'][mDi];
+										if (value_datatype.tname == mainData[0] && (mainData[1] == null || value_datatype_messurment.mperiod == mainData[1])) {
+											currentValuesDiv = mainValuesDiv;
+											break;
+										}
 									}
-								}
-								let row = document.createElement('div')
-								row.className = "details-valueItem1"
-								currentValuesDiv.appendChild(row)
-								let rowAlink = document.createElement('a')
+									let row = document.createElement('div')
+									row.className = "details-valueItem1"
+									currentValuesDiv.appendChild(row)
+									let rowAlink = document.createElement('a')
 
-								let mvalueSpan = document.createElement('span');
-								mvalueSpan.textContent = ('' + value_datatype_messurment.mvalue).toUpperCase();
-								rowAlink.appendChild(mvalueSpan)
+									let mvalueSpan = document.createElement('span');
+									mvalueSpan.textContent = ('' + value_datatype_messurment.mvalue).toUpperCase();
+									rowAlink.appendChild(mvalueSpan)
 
-								if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
-									layer_info.imageMapping.length > 0) {
-									for(let is_i = 0; is_i < layer_info.imageMapping.length; is_i++) {
-										if(value_datatype.tname == layer_info.imageMapping[is_i].dataType) {
-											mvalueSpan.textContent = '';
-											let value_parts = value_datatype_messurment.mvalue.split(layer_info.imageMapping[is_i].valueSeparator);
-											for(let vp_i = 0; vp_i < value_parts.length; vp_i++) {
-												let imgData = imageMapping[stationType][value_datatype.tname]?
-													imageMapping[stationType][value_datatype.tname].filter(function (imgData) {
-													return imgData.id == value_parts[vp_i]
-												}): [];
-												if(imgData.length > 0) {
-													let mvaluePartImg = document.createElement('img');
-													mvaluePartImg.src = 'data:image/*;base64,' + imgData[0][layer_info.imageMapping[is_i].metaDataImgData];
-													mvaluePartImg.alt = imgData[0].description.it.toUpperCase();
-													mvaluePartImg.title = imgData[0].description.it.toUpperCase();
-													mvaluePartImg.style.height = '16px';
-													mvalueSpan.appendChild(mvaluePartImg);
+									if (layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
+										layer_info.imageMapping.length > 0) {
+										for (let is_i = 0; is_i < layer_info.imageMapping.length; is_i++) {
+											if (value_datatype.tname == layer_info.imageMapping[is_i].dataType) {
+												mvalueSpan.textContent = '';
+												let value_parts = value_datatype_messurment.mvalue.split(layer_info.imageMapping[is_i].valueSeparator);
+												for (let vp_i = 0; vp_i < value_parts.length; vp_i++) {
+													let imgData = imageMapping[stationType][value_datatype.tname] ?
+														imageMapping[stationType][value_datatype.tname].filter(function (imgData) {
+															return imgData.id == value_parts[vp_i]
+														}) : [];
+													if (imgData.length > 0) {
+														let mvaluePartImg = document.createElement('img');
+														mvaluePartImg.src = 'data:image/*;base64,' + imgData[0][layer_info.imageMapping[is_i].metaDataImgData];
+														mvaluePartImg.alt = imgData[0].description.it.toUpperCase();
+														mvaluePartImg.title = imgData[0].description.it.toUpperCase();
+														mvaluePartImg.style.height = '16px';
+														mvalueSpan.appendChild(mvaluePartImg);
 
-                                                    let mvaluePartSpan = document.createElement('span');
-                                                    mvaluePartSpan.textContent = ' ' + imgData[0].description.it.toUpperCase();
-                                                    mvalueSpan.appendChild(mvaluePartSpan);
+														let mvaluePartSpan = document.createElement('span');
+														mvaluePartSpan.textContent = ' ' + imgData[0].description.it.toUpperCase();
+														mvalueSpan.appendChild(mvaluePartSpan);
 
-												} else {
-													let mvaluePartSpan = document.createElement('span');
-													mvaluePartSpan.textContent = value_parts[vp_i].toUpperCase();
-													mvalueSpan.appendChild(mvaluePartSpan);
-												}
-												if(vp_i != value_parts.length - 1) {
-													let mvaluePartSeparatorSpan = document.createElement('span');
-													mvaluePartSeparatorSpan .textContent = '|';
-													mvalueSpan.appendChild(mvaluePartSeparatorSpan );
+													} else {
+														let mvaluePartSpan = document.createElement('span');
+														mvaluePartSpan.textContent = value_parts[vp_i].toUpperCase();
+														mvalueSpan.appendChild(mvaluePartSpan);
+													}
+													if (vp_i != value_parts.length - 1) {
+														let mvaluePartSeparatorSpan = document.createElement('span');
+														mvaluePartSeparatorSpan.textContent = '|';
+														mvalueSpan.appendChild(mvaluePartSeparatorSpan);
+													}
 												}
 											}
 										}
+
 									}
 
+									let tnameMperiodSpan = document.createElement('span');
+									let tnameMperiodText = ' ' + value_datatype.tname + ' [' + value_datatype_messurment.mperiod + ']'
+									tnameMperiodSpan.textContent = tnameMperiodText.toUpperCase()
+									rowAlink.appendChild(tnameMperiodSpan)
+
+									let state = {
+										active_tab: 0,
+										height: "400px",
+										auto_refresh: false,
+										scale: {
+											from: new Date(new Date(value_datatype_messurment.mvalidtime).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+											to: new Date(value_datatype_messurment.mvalidtime).toISOString().split('T')[0]
+										},
+										graphs: [
+											{
+												category: layer_info.id,
+												station: integreen_data.scode,
+												station_name: integreen_data.sname,
+												data_type: value_datatype.tname,
+												unit: value_datatype.tunit,
+												period: value_datatype_messurment.mperiod,
+												yaxis: 1,
+												color: 3
+											}
+										]
+									};
+									rowAlink.href = location.origin + location.pathname + "#" + encodeURI(JSON.stringify(state))
+									rowAlink.target = '_blank'
+									row.appendChild(rowAlink)
+									let row2 = document.createElement('div')
+									row2.textContent = ' (' + new Date(value_datatype_messurment.mvalidtime).toLocaleString() + ')'
+									row2.className = "details-valueItem2"
+									currentValuesDiv.appendChild(row2)
 								}
-
-								let tnameMperiodSpan = document.createElement('span');
-								let tnameMperiodText = ' ' + value_datatype.tname + ' [' + value_datatype_messurment.mperiod + ']'
-								tnameMperiodSpan.textContent = tnameMperiodText.toUpperCase()
-								rowAlink.appendChild(tnameMperiodSpan)
-
-								let state = {
-									active_tab: 0,
-									height: "400px",
-									auto_refresh: false,
-									scale: {
-										from: new Date(new Date(value_datatype_messurment.mvalidtime).getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-										to: new Date(value_datatype_messurment.mvalidtime).toISOString().split('T')[0]
-									},
-									graphs: [
-										{
-											category: layer_info.id,
-											station: integreen_data.scode,
-											station_name: integreen_data.sname,
-											data_type: value_datatype.tname,
-											unit: value_datatype.tunit,
-											period: value_datatype_messurment.mperiod,
-											yaxis: 1,
-											color: 3
-										}
-									]
-								};
-								rowAlink.href = location.origin + location.pathname + "#" + encodeURI(JSON.stringify(state))
-								rowAlink.target = '_blank'
-								row.appendChild(rowAlink)
+							else {
+								let row = document.createElement('div')
+								row.className = "details-valueItem1"
+								let rowText = value_datatype.tname
+								row.textContent = rowText.toUpperCase()
+								moreValuesDiv.appendChild(row)
 								let row2 = document.createElement('div')
-								row2.textContent = ' (' + new Date(value_datatype_messurment.mvalidtime).toLocaleString() + ')'
+								row2.textContent = 'Error! Not authorized?'
 								row2.className = "details-valueItem2"
-								currentValuesDiv.appendChild(row2)
+								moreValuesDiv.appendChild(row2)
+
 							}
-						else {
-							let row = document.createElement('div')
-							row.className = "details-valueItem1"
-							let rowText = value_datatype.tname
-							row.textContent = rowText.toUpperCase()
-							moreValuesDiv.appendChild(row)
-							let row2 = document.createElement('div')
-							row2.textContent = 'Error! Not authorized?'
-							row2.className = "details-valueItem2"
-							moreValuesDiv.appendChild(row2)
-
 						}
-					}
-					valuesDiv.textContent = ''
-					valuesDiv.appendChild(mainValuesDiv)
-					valuesDiv.appendChild(moreValuesDiv)
-					if(mainValuesDiv.childElementCount > 0)
-					{
-						let moreButton = document.createElement('button')
-						moreButton.textContent =  'more'
-						valuesDiv.appendChild(moreButton)
+						valuesDiv.textContent = ''
+						valuesDiv.appendChild(mainValuesDiv)
+						valuesDiv.appendChild(moreValuesDiv)
+						if (mainValuesDiv.childElementCount > 0) {
+							let moreButton = document.createElement('button')
+							moreButton.textContent = 'more'
+							valuesDiv.appendChild(moreButton)
 
-						moreButton.addEventListener('click', function(e) {
-							moreValuesDiv.style.display = ''
-							moreButton.style.display = 'none'
-						})
-					} else
-					{
-						moreValuesDiv.style.display ='';
+							moreButton.addEventListener('click', function (e) {
+								moreValuesDiv.style.display = ''
+								moreButton.style.display = 'none'
+							})
+						} else {
+							moreValuesDiv.style.display = '';
+						}
 					}
 				}
 				catch (e)
