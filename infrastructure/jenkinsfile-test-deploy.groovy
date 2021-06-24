@@ -19,7 +19,6 @@ pipeline {
         KEYCLOAK_REDIRECT_URI = "https://analytics.opendatahub.testingmachine.eu/"
         KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI = "https://analytics.opendatahub.testingmachine.eu/callback.html"
 
-        GOOGLE_ANALYTICS_ID = credentials('google_analytics_id')
     }
 
     stages {
@@ -38,7 +37,6 @@ pipeline {
                     echo "KEYCLOAK_REDIRECT_URI=${KEYCLOAK_REDIRECT_URI}" >> .env
                     echo "KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI=${KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI}" >> .env
 
-                    echo "GOOGLE_ANALYTICS_ID=${GOOGLE_ANALYTICS_ID}" >> .env
 
                     cd infrastructure
                     ./dotenv-sed.sh
