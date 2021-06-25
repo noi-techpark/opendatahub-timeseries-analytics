@@ -109,6 +109,18 @@
 				["Average Speed Light Vehicles", 600]
 			]
 		},
+		
+		   {
+			"id": "BikeCounter",
+			"icons": ["traffic.svg"],
+			"stationType": ["BikeCounter"],
+			"format": "integreen",
+			"projection": "EPSG:4326",
+			"custom-function": null,
+			"color": "#CB8BC3",
+			"main-data": [
+			]
+		},
 
 		{
 			"id": "Road weather",

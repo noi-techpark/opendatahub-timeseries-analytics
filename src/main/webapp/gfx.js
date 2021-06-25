@@ -464,10 +464,40 @@ const init_tab_dataset = () => {
         }
      
     });
+    qs("#gfx_seldataset").addEventListener("change", (ev) => {
+        let cat = get_selval(qs("#gfx_selcategory"));
+        let station  = get_selval(qs("#gfx_selstation")).split(";")[0];
+        let type = get_selval(ev.target).split(";")[0];
+        jQuery.getJSON(CAT_BACKENDS[cat] + 
+            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq." + station + ",sactive.eq.true&select=mperiod",
+            (data) => {
+                    data = data.data;
+                    debug_log("got periods -> length = " + data.length);
+                    let opt = `<option value="">Select dataset...</option>`;
+                    opt += data
+                            .sort( (a, b) => a.mperiod > b.mperiod? 1: -1 )
+                            .map( period => { 
+                                    let periods = "";
+                                    if (period.mperiod !== undefined && period.mperiod !== "") {
+                                        periods = `${period.mperiod}`.trim();
+                                        if (periods.charAt(0) !== "[") {
+                                            periods = `[${periods}]`;
+                                        }
+                                    }
+                                    return `<option value="${period.mperiod}">&rarr; ${period.mperiod}</option>`; 
+                                  }
+                                )
+                            .join("\n");
+                    let next = qs("#gfx_selperiod");
+                    next.innerHTML = opt;
+                    next.style.display = "inline-block";
+        });
+    });
+     
 
     // initialize dataset select box: add event listener
 
-    qs("#gfx_seldataset").addEventListener("change", (ev) => {
+    /*qs("#gfx_seldatasets").addEventListener("change", (ev) => {
 
         let dataset = get_selval(ev.target);
         debug_log("event: #gfx_seldataset change fired with dataset = " + dataset);
@@ -489,20 +519,21 @@ const init_tab_dataset = () => {
         }
      
     });
-
+    */
     // initialize period select box: fill static values and add event listener
 
-    (() => {
+    /*(() => {
       let opt = `<option value="*">&rarr; preferred sample period is the smallest available</option>`;
       [1, 300, 600, 900, 1200, 1800, 3600, 5400, 7200, 9000, 10800, 12600, 14400, 21600, 86400].forEach( p => {
             opt += `<option value="${p}">&rarr; preferred sample period = ${p}s</option>`;
       }); 
       qs("#gfx_selperiod").innerHTML = opt;
-    })();
+    })();*/
 
     qs("#gfx_selperiod").addEventListener("change", (ev) => {
 
         let period = get_selval(ev.target);
+        qs("#gfx_addset").style.display = "inline-block";
         debug_log("event: #gfx_selperiod change fired with period = " + period);
 
     });
@@ -692,7 +723,7 @@ const load_data = () => {
                 url += "?limit=-1";
                 url += "&distinct=true";
                 url += "&select=mvalue,mvalidtime,mperiod";
-                url += "&where=and%28scode.eq.%22" + graph.station + "%22%2Csactive.eq.true%29";
+                url += "&where=scode.eq." + graph.station + ",mperiod.eq." + graph.period +",sactive.eq.true";
 
                 let headers = {};
                 if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN != "") {
