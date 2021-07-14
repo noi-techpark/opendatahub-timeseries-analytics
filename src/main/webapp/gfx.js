@@ -476,7 +476,7 @@ const init_tab_dataset = () => {
         let station  = get_selval(qs("#gfx_selstation")).split(";")[0];
         let type = get_selval(ev.target).split(";")[0];
         fetch(CAT_BACKENDS[cat] +
-            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq." + station + ",sactive.eq.true&select=mperiod",headers)
+            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq." + station + ",sactive.eq.true&select=mperiod",{headers: headers})
         .then(response => response.json())
         .then(
             (data) => {
