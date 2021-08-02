@@ -466,10 +466,19 @@ const init_tab_dataset = () => {
     });
     qs("#gfx_seldataset").addEventListener("change", (ev) => {
         let cat = get_selval(qs("#gfx_selcategory"));
+        const headers = {
+            "Content-Type":"application/json"
+        }
+
+        if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN != "") {
+            headers["Authorization"] = AUTHORIZATION_TOKEN;
+        }
         let station  = get_selval(qs("#gfx_selstation")).split(";")[0];
         let type = get_selval(ev.target).split(";")[0];
-        jQuery.getJSON(CAT_BACKENDS[cat] + 
-            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq." + station + ",sactive.eq.true&select=mperiod",
+        fetch(CAT_BACKENDS[cat] +
+            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq." + station + ",sactive.eq.true&select=mperiod",{headers: headers})
+        .then(response => response.json())
+        .then(
             (data) => {
                     data = data.data;
                     debug_log("got periods -> length = " + data.length);
@@ -491,6 +500,9 @@ const init_tab_dataset = () => {
                     let next = qs("#gfx_selperiod");
                     next.innerHTML = opt;
                     next.style.display = "inline-block";
+        })
+        .catch((error) => {
+            console.error('Error:', error);
         });
     });
      
