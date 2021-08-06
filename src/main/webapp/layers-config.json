@@ -112,14 +112,16 @@
 		
 		   {
 			"id": "BikeCounter",
-			"icons": ["traffic.svg"],
+			"icons": ["traffic.svg", ["green.svg", "vehicle detection (count)", 3600, 0, 49],
+				  ["yellow.svg", "vehicle detection (count)", 3600, 50, 149],
+				  ["red.svg", "vehicle detection (count)", 3600, 150, 999999]
+		        ],
 			"stationType": ["BikeCounter"],
 			"format": "integreen",
 			"projection": "EPSG:4326",
 			"custom-function": null,
 			"color": "#CB8BC3",
-			"main-data": [
-			]
+			"main-data": []
 		},
 
 		{
