@@ -121,9 +121,7 @@
 			"projection": "EPSG:4326",
 			"custom-function": null,
 			"color": "#CB8BC3",
-			"main-data": [
-				["vehicle detection (count)", 3600]
-			]
+			"main-data": []
 		},
 
 		{
