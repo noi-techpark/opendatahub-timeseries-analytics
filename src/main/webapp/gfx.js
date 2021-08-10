@@ -476,7 +476,7 @@ const init_tab_dataset = () => {
         let station  = get_selval(qs("#gfx_selstation")).split(";")[0];
         let type = get_selval(ev.target).split(";")[0];
         fetch(CAT_BACKENDS[cat] +
-            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq." + station + ",sactive.eq.true&select=mperiod",{headers: headers})
+            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22,sactive.eq.true&select=mperiod",{headers: headers})
         .then(response => response.json())
         .then(
             (data) => {
@@ -735,7 +735,7 @@ const load_data = () => {
                 url += "?limit=-1";
                 url += "&distinct=true";
                 url += "&select=mvalue,mvalidtime,mperiod";
-                url += "&where=scode.eq." + graph.station + ",mperiod.eq." + graph.period +",sactive.eq.true";
+                url += "&where=scode.eq.%22" + graph.station + "%22,mperiod.eq." + graph.period +",sactive.eq.true";
 
                 let headers = {};
                 if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN != "") {
