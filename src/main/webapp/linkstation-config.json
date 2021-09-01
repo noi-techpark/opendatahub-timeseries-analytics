@@ -179,7 +179,71 @@
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 451, 800],
 		["#ff0000", "Bluetooth Elapsed time (test)", 600, 801, 999999]
 	],
-	
+	"roma_sud->sinigo": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 350],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 351, 700],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 701, 999999]
+	],
+	"sinigo->roma_sud": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 350],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 351, 700],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 701, 999999]
+	],
+	"zuegg-palade->piave-palade": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 300],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 301, 700],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 701, 999999]
+	],
+	"piave-palade->piave_matteotti": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 250],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 251, 999999]
+	],
+	"piave_matteotti->roma_nord": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 250],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 251, 500],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 501, 999999]
+	],
+	"terme_ovest->piave_matteotti": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 250],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 251, 500],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 501, 999999]
+	],
+	"roma_nord->terme_est": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 250],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 251, 999999]
+	],
+	"cavour->terme_est": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 350],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 351, 999999]
+	],
+	"terme_est->terme_ovest": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 150],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 151, 350],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 351, 999999]
+	],
+	"terme_ovest->liberta-corse": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
+	],
+	"petrarca->ponte_rezia": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
+	],
+	"mazzini->ponte_rezia": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
+	],
+	"stazione->mazzini": [
+		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
+		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
+		["#ff0000", "Bluetooth Elapsed time (test)", 600, 201, 999999]
+	],
 	"druso-poste->Druso_Palermo": [
 		["#00ff00", "Bluetooth Elapsed time (test)", 600, 0, 100],
 		["#ffff00", "Bluetooth Elapsed time (test)", 600, 101, 200],
