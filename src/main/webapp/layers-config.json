@@ -198,9 +198,9 @@
 		},
 		{
 			"id": "Bike chargers",
-			"icons": ["e_mobility.svg", ["red.svg", "number-available", 600, 0, 1],
-				["yellow.svg", "number-available", 600, 1, 2],
-				["green.svg", "number-available", 600, 2, 100]
+			"icons": ["e_mobility.svg", ["red.svg", "freebay", 600, 0, 1],
+				["yellow.svg", "freebay", 600, 1, 2],
+				["green.svg", "freebay", 600, 2, 100]
 			],
 			"stationType": ["BIKE_CHARGER"],
 			"format": "integreen",
