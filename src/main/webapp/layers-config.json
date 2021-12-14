@@ -197,6 +197,19 @@
 			"main-data": []
 		},
 		{
+			"id": "Bike chargers",
+			"icons": ["e_mobility.svg", ["red.svg", "number-available", 600, 0, 1],
+				["yellow.svg", "number-available", 600, 1, 2],
+				["green.svg", "number-available", 600, 2, 100]
+			],
+			"stationType": ["BIKE_CHARGER"],
+			"format": "integreen",
+			"projection": "EPSG:4326",
+			"custom-function": null,
+			"color": "#BFCE89",
+			"main-data": []
+		},
+		{
 			"id": "VMS",
 			"icons": ["vms.svg", ["red.svg", "stato", 1, 0, 1],
 				["green.svg", "stato", 1, 1, 2]
