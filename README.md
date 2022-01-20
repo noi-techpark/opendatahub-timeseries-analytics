@@ -1,5 +1,7 @@
 # it.bz.opendatahub.analytics
 
+[![CI](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/ci.yml)
+
 This is a web application hosted on https://analytics.opendatahub.bz.it to show
 data from the [Open Data Hub](https://opendatahub.bz.it) in various forms. It is
 also possible to download data to process it with your preferred tool on your
