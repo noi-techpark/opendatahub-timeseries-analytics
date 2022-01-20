@@ -1,21 +1,6 @@
-name: ci it.bz.opendatahub.analytics
+name: CI
 
-on: 
-  push:
-   # commented out because a lot of branches exist in this repo
-   # branches: [development, master]
-    paths:
-      - "!README.md"
-      
-  pull_request:
-   # commented out because a lot of branches exist in this repo
-   # branches: [development, master]
-    paths:
-      - "!README.md"
-
-
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+on: push
 
 jobs:
   build:
