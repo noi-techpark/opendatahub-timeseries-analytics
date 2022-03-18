@@ -25,13 +25,13 @@ corresponding API key has been given, otherwise the standard OSM Tiles
 (https://www.openstreetmap.org) are used. See env variable `THUNDERFOREST_MAP_API_KEY`.
 
 ## Continuous Deployment
-See https://jenkins.testingmachine.eu/job/it.bz.opendatahub.analytics/
+See https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions
 
-- On testing the static web app will be automatically deployed on each push to the development branch
-- On production the static web app will be manually deployed from the master branch
+- On testing the static web app will be automatically deployed on each push to the main branch
+- On production the static web app will be manually deployed from the prod branch
 
 ## Continous Integration
-See https://ci.opendatahub.bz.it/job/it.bz.opendatahub.analytics/
+See https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions
 
 - The CI pipeline runs on every branch including pull requests and gives feedback to the Github repo
 
