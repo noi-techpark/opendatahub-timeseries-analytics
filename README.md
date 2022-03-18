@@ -1,6 +1,6 @@
 # it.bz.opendatahub.analytics
 
-[![CI](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/ci.yml/badge.svg)](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/ci.yml)
+[![CI/CD](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/main.yml/badge.svg)](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/main.yml)
 
 This is a web application hosted on https://analytics.opendatahub.bz.it to show
 data from the [Open Data Hub](https://opendatahub.bz.it) in various forms. It is
@@ -11,13 +11,14 @@ machine.
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents** 
 
-- [Local development](#local-development)
-- [Docker environment (optional)](#docker-environment-optional)
-  - [Installation](#installation)
-  - [Start and stop the containers](#start-and-stop-the-containers)
-  - [Running commands inside the container](#running-commands-inside-the-container)
-  - [Map style](#map-style)
-- [License](#license)
+- [it.bz.opendatahub.analytics](#itbzopendatahubanalytics)
+  - [Local development](#local-development)
+  - [Docker environment (optional)](#docker-environment-optional)
+    - [Installation](#installation)
+    - [Start and stop the containers](#start-and-stop-the-containers)
+    - [Running commands inside the container](#running-commands-inside-the-container)
+    - [Map style](#map-style)
+  - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
