@@ -83,6 +83,9 @@ jobs:
 
           X_GOOGLE_ANALYTICS_ID: "G-NR6DZ2C7MX"
 
+      - name: Run dotenv-sed.sh
+        run: cd infrastructure && ./dotenv-sed.sh
+
       - name: Sync to S3 bucket
         uses: noi-techpark/github-actions/aws-s3-bucket-sync@v2
         with:
