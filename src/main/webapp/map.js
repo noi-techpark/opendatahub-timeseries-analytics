@@ -935,7 +935,7 @@ async function map_start_promise()
 				}
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=sactive.eq.true" +
+					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=" +
 					(layer_info.apiWhere? "," + encodeURIComponent(layer_info.apiWhere): ""),
 					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
@@ -960,7 +960,7 @@ async function map_start_promise()
 						"&distinct=true" +
 						"&select=tmeasurements" +
 						"&showNull=true" +
-						"&where=sactive.eq.true," +
+						"&where=" +
 							(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere) + ",": "") +
 							encodeURIComponent(query_where_datatypes),
 						AUTHORIZATION_TOKEN, loadingItem)
@@ -1234,7 +1234,7 @@ async function map_start_promise()
 					"?limit=-1" +
 					"&distinct=true" +
 					"&select=tmeasurements" +
-					"&where=sactive.eq.true," +
+					"&where=" +
 						(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere) + ",": "") +
 						encodeURIComponent(query_where_datatypes),
 					AUTHORIZATION_TOKEN, loadingItem)

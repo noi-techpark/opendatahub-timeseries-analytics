@@ -393,7 +393,7 @@ const init_tab_dataset = () => {
 
             default:
 
-                jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=sactive.eq.true" +
+                jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=" +
                     (CAT_API_WHERE[cat]? "," + encodeURIComponent(CAT_API_WHERE[cat]): ""), (data) => {
                     data = data.data;
                     debug_log("got station details -> length = " + data.length);
@@ -435,7 +435,7 @@ const init_tab_dataset = () => {
             default: 
 
                 jQuery.getJSON(CAT_BACKENDS[cat] + 
-                               "/*/?limit=-1&distinct=true&where=and%28scode.eq.%22" + station + "%22%2Csactive.eq.true%29",
+                               "/*/?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22",
                                (data) => {
                     data = data.data;
                     debug_log("got data types -> length = " + data.length);
@@ -476,7 +476,7 @@ const init_tab_dataset = () => {
         let station  = get_selval(qs("#gfx_selstation")).split(";")[0];
         let type = get_selval(ev.target).split(";")[0];
         fetch(CAT_BACKENDS[cat] +
-            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22,sactive.eq.true&select=mperiod",{headers: headers})
+            "/" + type +"/latest?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22&select=mperiod",{headers: headers})
         .then(response => response.json())
         .then(
             (data) => {
