@@ -394,7 +394,7 @@ const init_tab_dataset = () => {
             default:
 
                 jQuery.getJSON(CAT_BACKENDS[cat] + "?limit=-1&distinct=true&where=" +
-                    (CAT_API_WHERE[cat]? "," + encodeURIComponent(CAT_API_WHERE[cat]): ""), (data) => {
+                    (CAT_API_WHERE[cat]? encodeURIComponent(CAT_API_WHERE[cat]): ""), (data) => {
                     data = data.data;
                     debug_log("got station details -> length = " + data.length);
                     let opt = `<option value="">Select station...</option>`;

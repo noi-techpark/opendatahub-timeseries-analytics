@@ -936,7 +936,7 @@ async function map_start_promise()
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=" +
-					(layer_info.apiWhere? "," + encodeURIComponent(layer_info.apiWhere): ""),
+					(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere): ""),
 					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
 				if(layer_info.icons.length > 1) {
