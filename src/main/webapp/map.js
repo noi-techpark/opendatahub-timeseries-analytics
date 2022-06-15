@@ -520,7 +520,7 @@ async function map_start_promise()
 				try
 				{
 					if(integreen_data.sdatatypes == undefined || integreen_data.sdatatypes == null) {
-						valuesDiv.textContent = 'Error! No data type available';
+						valuesDiv.textContent = 'This ' + integreen_data['stype'] + ' has no associated types or measurements, or your privileges are not sufficient';
 					} else {
 						let json_datatypes = Object.values(integreen_data.sdatatypes)
 						if (json_datatypes === undefined) {
