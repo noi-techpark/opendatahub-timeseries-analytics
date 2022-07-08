@@ -21,28 +21,7 @@ cc.run({
 
     onFirstAction: function() {},
 
-    onAccept: function (cookie) {
-
-        try {
-            if (cookie.categories[1] === "targeting") {
-                let script = document.createElement('script');
-                script.setAttribute('src','https://www.googletagmanager.com/gtag/js?id=' + env.GOOGLE_ANALYTICS_ID);
-                script.setAttribute('async','true')
-                document.head.appendChild(script)
-                
-                window.dataLayer = window.dataLayer || [];
-                function gtag() {
-                dataLayer.push(arguments);
-                }
-    
-                gtag("js", new Date());
-                gtag('config', env.GOOGLE_ANALYTICS_ID, { 'anonymize_ip': true });
-            }
-        } catch (error) {
-            console.error(error);
-        }
-
-    },
+    onAccept: function (cookie) {},
 
     onChange: function (cookie, changed_preferences) {},
 

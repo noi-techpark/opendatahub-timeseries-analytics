@@ -81,8 +81,6 @@ jobs:
           X_KEYCLOAK_REDIRECT_URI: "https://analytics.opendatahub.com/"
           X_KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI: "https://analytics.opendatahub.com/callback.html"
 
-          X_GOOGLE_ANALYTICS_ID: "G-NR6DZ2C7MX"
-
       - name: Run dotenv-sed.sh
         run: cd infrastructure && ./dotenv-sed.sh
 
