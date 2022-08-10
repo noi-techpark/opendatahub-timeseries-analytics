@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
     <title>bz analytics</title>
@@ -11,7 +12,7 @@
     <link rel="stylesheet" href="gfx.css">
     <link rel="stylesheet" href="cookieconsent.css">
     <link rel="stylesheet" href="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.css">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:200,400,500,700" rel="stylesheet">
+    <link href="https://fonts.testingmachine.eu/roboto/style.css" rel="stylesheet">
 
     <script src="vendor/openlayers/v5.3.0-dist/ol.js"></script>
     <script src="vendor/jquery/3.3.1/jquery.js"></script>
@@ -28,21 +29,9 @@
 
     <!-- Matomo -->
     <script type="text/plain" data-cookiecategory="targeting">
-        var _paq = (window._paq = window._paq || []);
-        /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-        _paq.push(["trackPageView"]);
-        _paq.push(["enableLinkTracking"]);
-        (function () {
-            var u = "https://digital.matomo.cloud/";
-            _paq.push(["setTrackerUrl", u + "matomo.php"]);
-            _paq.push(["setSiteId", "5"]);
-            var d = document,
-                g = d.createElement("script"),
-                s = d.getElementsByTagName("script")[0];
-            g.async = true;
-            g.src = "//cdn.matomo.cloud/digital.matomo.cloud/matomo.js";
-            s.parentNode.insertBefore(g, s);
-        })();
+        var _paq = (window._paq = window._paq || []); /* tracker methods like "setCustomDimension" should be called before "trackPageView" */ _paq.push(["trackPageView"]); _paq.push(["enableLinkTracking"]); (function () { var u = "https://digital.matomo.cloud/";
+        _paq.push(["setTrackerUrl", u + "matomo.php"]); _paq.push(["setSiteId", "5"]); var d = document, g = d.createElement("script"), s = d.getElementsByTagName("script")[0]; g.async = true; g.src = "//cdn.matomo.cloud/digital.matomo.cloud/matomo.js";
+        s.parentNode.insertBefore(g, s); })();
     </script>
     <!-- End Matomo Code -->
 
@@ -56,211 +45,213 @@
 
 <body style="display:flex; flex-direction:column; overflow-y:scroll;">
 
-<div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
-    <img id="logo" src="img/logo.svg">
-    <div class="header-nav">
-        <div class="header-nav-item" id="map_overview" onClick="showMapOverview()">
-            <span>Map Overview</span>
+    <div id="header" style="display:flex; flex-shrink:0; flex-wrap: nowrap; overflow: hidden">
+        <img id="logo" src="img/logo.svg">
+        <div class="header-nav">
+            <div class="header-nav-item" id="map_overview" onClick="showMapOverview()">
+                <span>Map Overview</span>
+            </div>
+            <div class="header-nav-item" id="headline" onClick="showCharts()">
+                <span>Charts</span>
+            </div>
         </div>
-        <div class="header-nav-item" id="headline"     onClick="showCharts()">
-            <span>Charts</span>
-        </div>
-    </div>
-    <div class="header-login">
-        <a id="login_button" class="login_button" style="display: none;">Login <img src="img/login.svg"></a>
-        <div id="logout-container" class="logout-container" style="display: none;">
-             <img src="img/user.svg">
-             <span id="logoutuser">user</span>
-             <a id="logout_button" class="logout_button">
+        <div class="header-login">
+            <a id="login_button" class="login_button" style="display: none;">Login <img src="img/login.svg"></a>
+            <div id="logout-container" class="logout-container" style="display: none;">
+                <img src="img/user.svg">
+                <span id="logoutuser">user</span>
+                <a id="logout_button" class="logout_button">
                  Logout
              </a>
-          </div>
-    </div>
-</div>
-
-<!-- *** MAPS ********************************************************************************* -->
-<div id="section_map" style="display: none; flex-direction:column; flex-grow:1; min-height:0px; background-color: #ffffff;">
-
-    <div style="display:flex; flex-grow:1; min-height:0px">
-
-        <div class="layers">
-            <div id="layers-container">
-
-            </div>
-            <div class="layers-footer">
-                <img src="img/logoMenu.png" alt="NOI" />
-                <img src="img/life.png" alt="life" />
-                <img src="img/brennerlec.png" alt="BRENNERLEC" />
             </div>
         </div>
+    </div>
 
-        <div style="background-color:#c7e0bd; position:relative; flex-grow:1; min-width:0px ">
-            <!--
+    <!-- *** MAPS ********************************************************************************* -->
+    <div id="section_map" style="display: none; flex-direction:column; flex-grow:1; min-height:0px; background-color: #ffffff;">
+
+        <div style="display:flex; flex-grow:1; min-height:0px">
+
+            <div class="layers">
+                <div id="layers-container">
+
+                </div>
+                <div class="layers-footer">
+                    <img src="img/logoMenu.png" alt="NOI" />
+                    <img src="img/life.png" alt="life" />
+                    <img src="img/brennerlec.png" alt="BRENNERLEC" />
+                </div>
+            </div>
+
+            <div style="background-color:#c7e0bd; position:relative; flex-grow:1; min-width:0px ">
+                <!--
             <div id="zoomlevel" style="position:absolute; right:2px; top:2px; z-index: 200000; background-color:white;padding:4px">Z</div>
              -->
-            <div id="map" style="width:100%; height:100%">
-            </div>
-            <div id="unsee-all" class="unsee-all">
-                <img src="img/ic_hide.svg">
-                <span>Unsee All</span>
-            </div>
-        </div>
-
-        <div id="details-container" style="overflow-y:scroll; display: none">
-            <div id="details-header" class="details-header">
-                <div class="ic-container">
-                    <img id="details-icon" src="img/marker/icons/bike_sharing.svg">
+                <div id="map" style="width:100%; height:100%">
                 </div>
-                <span id="details-title">title</span>
-                <div style="align-self: start; width: 12px">
-                    <img id="details-close" src="img/close.svg"/>
+                <div id="unsee-all" class="unsee-all">
+                    <img src="img/ic_hide.svg">
+                    <span>Unsee All</span>
                 </div>
             </div>
 
-            <div id="details-content"></div>
+            <div id="details-container" style="overflow-y:scroll; display: none">
+                <div id="details-header" class="details-header">
+                    <div class="ic-container">
+                        <img id="details-icon" src="img/marker/icons/bike_sharing.svg">
+                    </div>
+                    <span id="details-title">title</span>
+                    <div style="align-self: start; width: 12px">
+                        <img id="details-close" src="img/close.svg" />
+                    </div>
+                </div>
+
+                <div id="details-content"></div>
+            </div>
+
         </div>
+
+        <div id="error-console" style="height:1.5em; flex-shrink:0;color:red; background-color:black"></div>
+
+        <div id="map-popup" style="display:none">
+
+            <div id="map-popup-box">
+                <div id="map-popup-close">X</div>
+                <div id="map-popup-title">title</div>
+                <div id="map-popup-content">content</div>
+            </div>
+
+            <div id="map-popup-arrow">
+                <div></div>
+            </div>
+
+        </div>
+
+        <script type="text/javascript">
+            map_start_promise()
+            $(document).ready(function() {
+                let hash = location.hash;
+                if (hash !== undefined && hash !== "") {
+                    showCharts();
+                } else {
+                    showMapOverview();
+                }
+            })
+        </script>
+
+        <div style="flex-shrink:0; background-color:#dddddd">(C) 2018 :::: ::: :::</div>
 
     </div>
 
-    <div id="error-console" style="height:1.5em; flex-shrink:0;color:red; background-color:black"></div>
+    <!-- *** GFX (CHARTS) ************************************************************************* -->
 
-    <div id="map-popup" style="display:none">
+    <div id="section_gfx" style="display:none; margin-top: 85px;">
 
-        <div id="map-popup-box">
-            <div id="map-popup-close">X</div>
-            <div id="map-popup-title">title</div>
-            <div id="map-popup-content">content</div>
-        </div>
+        <div id="gfx">
 
-        <div id="map-popup-arrow"><div></div></div>
+            <!-- x-axis (time) range selection -->
 
-    </div>
+            <div id="gfx_time">
 
-    <script type="text/javascript">
-        map_start_promise()
-        $(document).ready(function () {
-            let hash = location.hash;
-            if (hash !== undefined && hash !== "") {
-                showCharts();
-            } else {
-                showMapOverview();
-            }
-        })
-    </script>
+                <div style="width: 470px; float:left;">
+                    <p>PICK PRESET VALUES</p>
+                    <button id="gfx_range_today">Today</button>
+                    <button id="gfx_range_ytoday">Yesterday &amp; today</button>
+                    <button id="gfx_range_week">One week</button>
+                    <button id="gfx_range_month">One month</button>
+                </div>
 
-    <div style="flex-shrink:0; background-color:#dddddd">(C) 2018 :::: ::: :::</div>
+                <div style="width: 360px; float:left;">
+                    <p>OR SELECT A CUSTOM DATE RANGE</p>
+                    <input id="gfx_fromdate" type="text" size="12">
+                    <img src="img/ic_arrow_forward.svg" alt="to" style="width: 10px; margin-left: 10px; margin-right: 10px">
+                    <input id="gfx_todate" type="text" size="12"> (
+                    <span id="gfx_days"></span>)
+                </div>
 
-</div>
+                <div style="width: 210px; float: left;">
+                    <p>AND UPDATE THE PLOT</p>
+                    <button id="gfx_update_range">Update</button>
+                </div>
 
-<!-- *** GFX (CHARTS) ************************************************************************* -->
+                <div style="float:clear;">
+                </div>
 
-<div id="section_gfx" style="display:none; margin-top: 85px;">
-
-    <div id="gfx">
-
-        <!-- x-axis (time) range selection -->
-
-        <div id="gfx_time">
-
-            <div style="width: 470px; float:left;">
-                <p>PICK PRESET VALUES</p>
-                <button id="gfx_range_today">Today</button>
-                <button id="gfx_range_ytoday">Yesterday &amp; today</button>
-                <button id="gfx_range_week">One week</button>
-                <button id="gfx_range_month">One month</button>
             </div>
 
-            <div style="width: 360px; float:left;">
-                <p>OR SELECT A CUSTOM DATE RANGE</p>
-                <input id="gfx_fromdate" type="text" size="12">
-                <img src="img/ic_arrow_forward.svg" alt="to" style="width: 10px; margin-left: 10px; margin-right: 10px">
-                <input id="gfx_todate"   type="text" size="12">
-                (<span id="gfx_days"></span>)
+            <!-- chart -->
+
+            <div id="gfx_plot">
+                <div id="gfx_flot"></div>
+                <div id="gfx_wait"><br><br><br>no dataset selected</div>
             </div>
 
-            <div style="width: 210px; float: left;">
-                <p>AND UPDATE THE PLOT</p>
-                <button id="gfx_update_range">Update</button>
+            <!-- spacer -->
+
+            <div id="gfx_vspacer"></div>
+
+            <!-- tabs -->
+
+            <div id="gfx_tabs">
+                <span class="gfx_tab"><a href="">Legend</a></span><span class="gfx_tab"><a href="">Extras</a></span>
             </div>
 
-            <div style="float:clear;">
-            </div>
+            <!-- tabbed panels -->
 
-        </div>
+            <div id="gfx_tabbed_panels">
 
-        <!-- chart -->
+                <div id="gfx_legend">
 
-        <div id="gfx_plot">
-            <div id="gfx_flot"></div>
-            <div id="gfx_wait"><br><br><br>no dataset selected</div>
-        </div>
+                    <div id="gfx_moredata">
 
-        <!-- spacer -->
+                        <p>ADD A DATASET TO THE CHART</p>
 
-        <div id="gfx_vspacer"></div>
+                        <table>
+                            <tr>
+                                <td>
+                                    <select id="gfx_selcategory">
+                                </select>
+                                </td>
 
-        <!-- tabs -->
+                                <td>
+                                    <select id="gfx_selstation">
+                                </select>
+                                </td>
 
-        <div id="gfx_tabs">
-            <span class="gfx_tab"><a href="">Legend</a></span><span class="gfx_tab"><a href="">Extras</a></span>
-        </div>
+                                <td>
+                                    <select id="gfx_seldataset">
+                                </select>
+                                </td>
 
-        <!-- tabbed panels -->
+                                <td>
+                                    <select id="gfx_selperiod">
+                                </select>
+                                </td>
 
-        <div id="gfx_tabbed_panels">
+                                <td>
+                                    <button id="gfx_addset">Add</button>
+                                </td>
 
-            <div id="gfx_legend">
+                            </tr>
+                        </table>
 
-                <div id="gfx_moredata">
-
-                    <p>ADD A DATASET TO THE CHART</p>
+                    </div>
 
                     <table>
-                        <tr>
-                            <td>
-                                <select id="gfx_selcategory">
-                                </select>
-                            </td>
-
-                            <td>
-                                <select id="gfx_selstation">
-                                </select>
-                            </td>
-
-                            <td>
-                                <select id="gfx_seldataset">
-                                </select>
-                            </td>
-
-                            <td>
-                                <select id="gfx_selperiod">
-                                </select>
-                            </td>
-
-                            <td>
-                                <button id="gfx_addset">Add</button>
-                            </td>
-
-                        </tr>
                     </table>
+
+                    <p>
+                        <button id="gfx_live">auto refresh off</button>
+                    </p>
+
+                    <div id="gfx_error_log"></div>
 
                 </div>
 
-                <table>
-                </table>
+                <div id="gfx_extras">
 
-                <p>
-                    <button id="gfx_live">auto refresh off</button>
-                </p>
-
-                <div id="gfx_error_log"></div>
-
-            </div>
-
-            <div id="gfx_extras">
-
-                <p>SELECT PLOT HEIGHT<br><br>
-                    <select id="gfx_hpx">
+                    <p>SELECT PLOT HEIGHT<br><br>
+                        <select id="gfx_hpx">
                         <option>200px</option>
                         <option>300px</option>
                         <option>400px</option>
@@ -273,25 +264,24 @@
                         <option>1100px</option>
                         <option>1200px</option>
                     </select>
-                </p>
+                    </p>
 
-                <p>PERMANENT LINK<br><br>
-                    <a href="" id="gfx_perma">permanent link to copy (warning: long)</a>
-                </p>
+                    <p>PERMANENT LINK<br><br>
+                        <a href="" id="gfx_perma">permanent link to copy (warning: long)</a>
+                    </p>
+
+                </div>
 
             </div>
 
         </div>
 
+
     </div>
 
-
-</div>
-
-<script defer src="cookieconsent.js"></script>
-<script defer src="cookieconsent-init.js"></script>
+    <script defer src="cookieconsent.js"></script>
+    <script defer src="cookieconsent-init.js"></script>
 
 </body>
 
 </html>
-
