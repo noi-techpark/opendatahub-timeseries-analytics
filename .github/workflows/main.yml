@@ -64,6 +64,7 @@ jobs:
     concurrency: deploy-prod
     env:
       AWS_S3_BUCKET_NAME : 'odh.analytics-prod'
+      SCRIPTS_HOST: 'https://scripts.opendatahub.com'
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
@@ -80,6 +81,9 @@ jobs:
           X_KEYCLOAK_CLIENT_ID: "odh-mobility-analytics"
           X_KEYCLOAK_REDIRECT_URI: "https://analytics.opendatahub.com/"
           X_KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI: "https://analytics.opendatahub.com/callback.html"
+
+      - name: Change scripts host to prod
+        run: sed -i -e "s%https://scripts.opendatahub.testingmachine.eu%${{env.SCRIPTS_HOST}}%g" src/main/webapp/index.html
 
       - name: Run dotenv-sed.sh
         run: cd infrastructure && ./dotenv-sed.sh
