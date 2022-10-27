@@ -305,6 +305,9 @@ async function map_start_promise()
                         case 'wms':
                             layer = await loadWMSLayer(layer_info)
                             break;
+							case "road_events":
+									layer = await loadRoadEventsLayer(layer_info, layer_div)
+									break;
                         default:
                             // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
                             alert('Unknow format: ' + format)
@@ -314,6 +317,7 @@ async function map_start_promise()
                 catch (e)
                 {
                     error_console.textContent = format_time() + ': ' + e;
+					console.error(e)
                 }
                 finally
                 {
@@ -415,41 +419,108 @@ async function map_start_promise()
 
 		popup_element.style.display = 'block'
 
+		//
+		// handle the click event on the map
 		map.on('click', async function(e)
 		{
 			var features = map.getFeaturesAtPixel(e.pixel);
-			if (features)
+
+			// close the details popup when the click was not on a feature - (does not work)
+			if (!features) {
+				popup_overlay.setPosition()
+				return
+			}
+
+			// clustered icon? simply zoom!
+			if (features[0].get("features").length > 1)
 			{
-				// clustered icon? simply zoom!
-				if (features[0].get("features").length > 1)
-				{
-					let currZoom = map.getView().getZoom();
-					let nextZoom = currZoom + 1;
-					let nextResolution = map.getView().getResolutionForZoom(nextZoom)
-					let newcenter = map.getView().calculateCenterZoom(nextResolution, features[0].getGeometry().getCoordinates());
-					map.getView().setCenter(newcenter)
-					map.getView().setZoom(nextZoom)
-					return;
-				}
+				let currZoom = map.getView().getZoom();
+				let nextZoom = currZoom + 1;
+				let nextResolution = map.getView().getResolutionForZoom(nextZoom)
+				let newcenter = map.getView().calculateCenterZoom(nextResolution, features[0].getGeometry().getCoordinates());
+				map.getView().setCenter(newcenter)
+				map.getView().setZoom(nextZoom)
+				return;
+			}
 
-				if (selectedFeature != null)
-					selectedFeature.changed();
-				selectedFeature = features[0].get("features")[0];
+			// send a changed event
+			if (selectedFeature != null)
 				selectedFeature.changed();
+			selectedFeature = features[0].get("features")[0];
+			selectedFeature.changed();
 
-                let layer_info = features[0].get("features")[0].getProperties()['layer_info'];
-                let color = features[0].get("features")[0].getProperties()['color'];
+			// determine which kind of feature details we're going to show
+			let layer_info = selectedFeature.getProperties()['layer_info'];
+			if (!layer_info) {
+				console.error("The feature clicked does not have custom data attached and cannot be displayed")
+				return
+			}
 
-				details_content.textContent  = 'loading ...';
-				details_title.textContent = '';
-                details_header.style.backgroundColor = color;
-                details_icon.src = "img/marker/icons/" + layer_info.icons[0];
+			// show feature details popup
+			let color = selectedFeature.getProperties()['color'];
+			details_content.textContent  = 'loading ...';
+			details_title.textContent = '';
+			details_header.style.backgroundColor = color;
+			details_icon.src = "img/marker/icons/" + layer_info.icons[1];
+			details_content.style.marginTop = details_header.clientHeight + 'px';
+			details_container.style.display = 'block';
+			map.updateSize();
+
+			// this function is used to create visual elements in the feature details popup using key-value pairs
+			let createDetailsRow = function (name, value, highlited) {
+				var row = document.createElement('div')
+				row.className = "valuesDiv"
+				row.style = "display:flex;align-items:center;"
+				var nameDiv = document.createElement('div')
+				nameDiv.textContent = name.toUpperCase();
+				nameDiv.className = "details-name"
+				row.appendChild(nameDiv);
+				var valueDiv = document.createElement('div')
+				var valueText = value + "";
+				valueDiv.textContent = valueText.toUpperCase();
+				valueDiv.className = "details-value"
+				row.appendChild(valueDiv);
+				if(highlited){
+					valueDiv.className += ' highlited';
+					valueDiv.style = "background-color: " + color;
+				}
+				details_content.appendChild(row)
+			}
+
+			// from now on, we handle the click depending on the format of the feature that was clicked
+			
+			// handle the road_events feature format
+			if (layer_info.format == "road_events") {
+				const data = selectedFeature.get('data')
+				details_content.textContent = '';
+				details_title.textContent = 'A22 Highway Brennero - Modena';
                 details_content.style.marginTop = details_header.clientHeight + 'px';
-				details_container.style.display = 'block';
-				map.updateSize();
-
-				var scode = features[0].get("features")[0].getProperties()['scode'];
-				var stationType = features[0].get("features")[0].getProperties()['stationType'];
+				createDetailsRow('evcategory', data.evcategory, false);
+				createDetailsRow('evend', data.evend, false);
+				createDetailsRow('evname', data.evname, false);
+				createDetailsRow('evorigin', data.evorigin, false);
+				createDetailsRow('evseriesuuid', data.evseriesuuid, false);
+				createDetailsRow('evstart', data.evstart, false);
+				createDetailsRow('evtransactiontime', data.evtransactiontime, false);
+				createDetailsRow('evuuid', data.evuuid, false);
+				createDetailsRow('prlineage', data.prlineage, false);
+				createDetailsRow('prname', data.prname, false);
+				createDetailsRow('prversion', data.prversion, false);
+				createDetailsRow('evmetadata.fascia_oraria', data.evmetadata.fascia_oraria, false);
+				createDetailsRow('evmetadata.id', data.evmetadata.id, false);
+				createDetailsRow('evmetadata.idcorsia', data.evmetadata.idcorsia, false);
+				createDetailsRow('evmetadata.iddirezione', data.evmetadata.iddirezione, false);
+				createDetailsRow('evmetadata.idsottotipoevento', data.evmetadata.idsottotipoevento, false);
+				createDetailsRow('evmetadata.idtipoevento', data.evmetadata.idtipoevento, false);
+				createDetailsRow('evmetadata.metro_fine', data.evmetadata.metro_fine, false);
+				createDetailsRow('evmetadata.metro_inizio', data.evmetadata.metro_inizio, false);
+				return
+			}
+			
+			// handle the integreen feature format
+			else if (layer_info.format == "integreen") {
+				var scode = selectedFeature.getProperties()['scode'];
+				var stationType = selectedFeature.getProperties()['stationType'];
 				let station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*/latest?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
 				if(station_data_json.data == undefined
 					|| jQuery.isEmptyObject(station_data_json.data)
@@ -468,31 +539,9 @@ async function map_start_promise()
 				var integreen_data = station_data_json.data[stationType].stations[scode];
 
                 details_title.textContent = integreen_data['sname'];
-                console.log(details_header)
                 details_content.style.marginTop = details_header.clientHeight + 'px';
 				details_content.textContent = ''
 
-				let createDetailsRow = function (name, value, highlited) {
-					var row = document.createElement('div')
-					row.className = "valuesDiv"
-					row.style = "display:flex;align-items:center;"
-					var nameDiv = document.createElement('div')
-					nameDiv.textContent = name.toUpperCase();
-					nameDiv.className = "details-name"
-					row.appendChild(nameDiv);
-					var valueDiv = document.createElement('div')
-					var valueText = value + "";
-					valueDiv.textContent = valueText.toUpperCase();
-					valueDiv.className = "details-value"
-					row.appendChild(valueDiv);
-
-					if(highlited){
-                        valueDiv.className += ' highlited';
-						valueDiv.style = "background-color: " + color;
-					}
-
-					details_content.appendChild(row)
-				}
 				createDetailsRow('code', integreen_data['scode'], true);
 				createDetailsRow('name', integreen_data['sname'], false);
 				if(!!integreen_data['scoordinate']) {
@@ -507,9 +556,6 @@ async function map_start_promise()
 						createDetailsRow(name, integreen_data['smetadata'][name], false);
 					}
 				}
-
-
-
 
 				let valuesDiv = document.createElement('div')
 				details_content.appendChild(valuesDiv)
@@ -659,11 +705,6 @@ async function map_start_promise()
 					console.log(e)
 					valuesDiv.textContent = 'Error! Not authorized?';
 				}
-
-			}
-			else
-			{
-				popup_overlay.setPosition()
 			}
 		});
 
@@ -1312,6 +1353,111 @@ async function map_start_promise()
 			}
 		})
 
+	}
+
+	async function loadRoadEventsLayer(layer_info, loadingItem){
+		return new Promise(async function(ok,fail){
+			try{
+				// define a function to compute dynamically the style for a feature/cluster
+				let RoadEventsStyle = function (feature) {
+					const size = feature.get('features').length;
+					if (size > 1){
+						// style for clustered features
+						return new ol.style.Style({
+							image: new ol.style.Icon({
+								anchor: [6, 13],
+								anchorOrigin: 'top-right',
+								anchorXUnits: 'pixel',
+								anchorYUnits: 'pixel',
+								src: 'img/marker/icons/' + layer_info.icons[0],
+							}),
+							text: new ol.style.Text({
+								text: " " + size.toString() + " ",
+								fill: new ol.style.Fill({
+									color: '#fff',
+								}),
+								backgroundFill: new ol.style.Fill({
+									color: '#000',
+								}),
+							}),
+						});
+					} else {
+						// style for single features
+						const evcategory = feature.get('features')[0].get('data').evcategory
+						let icon = layer_info.icons[1]
+						switch(evcategory){
+							case "A22:Cantieri e limitazioni di traffico_Cantiere mobile":
+								icon = layer_info.icons[1]
+								break
+							default:
+								console.warn("Please implement me")
+								console.error('Could not find the icon for event category ' + evcategory)
+						}
+						return new ol.style.Style({
+							image: new ol.style.Icon({
+								src: 'img/marker/icons/' + icon,
+							})
+						});
+					}
+				}
+
+				let source_vector = new ol.source.Vector({
+					wrapX: false
+				})
+
+				var clusterSource = new ol.source.Cluster({
+					distance: map.getView().getZoom() < disableClusteringZoomLevel? clusterDistance: 0,
+					source: source_vector
+				});
+
+				var layer = new ol.layer.Vector({
+					source: clusterSource,
+					style: RoadEventsStyle
+				});
+				map.addLayer(layer)
+				loadingItem.classList.add('loading');
+
+				let api_uri = env.ODH_MOBILITY_API_URI
+				const api_resource_name = encodeURIComponent(layer_info.stationType) 
+				
+				let now = (new Date("2022-04-23T12:00")).toISOString()
+				let events_flat_json = await fetchJson_promise(
+					`${api_uri}/flat,event/${api_resource_name}/${now}/?limit=10&distinct=false`,
+					AUTHORIZATION_TOKEN,
+					loadingItem
+				);
+				
+				let features = []
+				events_flat_json.data.forEach(event => {
+					let coordinates = event.evlgeometry.coordinates
+					let points = [];
+					if (Array.isArray(coordinates[0])) {
+						// some events have a polyline geometry
+						coordinates.forEach(coord => {
+							points.push(ol.proj.fromLonLat([coord[0], coord[1]]))
+						})
+					} else {
+						// other events are returned straight as points
+						points.push(ol.proj.fromLonLat([coordinates[0], coordinates[1]]))
+					}
+
+					let myFeature = new ol.Feature({
+						geometry: new ol.geom.Point(points[0]),
+						layer_info: layer_info,
+						data: event,
+						color: layer_info.color
+					})
+					
+					features.push(myFeature)
+				})
+				source_vector.addFeatures(features);
+
+				loadingItem.classList.remove('loading');
+				ok(layer)
+			} catch(e) {
+				fail(e)
+			}
+		})
 	}
 
 	async function loadWMSLayer(layer_info)
