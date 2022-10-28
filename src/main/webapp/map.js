@@ -1587,6 +1587,8 @@ async function map_start_promise()
 }
 
 
+
+
 function showMapOverview()
 {
 	document.getElementById('section_gfx').style.display='none';
@@ -1600,6 +1602,8 @@ function showMapOverview()
 	bzanalytics_map.updateSize();
 	document.getElementById('headline').classList.remove("active");
 	document.getElementById('map_overview').classList.add("active");
+	document.getElementById('section_events').style.display='none';
+    document.getElementById('show_events_btn').classList.remove("active");
 }
 
 function showCharts()
@@ -1608,7 +1612,21 @@ function showCharts()
 	document.getElementById('section_map').style.display='none';
     document.getElementById('map_overview').classList.remove("active");
     document.getElementById('headline').classList.add("active");
+	document.getElementById('section_events').style.display='none';
+    document.getElementById('show_events_btn').classList.remove("active");
 }
+
+
+function showEvents()
+{
+	document.getElementById('section_gfx').style.display='none';
+	document.getElementById('section_map').style.display='none';
+	document.getElementById('section_events').style.display='block';
+    document.getElementById('map_overview').classList.remove("active");
+    document.getElementById('headline').classList.remove("active");
+    document.getElementById('show_events_btn').classList.add("active");
+}
+
 
 function generatePointsCircle(count, centerCoords) {
 	var

@@ -1,0 +1,29 @@
+#events_controls {
+    min-width: 990px;
+    display: flex;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    padding: 4px 16px 16px 16px;
+    color: #999999;
+}
+
+.event_control {
+    flex-grow: 1;
+}
+
+#events_controls input,
+#events_controls select,
+#events_controls button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    max-width: 150px;
+}
+
+#events_main {
+    border: 1px solid #999999;
+    background-color: white;
+    padding: 4px;
+    margin: 0 16px;
+    min-height: 400px;
+    white-space: pre;
+}
