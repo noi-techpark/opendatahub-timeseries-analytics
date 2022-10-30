@@ -1,6 +1,6 @@
 (() => {
     console.debug("loading the events.js script")
-    setTimeout(() => {console.clear()}, 2000)
+    // setTimeout(() => {console.clear()}, 2000)
 
     // this will contain the form state
     let state = {}
@@ -17,7 +17,7 @@
     let _update = document.querySelector("#events_update_btn")
     let _category = document.querySelector("#events_category")
     let _provider = document.querySelector("#events_data_provider")
-    let _main = document.querySelector("#events_main")
+    let _table = document.querySelector("#events_table")
 
     // setup datepickers
     $fromdate.datepicker({ dateFormat: "yy-mm-dd" })
@@ -43,6 +43,10 @@
         $todate.datepicker("setDate", "0")
     })
 
+
+    // disable update button when no provider is selected
+    _update.disabled = !_provider.value
+
     // load category list dinamically after choosing data provider
     _provider.addEventListener("change", async (e) => {
         const addOption = (text, value, parent, selected) => {
@@ -56,6 +60,7 @@
         }
 
         const provider = e.target.value
+        _update.disabled = !provider
         _category.innerHTML = ''
         if (provider) {
             const api_response = await fetch(`https://mobility.api.opendatahub.bz.it/v2/flat,event/${provider}?select=evcategory&distinct=1`)
@@ -78,12 +83,41 @@
             category: _category.value,
             provider: _provider.value,
         }
-        console.table(state)
         let api_url = `https://mobility.api.opendatahub.bz.it/v2/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
         api_url = !state.category ? api_url : `${api_url}?where=evcategory.eq.${state.category}` 
         const api_response = await fetch(api_url)
         const response_body = await api_response.json()
-        const data = response_body.data[state.provider].eventseries
-        _main.innerText = JSON.stringify(data, null, 4)
+        const data = response_body.data[state.provider]?.eventseries
+        
+        const events = []
+        for(const eventgroup_index in data) {
+            const eventgroup = data[eventgroup_index]
+            for (const event_index in eventgroup.events) {
+                if (Object.keys(eventgroup.events).length > 1) {
+                    const event_with_subrows = []
+                    for (const event_index2 in eventgroup.events) {
+                        const event = eventgroup.events[event_index]
+                        event_with_subrows.push({
+                            evstart: event.evstart,
+                            evend: event.evend,
+                            evcategory: event.evcategory,
+                            evname: event.evname,
+                        })
+                    }
+                    events.push(event_with_subrows)
+                    break
+                } else {
+                    const event = eventgroup.events[event_index]
+                    events.push({
+                        evstart: event.evstart,
+                        evend: event.evend,
+                        evcategory: event.evcategory,
+                        evname: event.evname,
+                    })
+                }
+            }
+        }
+        
+        _table.data = JSON.stringify(events)
     })
 })()

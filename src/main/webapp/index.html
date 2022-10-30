@@ -325,7 +325,31 @@
             </div>
         </div>
         <div id="events_main">
-            Ready to accept your query.
+            <reactive-table id="events_table"
+                schema='[
+                    {
+                        "key": "evstart",
+                        "name": "Start time",
+                        "type": "string"
+                    },
+                    {
+                        "key": "evend",
+                        "name": "End time",
+                        "type": "string"
+                    },
+                    {
+                        "key": "evcategory",
+                        "name": "Category",
+                        "type": "string"
+                    },
+                    {
+                        "key": "evname",
+                        "name": "Name",
+                        "type": "string"
+                    }
+                ]'
+            />
+            <script src="reactive-table.min.js"></script>
         </div>
     </div>
 </body>
