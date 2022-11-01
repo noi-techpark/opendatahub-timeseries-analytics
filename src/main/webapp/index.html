@@ -313,41 +313,27 @@
             <div class="event_control">
                 <p>CATEGORY</p>
                 <select name="events_category" id="events_category">
-                    <option value="">All</option>
-                    <option value="a">ambaraba cici coco tre civette sul como</option>
-                    <option value="b">b</option>
-                    <option value="c">c</option>
+                    <option value="">None</option>
                 </select>
             </div>
             <div class="event_control">
                 <p>AND HERE WE GO</p>
-                <button id="events_update_btn">Update</button>
+                <button id="events_query_btn">
+                    <img src="img/marker/icons/gear.svg" id="icon_query_loading"/>
+                    Query
+                </button>
             </div>
         </div>
         <div id="events_main">
             <reactive-table id="events_table"
                 schema='[
                     {
-                        "key": "evstart",
-                        "name": "Start time",
-                        "type": "string"
-                    },
-                    {
-                        "key": "evend",
-                        "name": "End time",
-                        "type": "string"
-                    },
-                    {
-                        "key": "evcategory",
-                        "name": "Category",
-                        "type": "string"
-                    },
-                    {
-                        "key": "evname",
-                        "name": "Name",
+                        "key": "empty",
+                        "name": "No query performed",
                         "type": "string"
                     }
                 ]'
+                date-format="DD/MM/yyyy - hh:mm"
             />
             <script src="reactive-table.min.js"></script>
         </div>

@@ -26,3 +26,51 @@
     margin: 0 16px;
     min-height: 400px;
 }
+
+#events_query_btn {
+    color: white;
+    background-color: #a767a5;
+    border: 0;
+    border-radius: 5px;
+    padding: 0.2rem 1.5rem 0.2rem 0.3rem;
+    cursor: pointer;
+}
+
+#events_query_btn:hover {
+    color: white;
+    background-color: #7c0e6f;
+}
+
+#events_query_btn:disabled {
+    cursor: not-allowed;
+    color: white;
+    background-color: #937c92;
+}
+
+#icon_query_loading {
+    visibility: hidden;
+    width: 1rem;
+    height: 1rem;
+    position: relative;
+    top: 0.1rem;
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 4s linear infinite;
+}
+
+#events_table {
+    font-size: 0.8rem;
+}
+
+@-moz-keyframes spin { 
+    100% { -moz-transform: rotate(360deg); } 
+}
+@-webkit-keyframes spin { 
+    100% { -webkit-transform: rotate(360deg); } 
+}
+@keyframes spin { 
+    100% { 
+        -webkit-transform: rotate(360deg); 
+        transform:rotate(360deg); 
+    }
+}
