@@ -493,7 +493,6 @@ async function map_start_promise()
 			if (layer_info.format == "road_events") {
 				const data = selectedFeature.get('data')
 				details_content.textContent = '';
-				details_title.textContent = 'A22 Highway Brennero - Modena';
                 details_content.style.marginTop = details_header.clientHeight + 'px';
 				createDetailsRow('evcategory', data.evcategory, false);
 				createDetailsRow('evend', data.evend, false);
@@ -506,14 +505,52 @@ async function map_start_promise()
 				createDetailsRow('prlineage', data.prlineage, false);
 				createDetailsRow('prname', data.prname, false);
 				createDetailsRow('prversion', data.prversion, false);
-				createDetailsRow('evmetadata.fascia_oraria', data.evmetadata.fascia_oraria, false);
-				createDetailsRow('evmetadata.id', data.evmetadata.id, false);
-				createDetailsRow('evmetadata.idcorsia', data.evmetadata.idcorsia, false);
-				createDetailsRow('evmetadata.iddirezione', data.evmetadata.iddirezione, false);
-				createDetailsRow('evmetadata.idsottotipoevento', data.evmetadata.idsottotipoevento, false);
-				createDetailsRow('evmetadata.idtipoevento', data.evmetadata.idtipoevento, false);
-				createDetailsRow('evmetadata.metro_fine', data.evmetadata.metro_fine, false);
-				createDetailsRow('evmetadata.metro_inizio', data.evmetadata.metro_inizio, false);
+				// A22
+				if (data.evorigin === 'A22') {
+					details_title.textContent = 'A22 Highway Brennero - Modena';
+					createDetailsRow('evmetadata.fascia_oraria', data.evmetadata.fascia_oraria, false);
+					createDetailsRow('evmetadata.id', data.evmetadata.id, false);
+					createDetailsRow('evmetadata.idcorsia', data.evmetadata.idcorsia, false);
+					createDetailsRow('evmetadata.iddirezione', data.evmetadata.iddirezione, false);
+					createDetailsRow('evmetadata.idsottotipoevento', data.evmetadata.idsottotipoevento, false);
+					createDetailsRow('evmetadata.idtipoevento', data.evmetadata.idtipoevento, false);
+					createDetailsRow('evmetadata.metro_fine', data.evmetadata.metro_fine, false);
+					createDetailsRow('evmetadata.metro_inizio', data.evmetadata.metro_inizio, false);
+				}
+				// PROVINCE_BZ
+				if (data.evorigin === 'PROVINCE_BZ') {
+					details_title.textContent = `${data.evmetadata.messageGradDescDe} - ${data.evmetadata.messageGradDescIt}`.toUpperCase()
+					createDetailsRow('evmetadata.placeDe', data.evmetadata.placeDe, false);
+					createDetailsRow('evmetadata.placeIt', data.evmetadata.placeIt, false);
+					createDetailsRow('evmetadata.tycodeDe', data.evmetadata.tycodeDe, false);
+					createDetailsRow('evmetadata.tycodeIt', data.evmetadata.tycodeIt, false);
+					createDetailsRow('evmetadata.messageId', data.evmetadata.messageId, false);
+					createDetailsRow('evmetadata.actualMail', data.evmetadata.actualMail, false);
+					createDetailsRow('evmetadata.subTycodeDe', data.evmetadata.subTycodeDe, false);
+					createDetailsRow('evmetadata.subTycodeIt', data.evmetadata.subTycodeIt, false);
+					createDetailsRow('evmetadata.tycodeValue', data.evmetadata.tycodeValue, false);
+					createDetailsRow('evmetadata.messageGradId', data.evmetadata.messageGradId, false);
+					createDetailsRow('evmetadata.messageStatus', data.evmetadata.messageStatus, false);
+					createDetailsRow('evmetadata.messageTypeId', data.evmetadata.messageTypeId, false);
+					createDetailsRow('evmetadata.messageZoneId', data.evmetadata.messageZoneId, false);
+					createDetailsRow('evmetadata.subTycodeValue', data.evmetadata.subTycodeValue, false);
+					createDetailsRow('evmetadata.messageStreetId', data.evmetadata.messageStreet1Id, false);
+					createDetailsRow('evmetadata.messageStreetNr', data.evmetadata.messageStreetNr, false);
+					createDetailsRow('evmetadata.json_featuretype', data.evmetadata.json_featuretype, false);
+					createDetailsRow('evmetadata.messageGradDescDe', data.evmetadata.messageGradDescDe, false);
+					createDetailsRow('evmetadata.messageGradDescIt', data.evmetadata.messageGradDescIt, false);
+					createDetailsRow('evmetadata.messageTypeDescDe', data.evmetadata.messageTypeDescDe, false);
+					createDetailsRow('evmetadata.messageTypeDescIt', data.evmetadata.messageTypeDescIt, false);
+					createDetailsRow('evmetadata.messageZoneDescDe', data.evmetadata.messageZoneDescDe, false);
+					createDetailsRow('evmetadata.messageZoneDescIt', data.evmetadata.messageZoneDescIt, false);
+					createDetailsRow('evmetadata.publisherDateTime', data.evmetadata.publisherDateTime, false);
+					createDetailsRow('evmetadata.messageStreetWapDescDe', data.evmetadata.messageStreetWapDescDe, false);
+					createDetailsRow('evmetadata.messageStreetWapDescIt', data.evmetadata.messageStreetWapDescIt, false);
+					createDetailsRow('evmetadata.messageStreetHierarchie', data.evmetadata.messageStreetHierarchie, false);
+					createDetailsRow('evmetadata.messageStreetInternetDescDe', data.evmetadata.messageStreetInternetDescDe, false);
+					createDetailsRow('evmetadata.messageStreetInternetDescIt', data.evmetadata.messageStreetInternetDescIt, false);
+				}
+
 				return
 			}
 			
@@ -1524,17 +1561,23 @@ async function map_start_promise()
 				loadingItem.classList.add('loading');
 
 				let api_uri = env.ODH_MOBILITY_API_URI
-				const api_resource_name = encodeURIComponent(layer_info.stationType) 
+				const api_resource_name = encodeURIComponent(layer_info.stationType)
 				
-				let now = (new Date("2022-04-23T12:00")).toISOString()
+				// let now = (new Date("2022-04-23T12:00")).toISOString() // use this date to debug
+				let now = (new Date()).toISOString()
 				let events_flat_json = await fetchJson_promise(
-					`${api_uri}/flat,event/${api_resource_name}/${now}/?limit=10&distinct=false`,
+					`${api_uri}/flat,event/${api_resource_name}/${now}/?limit=0&distinct=true`,
 					AUTHORIZATION_TOKEN,
 					loadingItem
 				);
 				
 				let features = []
 				events_flat_json.data.forEach(event => {
+					if (!event.evlgeometry) {
+						console.warn("An event has no geometry!")
+						console.log(event)
+						return
+					}
 					let coordinates = event.evlgeometry.coordinates
 					let points = [];
 					if (Array.isArray(coordinates[0])) {
