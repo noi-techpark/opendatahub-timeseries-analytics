@@ -1383,19 +1383,125 @@ async function map_start_promise()
 						});
 					} else {
 						// style for single features
-						const evcategory = feature.get('features')[0].get('data').evcategory
+						const event = feature.get('features')[0].get('data')
+						const evcategory = event.evcategory
 						let icon = layer_info.icons[1]
 						switch(evcategory){
+							// provider A22
+							case "A22:BrennerLEC_BrennerLec B3 90 T3 (km 138-167)":
+							case "A22:BrennerLEC_BrennerLec B3 II 90 T1 (km 77-100)":
+							case "A22:BrennerLEC_BrennerLec B3 II 90 T2 (km 100-138)":
+							case "A22:BrennerLEC_BrennerLec B3Nord 90 T1 (km 121-85)":
+							case "A22:BrennerLEC_BrennerLec B3Nord 90 T2 (km 142-121)":
+								icon = 'A22/h.png'
+								break	
+							case "A22:BrennerLEC_BrennerLec B4 II S.100/107 vel 90 SUD":
+							case "A22:BrennerLEC_BrennerLec B4 II S.107/100 vel 90 NORD":
+								icon = 'A22/g.png'
+								break
+							case "A22:BrennerLEC_BrennerLec B3 100 T3 (km 138-167)":
+							case "A22:BrennerLEC_BrennerLec B3 II 100 T1 (km 77-100)":
+							case "A22:BrennerLEC_BrennerLec B3 II 100 T2 (km 100-138)":
+							case "A22:BrennerLEC_BrennerLec B3Nord 100 T1 (km 121-85)":
+							case "A22:BrennerLEC_BrennerLec B3Nord 100 T2 (km 142-121)":
+								icon = 'A22/j.png'
+								break	
+							case "A22:BrennerLEC_BrennerLec B4 II S.100/107 vel 100 (BZ-SM)":
+							case "A22:BrennerLEC_BrennerLec B4 (BZ-SM)":
+							case "A22:BrennerLEC_BrennerLec B4 II S.103 (BZ-SM)":
+							case "A22:BrennerLEC_BrennerLec B4 II S.107 (EGNA-SM)":
+								icon = 'A22/i.png'
+								break
+							case "A22:BrennerLEC_BrennerLec B3 110 T3 (km 138-167)":
+							case "A22:BrennerLEC_BrennerLec B3 II 110 T1 (km 77-100)":
+							case "A22:BrennerLEC_BrennerLec B3 II 110 T2 (km 100-138)":
+							case "A22:BrennerLEC_BrennerLec B3Nord 110 T1 (km 121-85)":
+							case "A22:BrennerLEC_BrennerLec B3Nord 110 T2 (km 142-121)":
+								icon = 'A22/l.png'
+								break
+							case "A22:BrennerLEC_BrennerLec B4 II S.100/107 vel 110 (BZ-SM)":
+								icon = 'A22/k.png'
+								break
 							case "A22:Cantieri e limitazioni di traffico_Cantiere mobile":
-								icon = layer_info.icons[1]
+							case "A22:Cantieri e limitazioni di traffico_Cantiere spartitraffico centrale":
+							case "A22:Cantieri e limitazioni di traffico_Lavori ai caselli":
+								icon = 'A22/3.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Carreggiata ridotta a due corsie":
+								icon = 'A22/c.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Carreggiata ridotta a una corsia":
+								icon = 'A22/b.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Corsia di emergenza chiusa":
+							case "A22:Cantieri e limitazioni di traffico_Corsia di marcia chiusa":
+								icon = 'A22/6.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Corsia di sorpasso chiusa":
+								icon = 'A22/5.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Corsie a larghezza ridotta":
+								icon = 'A22/4.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Deviazione carreggiata con 2 corsie per il traffico deviato":
+								icon = 'A22/e.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Deviazione di carreggiata con 2 corsie per il traffico non deviato":
+								icon = 'A22/m.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Deviazione di carreggiata con 2 flussi di marcia":
+							case "A22:Cantieri e limitazioni di traffico_Senso unico alternato":
+								icon = 'A22/7.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Riduzione corsia di sorpasso e deviazione di 2 corsie ridotte per flusso deviato":
+								icon = 'A22/e.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Riduzione corsia di sorpasso e marcia e deviazione di 1 corsia ridotta per flusso deviato":
+								icon = 'A22/d.png'
+								break
+							case "A22:Cantieri e limitazioni di traffico_Scambio di carreggiata":
+								icon = 'A22/f.png'
+								break
+							case "A22:Chiusure_Allacciamento chiuso":
+							case "A22:Chiusure_Chiusura svincolo in entrata":
+							case "A22:Chiusure_Chiusura svincolo in uscita":
+							case "A22:Chiusure_Chiusura tratto autostradale":
+							case "A22:Chiusure_Corsia di accelerazione/decelerazione chiusa":
+								icon = 'A22/0.png'
+								break
+							case "A22:Chiusure_Chiusura tratto stradale per mezzi > 7,5T":
+								icon = 'A22/1.png'
+								break
+							case "A22:Chiusure_Entrata consigliata":
+							case "A22:Chiusure_Uscita consigliata":
+								icon = 'A22/a.png'
+								break
+							case "A22:Chiusure_Uscita consigliata mezzi leggeri":
+								icon = 'A22/9.png'
+								break
+							case "A22:Chiusure_Uscita obbligatoria mezzi leggeri":
+								icon = 'A22/8.png'
+								break
+							case "A22:Chiusure_Uscita obbligatoria":
+								icon = 'A22/2.png'
+								break
+							// provider PROVINCE_BZ
+							case "controllo velocità | Radarkontrolle":
+							case "evento eccezionale - caso particolare | Sonderfälle":
+							case "intralci viabilità in e fuori Alto Adige | Verkehrsbehinderung für Zonen und aus. Südt.":
+							case "avvenimenti attuali | Aktuelle Ereignisse":
+							case "passi di montagna | Passstrassen":
+								icon = `PROVINCE_BZ/${event.evmetadata.tycodeValue}_${event.evmetadata.subTycodeValue}.gif`
 								break
 							default:
 								console.warn("Please implement me")
 								console.error('Could not find the icon for event category ' + evcategory)
+								console.log(event)
 						}
 						return new ol.style.Style({
 							image: new ol.style.Icon({
 								src: 'img/marker/icons/' + icon,
+								scale: event.evorigin === 'A22' ? 0.15 : 1
 							})
 						});
 					}
