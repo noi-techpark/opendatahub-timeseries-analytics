@@ -502,9 +502,12 @@
         }
 
         kc.createLogoutUrl = function(options) {
-            var url = kc.endpoints.logout()
-                + '?redirect_uri=' + encodeURIComponent(adapter.redirectUri(options, false));
+            // removed becuase redirect_uri has been deprecated
+            // cehck out https://www.keycloak.org/docs/latest/upgrading/index.html#openid-connect-logout
+            // var url = kc.endpoints.logout()
+            //     + '?redirect_uri=' + encodeURIComponent(adapter.redirectUri(options, false));
 
+            var url = kc.endpoints.logout();
             return url;
         }
 
