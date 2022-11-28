@@ -507,7 +507,10 @@
             // var url = kc.endpoints.logout()
             //     + '?redirect_uri=' + encodeURIComponent(adapter.redirectUri(options, false));
 
-            var url = kc.endpoints.logout();
+            // var url = kc.endpoints.logout();
+
+            var url = kc.endpoints.logout()
+                + '?post_logout_redirect_uri=' + encodeURIComponent(adapter.redirectUri(options, false));
             return url;
         }
 
