@@ -85,7 +85,7 @@
         _query.disabled = !provider
         _category.innerHTML = ''
         if (provider) {
-            const api_response = await fetch(`https://mobility.api.opendatahub.bz.it/v2/flat,event/${provider}?select=evcategory&distinct=1`)
+            const api_response = await fetch(`https://mobility.api.opendatahub.com/v2/flat,event/${provider}?select=evcategory&distinct=1`)
             const response_body = await api_response.json()
             const categories = response_body.data.map(c => c.evcategory) // clean up the data
             if (categories) {
@@ -236,7 +236,7 @@
 
         // do the ajax request against the API
         toggleLoadingState()
-        let api_url = `https://mobility.api.opendatahub.bz.it/v2/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
+        let api_url = `https://mobility.api.opendatahub.com/v2/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
         api_url = !state.category ? api_url : `${api_url}?where=evcategory.eq.${state.category}` 
         const api_response = await fetch(api_url)
         const response_body = await api_response.json()
