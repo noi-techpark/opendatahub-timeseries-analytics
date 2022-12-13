@@ -1,21 +1,21 @@
 # Infrastructure for it.bz.opendatahub.analytics
 
-The Mobility Analytics [analytics.opendatahub.bz.it](https://analytics.opendatahub.bz.it) consists of a S3 bucket on AWS that hosts the static web application.
+The Mobility Analytics [analytics.opendatahub.com](https://analytics.opendatahub.com) consists of a S3 bucket on AWS that hosts the static web application.
 
 ## Servers
 
 ### Production Environment
 #### Web frontend
 - S3 Bucket to host the static webpage `odh.analytics-prod`
-- URL = https://analytics.opendatahub.bz.it
-- ALIASES = analytics.mobility.bz.it
-- The domain (managed by TT Digital) points to proxy.opendatahub.bz.it, which redirects it to the S3 bucket
+- URL = https://analytics.opendatahub.com
+- ALIASES = analytics.mobility.com
+- The domain (managed by TT Digital) points to proxy.opendatahub.com, which redirects it to the S3 bucket
 
 ### Testing Environment
 #### Web frontend
 - S3 Bucket to host the static webpage `odh.analytics-test`
 - URL = https://analytics.opendatahub.testingmachine.eu
-- The domain (managed by TT Digital) points to proxy.opendatahub.bz.it, which redirects it to the S3 bucket
+- The domain (managed by TT Digital) points to proxy.opendatahub.com, which redirects it to the S3 bucket
 
 ## External resources
 

@@ -2,8 +2,8 @@
 
 [![CI/CD](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/main.yml/badge.svg)](https://github.com/noi-techpark/it.bz.opendatahub.analytics/actions/workflows/main.yml)
 
-This is a web application hosted on https://analytics.opendatahub.bz.it to show
-data from the [Open Data Hub](https://opendatahub.bz.it) in various forms. It is
+This is a web application hosted on https://analytics.opendatahub.com to show
+data from the [Open Data Hub](https://opendatahub.com) in various forms. It is
 also possible to download data to process it with your preferred tool on your
 machine.
 
