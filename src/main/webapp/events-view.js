@@ -1,5 +1,5 @@
 /**
- * events.js
+ * events-view.js
  * 
  * This script is responsible for the Events tab. Here we show a form that allows to
  * - select a time range
@@ -22,7 +22,7 @@
  */
  
 (() => {
-    console.debug("loading the events.js script")
+    console.debug("loading the events-view.js script")
     // setTimeout(() => {console.clear()}, 2000)
 
     // this will contain the form state
