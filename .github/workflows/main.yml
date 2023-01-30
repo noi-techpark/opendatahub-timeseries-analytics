@@ -23,14 +23,14 @@ jobs:
 
   deploy-test:
     runs-on: ubuntu-20.04
-    if: github.ref == 'refs/heads/main'
+    if: github.ref != 'refs/heads/prod'
     needs: test
     concurrency: deploy-test
     env:
       AWS_S3_BUCKET_NAME : 'odh.analytics-test'
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: noi-techpark/github-actions/checkout@v2
 
       - name: Create .env file
         uses: noi-techpark/github-actions/env-file@v2
@@ -67,7 +67,7 @@ jobs:
       SCRIPTS_HOST: 'https://scripts.opendatahub.com'
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: noi-techpark/github-actions/checkout@v2
 
       - name: Create .env file
         uses: noi-techpark/github-actions/env-file@v2
