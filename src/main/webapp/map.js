@@ -482,7 +482,7 @@ async function map_start_promise()
 					row.appendChild(nameDiv);
 					var valueDiv = document.createElement('div')
 					var valueText = value + "";
-					valueDiv.textContent = valueText.toUpperCase();
+					valueDiv.textContent = valueText;
 					valueDiv.className = "details-value"
 					row.appendChild(valueDiv);
 
