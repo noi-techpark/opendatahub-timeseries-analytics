@@ -3,6 +3,8 @@ version: "3.4"
 services:
   app:
     image: python:3-alpine
+    env_file:
+      - .env
     volumes:
        - ./:/code
     working_dir: /code/src/main/webapp
