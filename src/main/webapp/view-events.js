@@ -85,7 +85,7 @@
         _query.disabled = !provider
         _category.innerHTML = ''
         if (provider) {
-            const api_response = await fetch(`${env.ODH_MOBILITY_API_URI}/flat,event/${provider}?select=evcategory&distinct=1`)
+            const api_response = await fetchAuthorized(`${env.ODH_MOBILITY_API_URI}/flat,event/${provider}?select=evcategory&distinct=1`, AUTHORIZATION_TOKEN)
             const response_body = await api_response.json()
             const categories = response_body.data.map(c => c.evcategory) // clean up the data
             if (categories) {
