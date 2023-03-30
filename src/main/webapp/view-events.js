@@ -45,9 +45,9 @@
 
     // setup datepickers
     $fromdate.datepicker({ dateFormat: "yy-mm-dd" })
-    $fromdate.datepicker("setDate", "-8")
+    $fromdate.datepicker("setDate", "-7")
     $todate.datepicker({ dateFormat: "yy-mm-dd" })
-    $todate.datepicker("setDate", "-1")
+    $todate.datepicker("setDate", "0")
     
     // set some preset dates when clicking on the date button controls
     _today.addEventListener("click", () => {
