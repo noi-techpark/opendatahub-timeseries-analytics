@@ -244,7 +244,7 @@
         // do the ajax request against the API
         toggleLoadingState()
         let api_url = `${env.ODH_MOBILITY_API_URI}/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
-        api_url = !state.category ? api_url : `${api_url}?where=evcategory.eq.${state.category}` 
+        api_url = !state.category ? api_url + "?limit=-1" : `${api_url}?where=evcategory.eq.${state.category}&limit=-1` 
         const api_response = await fetchAuthorized(api_url, AUTHORIZATION_TOKEN)
         const response_body = await api_response.json()
         const data = response_body.data[state.provider]?.eventseries
