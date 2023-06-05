@@ -1,0 +1,32 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: it.bz.opendatahub.analytics
+Upstream-Contact: NOI Techpark <digital@noi.bz.it>
+Source: https://github.com/noi-techpark/it.bz.opendatahub.analytics
+
+Files: .github/* infrastructure/* .gitignore LICENSE.md .env.example src/main/webapp/fonts/* src/main/webapp/img/* src/main/webapp/*.json src/main/webapp/*.txt src/main/webapp/*.png
+Copyright: (c) NOI Techpark <digital@noi.bz.it>
+License: CC0-1.0
+
+Files: src/main/webapp/vendor/flot/*
+Copyright: (c) 2007-2014 IOLA and Ole Laursen.
+License: MIT
+
+Files: src/main/webapp/vendor/flot-axislabels/*
+Copyright: Xuan Luo, September 2010.
+License: GPL-3.0-only
+
+Files: src/main/webapp/vendor/jquery/* src/main/webapp/vendor/jquery-ui/*
+Copyright: JS Foundation and other contributors
+License: MIT
+
+Files: src/main/webapp/vendor/keycloak-js/*
+Copyright: Keycloak
+License: Apache-2.0
+
+Files: src/main/webapp/vendor/ol-ext/*
+Copyright: Jean-Marc Viglino
+License: BSD-3-Clause
+
+Files: src/main/webapp/vendor/openlayers/*
+Copyright: OpenLayers Contributors
+License: BSD-2-Clause
