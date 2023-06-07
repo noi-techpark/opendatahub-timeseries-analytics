@@ -1766,11 +1766,11 @@ function getProvinceBZIcon(subTycodeValue) {
 	switch (subTycodeValue) {
 		case 'SPERRE':
 		case 'STEINSCHLAG':
-			return `SPERRE.gif`;
+			return `PROVINCE_BZ/SPERRE.gif`;
 
 		case 'VORSICHT':
 		case 'BESCHRAENKUNG':
-			return `VORSICHT.gif`;
+			return `PROVINCE_BZ/VORSICHT.gif`;
 
 
 		case 'AMPELREGELUNG':
@@ -1790,7 +1790,7 @@ function getProvinceBZIcon(subTycodeValue) {
 		case 'TIERE_AUF_FAHRB':
 		case 'VIEHABTRIEB':
 		case 'WINDBOEHEN':
-			return `${subTycodeValue}.gif`;
+			return `PROVINCE_BZ/${subTycodeValue}.gif`;
 
 		default:
 			console.log(`icon not found for: ${subTycodeValue}. Using fallback`);
