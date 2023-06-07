@@ -1763,8 +1763,6 @@ function distanceBetwennCoords(lat1, lon1, lat2, lon2) {
 
 
 function getProvinceBZIcon(subTycodeValue) {
-	console.log(subTycodeValue);
-
 	switch (subTycodeValue) {
 		case 'SPERRE':
 		case 'STEINSCHLAG':
