@@ -5,8 +5,7 @@
 "use strict";
 
 
-async function map_start_promise()
-{
+async function map_start_promise() {
 	let autorefresh_functions = []
 	let unsee_functions = []
 	var disableClusteringZoomLevel = 18;
@@ -44,15 +43,15 @@ async function map_start_promise()
 
 	let mapLayer = null;
 
-	for(let i = 0; i < mapTileURLs.length; i++) {
-		if(i == 0) {
+	for (let i = 0; i < mapTileURLs.length; i++) {
+		if (i == 0) {
 			sources[0] = new ol.source.OSM();
 		} else {
 			sources[sources.length] = new ol.source.OSM({
 				attributions: [
 					'Maps © <a href="http://www.thunderforest.com">Thunderforest</a>, Data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
 				],
-				url : mapTileURLs[i][1] + env.THUNDERFOREST_MAP_API_KEY
+				url: mapTileURLs[i][1] + env.THUNDERFOREST_MAP_API_KEY
 			})
 		}
 		let opt = document.createElement('option');
@@ -65,41 +64,41 @@ async function map_start_promise()
 	});
 
 	mapLayer = new ol.layer.Tile({
-//		thunderforest tile disabled
-//		source : env.THUNDERFOREST_MAP_API_KEY ? sources[1] : sources[0]
-		source : sources[0]
+		//		thunderforest tile disabled
+		//		source : env.THUNDERFOREST_MAP_API_KEY ? sources[1] : sources[0]
+		source: sources[0]
 	})
 
 	var filterGrayscale = new ol.filter.Colorize();
 	mapLayer.addFilter(filterGrayscale);
-    filterGrayscale.setFilter('grayscale');
+	filterGrayscale.setFilter('grayscale');
 
-    var filterLuminosity = new ol.filter.Colorize();
-    mapLayer.addFilter(filterLuminosity);
-    filterLuminosity.setFilter({ operation: 'luminosity', value: 0.75});
+	var filterLuminosity = new ol.filter.Colorize();
+	mapLayer.addFilter(filterLuminosity);
+	filterLuminosity.setFilter({ operation: 'luminosity', value: 0.75 });
 
 
 	let map = new ol.Map({
-		target : 'map',
-		layers : [ mapLayer
+		target: 'map',
+		layers: [mapLayer
 
 		],
-		view : new ol.View({
+		view: new ol.View({
 
-			enableRotation : false, // altrimenti sballano i tile calcolati da me
-			center : ol.proj.fromLonLat([ 11.34, 46.48 ]),
+			enableRotation: false, // altrimenti sballano i tile calcolati da me
+			center: ol.proj.fromLonLat([11.34, 46.48]),
 			// zoom iniziale mappa
-			zoom : 12
+			zoom: 12
 
 		})
 	});
 
-	map.getView().on('change:resolution', function(evt){
+	map.getView().on('change:resolution', function (evt) {
 		var view = evt.target;
 
-		map.getLayers().getArray().map(function(layer) {
+		map.getLayers().getArray().map(function (layer) {
 			var source = layer.getSource();
-			if(layer.get('layerUseType') === 'route') {
+			if (layer.get('layerUseType') === 'route') {
 				if (view.getZoom() >= disableClusteringZoomLevel && !layer.getVisible()) {
 					layer.setVisible(true);
 				} else if (view.getZoom() < disableClusteringZoomLevel && layer.getVisible()) {
@@ -127,267 +126,246 @@ async function map_start_promise()
 
 	// for groups
 	/*
-	    <div>
-	        <div>nome gruppo</div>
-	        <div > css: margin-left
-	            ... layers
-	        </div>
-	    </div>
+		<div>
+			<div>nome gruppo</div>
+			<div > css: margin-left
+				... layers
+			</div>
+		</div>
 
 	 */
 
-	for (var layer_group of json)
-	{
-        let group_layer_div = document.createElement('div');
-        group_layer_div.style.display = 'none';
+	for (var layer_group of json) {
+		let group_layer_div = document.createElement('div');
+		group_layer_div.style.display = 'none';
 		setupLayerGroup_promise(layer_group, group_layer_div);
-        layers_container.appendChild(group_layer_div);
+		layers_container.appendChild(group_layer_div);
 
-		for (var layer_info of layer_group.layers)
-		{
+		for (var layer_info of layer_group.layers) {
 			setupLayer_promise(layer_info, layer_group.id, group_layer_div)
 		}
 	}
 
 	let unseeAll = document.getElementById('unsee-all');
 	unseeAll.addEventListener('click', function (ev) {
-		for(let i = unsee_functions.length - 1; i >= 0; i--) {
+		for (let i = unsee_functions.length - 1; i >= 0; i--) {
 			unsee_functions[i]();
 		}
 	});
 
 	setupFeatureClickPopup()
 
-//	setupLoginForm()
+	//	setupLoginForm()
 
 	//////////////////////////////////////////////////////
 	// Functions
 	//////////////////////////////////////////////////////
 
-	async function setupLayer_promise(layer_info, layer_group_id, group_layer_div)
-    {
-        let layer_div = document.createElement('div');
-        layer_div.className = 'layer-div inactive';
+	async function setupLayer_promise(layer_info, layer_group_id, group_layer_div) {
+		let layer_div = document.createElement('div');
+		layer_div.className = 'layer-div inactive';
 
-        let layer_div_svg = document.createElement('div');
-        layer_div_svg.style.display = 'flex';
-        layer_div_svg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="27px" height="27px">' +
-            '<ellipse style="fill: ' + layer_info.color + '" rx="13.5" ry="13.5" cx="13.5" cy="13.5">' +
-            '</ellipse>' +
-            '</svg>';
-        layer_div.appendChild(layer_div_svg);
+		let layer_div_svg = document.createElement('div');
+		layer_div_svg.style.display = 'flex';
+		layer_div_svg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="27px" height="27px">' +
+			'<ellipse style="fill: ' + layer_info.color + '" rx="13.5" ry="13.5" cx="13.5" cy="13.5">' +
+			'</ellipse>' +
+			'</svg>';
+		layer_div.appendChild(layer_div_svg);
 
-        let layer_label_div = document.createElement('div');
-        layer_label_div.className = 'layer-label-div';
-        layer_label_div.style.backgroundColor = layer_info.color;
-        layer_div.appendChild(layer_label_div);
+		let layer_label_div = document.createElement('div');
+		layer_label_div.className = 'layer-label-div';
+		layer_label_div.style.backgroundColor = layer_info.color;
+		layer_div.appendChild(layer_label_div);
 
-        let layer_label_div_span = document.createElement('span');
-        layer_label_div_span.textContent = layer_info.id;
-        layer_label_div.appendChild(layer_label_div_span);
+		let layer_label_div_span = document.createElement('span');
+		layer_label_div_span.textContent = layer_info.id;
+		layer_label_div.appendChild(layer_label_div_span);
 
-        let layer_label_div_img_hide = document.createElement('img');
-        layer_label_div_img_hide.className = 'img-hide';
-        layer_label_div_img_hide.src = 'img/ic_hide.svg';
-        layer_label_div.appendChild(layer_label_div_img_hide);
+		let layer_label_div_img_hide = document.createElement('img');
+		layer_label_div_img_hide.className = 'img-hide';
+		layer_label_div_img_hide.src = 'img/ic_hide.svg';
+		layer_label_div.appendChild(layer_label_div_img_hide);
 
-        let layer_label_div_img_loading = document.createElement('img');
-        layer_label_div_img_loading.className = 'img-loading';
-        layer_label_div_img_loading.src = 'img/ic_loading.svg';
-        layer_label_div.appendChild(layer_label_div_img_loading);
+		let layer_label_div_img_loading = document.createElement('img');
+		layer_label_div_img_loading.className = 'img-loading';
+		layer_label_div_img_loading.src = 'img/ic_loading.svg';
+		layer_label_div.appendChild(layer_label_div_img_loading);
 
-        group_layer_div.appendChild(layer_div);
+		group_layer_div.appendChild(layer_div);
 
-        if(layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
-            layer_info.imageMapping.length > 0) {
-            for(let i = 0; i < layer_info.imageMapping.length; i++) {
-                let imagesCall =env.ODH_MOBILITY_API_URI +
-                    "/flat/" +
-                    encodeURIComponent(layer_info.stationType) +
-                    "/" +
-                    encodeURIComponent(layer_info.imageMapping[i].dataType) +
-                    "/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
-                $.ajax({
-                    url: imagesCall,
-                    beforeSend: function (xhr) {
-                        if(AUTHORIZATION_TOKEN) {
-                            xhr.setRequestHeader("Authorization", "Bearer " + AUTHORIZATION_TOKEN);
-                        }
-                    },
-                    success: function( images_metadata ) {
-                        imageMapping[layer_info.stationType] = imageMapping[layer_info.stationType] || {};
-                        imageMapping[layer_info.stationType][layer_info.imageMapping[i].dataType] =
-                            images_metadata.data[0].tmetadata[layer_info.imageMapping[i].dataTypeMetadata];
-                    }
-                });
-            }
-        }
+		if (layer_info.imageMapping != undefined && layer_info.imageMapping != null &&
+			layer_info.imageMapping.length > 0) {
+			for (let i = 0; i < layer_info.imageMapping.length; i++) {
+				let imagesCall = env.ODH_MOBILITY_API_URI +
+					"/flat/" +
+					encodeURIComponent(layer_info.stationType) +
+					"/" +
+					encodeURIComponent(layer_info.imageMapping[i].dataType) +
+					"/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
+				$.ajax({
+					url: imagesCall,
+					beforeSend: function (xhr) {
+						if (AUTHORIZATION_TOKEN) {
+							xhr.setRequestHeader("Authorization", "Bearer " + AUTHORIZATION_TOKEN);
+						}
+					},
+					success: function (images_metadata) {
+						imageMapping[layer_info.stationType] = imageMapping[layer_info.stationType] || {};
+						imageMapping[layer_info.stationType][layer_info.imageMapping[i].dataType] =
+							images_metadata.data[0].tmetadata[layer_info.imageMapping[i].dataTypeMetadata];
+					}
+				});
+			}
+		}
 
-        let layer_selected = false;
-        let layer_loading = false;
+		let layer_selected = false;
+		let layer_loading = false;
 
-        var layer = null;
-
-
-        let refresh_function = async function()
-        {
-            // refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
-            if (!layer_selected || layer_loading)
-            {
-                return;
-            }
-            await toggle_layer_function()
-
-            if (layer_selected)
-            {
-                return;
-            }
-
-            await toggle_layer_function()
-        }
+		var layer = null;
 
 
-        let unsee_function = async function()
-        {
-            // refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
-            if (!layer_selected || layer_loading)
-            {
-                return;
-            }
-            await toggle_layer_function()
-        }
+		let refresh_function = async function () {
+			// refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
+			if (!layer_selected || layer_loading) {
+				return;
+			}
+			await toggle_layer_function()
 
-        let toggle_layer_function = async function()
-        {
-            // se il layer sta caricando ignora il click
-            if (layer_loading)
-                return;
+			if (layer_selected) {
+				return;
+			}
 
-            if (layer_selected)
-            {
-                // spegni layer
-                layer_selected = false;
-                layer_div.classList.add('inactive')
-                if(layer.get('routesLayer')) {
-                    map.removeLayer(layer.get('routesLayer'));
-                }
-                map.removeLayer(layer);
+			await toggle_layer_function()
+		}
 
-                // rimuovi il timer di aggiornamento automatico
-                autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function),1)
-                unsee_functions.splice(unsee_functions.indexOf(unsee_function),1)
-            }
-            else
-            {
-                // crea layer
-                // mostrare progress di caricamento
-                layer_loading = true;
-                layer_selected = true;
-                layer_div.classList.remove('inactive')
 
-                try
-                {
+		let unsee_function = async function () {
+			// refresh_function dovrebbe essere chiamata solo nello stato layer_selected e no layer_loading
+			if (!layer_selected || layer_loading) {
+				return;
+			}
+			await toggle_layer_function()
+		}
 
-                    let format = layer_info.format
-                    switch (format)
-                    {
-                        case 'integreen':
-                            switch (layer_group_id){
-                                case "Node Layer":
+		let toggle_layer_function = async function () {
+			// se il layer sta caricando ignora il click
+			if (layer_loading)
+				return;
 
-                                    layer = await loadIntegreenNodeLayer(layer_info, layer_div)
-                                    break;
-                                case "Edge Layer":
-                                    layer = await loadIntegreenEdgeLayer(layer_info, layer_div)
-                                    break;
-                                default:
-                                    // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-                                    alert('Unknow layer group: ' + layer_group_id)
-                                    break;
-                            }
-                            break;
-                        case 'wms':
-                            layer = await loadWMSLayer(layer_info)
-                            break;
-							case "road_events":
-									layer = await loadRoadEventsLayer(layer_info, layer_div)
+			if (layer_selected) {
+				// spegni layer
+				layer_selected = false;
+				layer_div.classList.add('inactive')
+				if (layer.get('routesLayer')) {
+					map.removeLayer(layer.get('routesLayer'));
+				}
+				map.removeLayer(layer);
+
+				// rimuovi il timer di aggiornamento automatico
+				autorefresh_functions.splice(autorefresh_functions.indexOf(refresh_function), 1)
+				unsee_functions.splice(unsee_functions.indexOf(unsee_function), 1)
+			}
+			else {
+				// crea layer
+				// mostrare progress di caricamento
+				layer_loading = true;
+				layer_selected = true;
+				layer_div.classList.remove('inactive')
+
+				try {
+
+					let format = layer_info.format
+					switch (format) {
+						case 'integreen':
+							switch (layer_group_id) {
+								case "Node Layer":
+
+									layer = await loadIntegreenNodeLayer(layer_info, layer_div)
 									break;
-                        default:
-                            // meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
-                            alert('Unknow format: ' + format)
-                            break;
-                    }
-                }
-                catch (e)
-                {
-                    error_console.textContent = format_time() + ': ' + e;
+								case "Edge Layer":
+									layer = await loadIntegreenEdgeLayer(layer_info, layer_div)
+									break;
+								default:
+									// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+									alert('Unknow layer group: ' + layer_group_id)
+									break;
+							}
+							break;
+						case 'wms':
+							layer = await loadWMSLayer(layer_info)
+							break;
+						case "road_events":
+							layer = await loadRoadEventsLayer(layer_info, layer_div)
+							break;
+						default:
+							// meglio sarebbe lanciare un eccezione per bloccare l'esecuzione successiva!
+							alert('Unknow format: ' + format)
+							break;
+					}
+				}
+				catch (e) {
+					error_console.textContent = format_time() + ': ' + e;
 					console.error(e)
-                }
-                finally
-                {
+				}
+				finally {
 
-                    layer_loading = false;
+					layer_loading = false;
 
-                    autorefresh_functions.push(refresh_function)
-                    unsee_functions.push(unsee_function)
-                }
+					autorefresh_functions.push(refresh_function)
+					unsee_functions.push(unsee_function)
+				}
 
-            }
-        }
+			}
+		}
 
-        layer_div.addEventListener('click', toggle_layer_function)
-    }
+		layer_div.addEventListener('click', toggle_layer_function)
+	}
 
-	async function setupLayerGroup_promise(layer_group, group_layer_div)
-	{
-	    let layer_div = document.createElement('div');
-	    layer_div.className = 'layer-div';
+	async function setupLayerGroup_promise(layer_group, group_layer_div) {
+		let layer_div = document.createElement('div');
+		layer_div.className = 'layer-div';
 
-        let layer_div_span = document.createElement('span');
-        layer_div_span.textContent = layer_group.id;
-        layer_div.appendChild(layer_div_span);
+		let layer_div_span = document.createElement('span');
+		layer_div_span.textContent = layer_group.id;
+		layer_div.appendChild(layer_div_span);
 
-        let layer_div_img = document.createElement('img');
-        layer_div_img.src = 'img/ic_arrow_down.svg';
-        layer_div_img.style = 'margin-left: 28px';
-        layer_div.appendChild(layer_div_img);
+		let layer_div_img = document.createElement('img');
+		layer_div_img.src = 'img/ic_arrow_down.svg';
+		layer_div_img.style = 'margin-left: 28px';
+		layer_div.appendChild(layer_div_img);
 
-        layers_container.appendChild(layer_div);
+		layers_container.appendChild(layer_div);
 
-        let groupVisivle = false;
+		let groupVisivle = false;
 
-        let toggle_layer_function = async function()
-        {
-            if(groupVisivle) {
-                group_layer_div.style.display = 'none';
-                groupVisivle = false;
-            } else {
-                group_layer_div.style.display = 'block';
-                groupVisivle = true;
-            }
-        }
+		let toggle_layer_function = async function () {
+			if (groupVisivle) {
+				group_layer_div.style.display = 'none';
+				groupVisivle = false;
+			} else {
+				group_layer_div.style.display = 'block';
+				groupVisivle = true;
+			}
+		}
 
-        layer_div.addEventListener('click', toggle_layer_function)
+		layer_div.addEventListener('click', toggle_layer_function)
 	}
 
 
-	function startAutoRefresh()
-	{
+	function startAutoRefresh() {
 		let now_millis = new Date().getTime()
 		let next_time = 600000 - now_millis % 600000
-		setTimeout(async function()
-		{
+		setTimeout(async function () {
 			let refresh_local_copy = autorefresh_functions.slice();
-			for (let i = 0; i < refresh_local_copy.length; i++)
-			{
+			for (let i = 0; i < refresh_local_copy.length; i++) {
 				refresh_local_copy[i]()
 			}
 			startAutoRefresh()
 		}, next_time)
 	}
 
-	function setupFeatureClickPopup()
-	{
+	function setupFeatureClickPopup() {
 		var popup_element = document.getElementById('map-popup');
 		var popup_close = document.getElementById('map-popup-close');
 
@@ -398,15 +376,13 @@ async function map_start_promise()
 		var details_title = document.getElementById('details-title');
 		var details_container = document.getElementById('details-container');
 
-		popup_close.addEventListener('click', function()
-		{
+		popup_close.addEventListener('click', function () {
 			popup_overlay.setPosition()
 		})
 
-		details_close.addEventListener('click', function()
-		{
-			details_content.textContent  = '';
-            details_title.textContent = '';
+		details_close.addEventListener('click', function () {
+			details_content.textContent = '';
+			details_title.textContent = '';
 			details_container.style.display = "none";
 			if (selectedFeature != null)
 				selectedFeature.changed();
@@ -415,9 +391,9 @@ async function map_start_promise()
 		})
 
 		var popup_overlay = new ol.Overlay({
-			element : popup_element,
-			positioning : 'bottom-center',
-			offset : [ 0, -30 ]
+			element: popup_element,
+			positioning: 'bottom-center',
+			offset: [0, -30]
 		})
 		map.addOverlay(popup_overlay);
 
@@ -425,8 +401,7 @@ async function map_start_promise()
 
 		//
 		// handle the click event on the map
-		map.on('click', async function(e)
-		{
+		map.on('click', async function (e) {
 			var features = map.getFeaturesAtPixel(e.pixel);
 
 			// close the details popup when the click was not on a feature - (does not work)
@@ -436,8 +411,7 @@ async function map_start_promise()
 			}
 
 			// clustered icon? simply zoom!
-			if (features[0].get("features").length > 1)
-			{
+			if (features[0].get("features").length > 1) {
 				let currZoom = map.getView().getZoom();
 				let nextZoom = currZoom + 1;
 				let nextResolution = map.getView().getResolutionForZoom(nextZoom)
@@ -462,7 +436,7 @@ async function map_start_promise()
 
 			// show feature details popup
 			let color = selectedFeature.getProperties()['color'];
-			details_content.textContent  = 'loading ...';
+			details_content.textContent = 'loading ...';
 			details_title.textContent = '';
 			details_header.style.backgroundColor = color;
 			details_icon.src = "img/marker/icons/" + layer_info.icons[1];
@@ -484,7 +458,7 @@ async function map_start_promise()
 				valueDiv.textContent = valueText;
 				valueDiv.className = "details-value"
 				row.appendChild(valueDiv);
-				if(highlited){
+				if (highlited) {
 					valueDiv.className += ' highlited';
 					valueDiv.style = "background-color: " + color;
 				}
@@ -492,12 +466,12 @@ async function map_start_promise()
 			}
 
 			// from now on, we handle the click depending on the format of the feature that was clicked
-			
+
 			// handle the road_events feature format
 			if (layer_info.format == "road_events") {
 				const data = selectedFeature.get('data')
 				details_content.textContent = '';
-                details_content.style.marginTop = details_header.clientHeight + 'px';
+				details_content.style.marginTop = details_header.clientHeight + 'px';
 				createDetailsRow('evcategory', data.evcategory, false);
 				createDetailsRow('evend', data.evend, false);
 				createDetailsRow('evname', data.evname, false);
@@ -557,35 +531,35 @@ async function map_start_promise()
 
 				return
 			}
-			
+
 			// handle the integreen feature format
 			else if (layer_info.format == "integreen") {
 				var scode = selectedFeature.getProperties()['scode'];
 				var stationType = selectedFeature.getProperties()['stationType'];
 				let station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*/latest?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
-				if(station_data_json.data == undefined
+				if (station_data_json.data == undefined
 					|| jQuery.isEmptyObject(station_data_json.data)
 					|| station_data_json.data[stationType] == undefined
 					|| station_data_json.data[stationType].stations == undefined
-					|| jQuery.isEmptyObject(station_data_json.data[stationType].stations)){
+					|| jQuery.isEmptyObject(station_data_json.data[stationType].stations)) {
 					station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "/*?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
-						if(station_data_json.data == undefined
-							|| jQuery.isEmptyObject(station_data_json.data)
-							|| station_data_json.data[stationType] == undefined
-							|| station_data_json.data[stationType].stations == undefined
-							|| jQuery.isEmptyObject(station_data_json.data[stationType].stations)){
-							station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
-						}
+					if (station_data_json.data == undefined
+						|| jQuery.isEmptyObject(station_data_json.data)
+						|| station_data_json.data[stationType] == undefined
+						|| station_data_json.data[stationType].stations == undefined
+						|| jQuery.isEmptyObject(station_data_json.data[stationType].stations)) {
+						station_data_json = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/tree/" + stationType + "?where=scode.eq.\"" + scode + "\"", AUTHORIZATION_TOKEN)
+					}
 				}
 				var integreen_data = station_data_json.data[stationType].stations[scode];
 
-                details_title.textContent = integreen_data['sname'];
-                details_content.style.marginTop = details_header.clientHeight + 'px';
+				details_title.textContent = integreen_data['sname'];
+				details_content.style.marginTop = details_header.clientHeight + 'px';
 				details_content.textContent = ''
 
 				createDetailsRow('code', integreen_data['scode'], true);
 				createDetailsRow('name', integreen_data['sname'], false);
-				if(!!integreen_data['scoordinate']) {
+				if (!!integreen_data['scoordinate']) {
 					createDetailsRow('latitude', integreen_data['scoordinate']['y'], false);
 					createDetailsRow('longitude', integreen_data['scoordinate']['x'], false);
 					createDetailsRow('EPSG', integreen_data['scoordinate']['srid'], false);
@@ -593,7 +567,7 @@ async function map_start_promise()
 				createDetailsRow('origin', integreen_data['sorigin'], false);
 				createDetailsRow('type', integreen_data['stype'], false);
 				for (var name in integreen_data['smetadata']) {
-					if(name != 'coordinates') {
+					if (name != 'coordinates') {
 						createDetailsRow(name, integreen_data['smetadata'][name], false);
 					}
 				}
@@ -602,11 +576,10 @@ async function map_start_promise()
 				details_content.appendChild(valuesDiv)
 				let mainValuesDiv = document.createElement('div')
 				let moreValuesDiv = document.createElement('div')
-				moreValuesDiv.style.display ='none';
+				moreValuesDiv.style.display = 'none';
 
-				try
-				{
-					if(integreen_data.sdatatypes == undefined || integreen_data.sdatatypes == null) {
+				try {
+					if (integreen_data.sdatatypes == undefined || integreen_data.sdatatypes == null) {
 						valuesDiv.textContent = 'This ' + integreen_data['stype'] + ' has no associated types or measurements, or your privileges are not sufficient';
 					} else {
 						let json_datatypes = Object.values(integreen_data.sdatatypes)
@@ -741,28 +714,27 @@ async function map_start_promise()
 						}
 					}
 				}
-				catch (e)
-				{
+				catch (e) {
 					console.log(e)
 					valuesDiv.textContent = 'Error! Not authorized?';
 				}
 			}
 		});
 
-		map.on('pointermove', function(e) {
+		map.on('pointermove', function (e) {
 			let preHoverFeature = hoverFeature;
 			hoverFeature = null;
 
-			map.forEachFeatureAtPixel(e.pixel, function(f) {
+			map.forEachFeatureAtPixel(e.pixel, function (f) {
 				hoverFeature = f;
 				return true;
 			});
 
-			if(hoverFeature == null && preHoverFeature != null) {
+			if (hoverFeature == null && preHoverFeature != null) {
 				preHoverFeature.changed();
 			}
 
-			if(hoverFeature != null && hoverFeature != preHoverFeature) {
+			if (hoverFeature != null && hoverFeature != preHoverFeature) {
 				hoverFeature.changed();
 			}
 		});
@@ -776,44 +748,41 @@ async function map_start_promise()
 	let raw_marker_overlapping_marker_svg = null;
 	let raw_marker_overlapping_selected_marker_svg = null;
 
-	async function loadIntegreenNodeLayer(layer_info, loadingItem)
-	{
-		return new Promise(async function(ok,fail)
-		{
-            loadingItem.classList.add('loading');
-			try
-			{
-				if(raw_marker_svg == null || raw_marker_svg == undefined){
+	async function loadIntegreenNodeLayer(layer_info, loadingItem) {
+		return new Promise(async function (ok, fail) {
+			loadingItem.classList.add('loading');
+			try {
+				if (raw_marker_svg == null || raw_marker_svg == undefined) {
 					raw_marker_svg = await fetchSvg_promise('img/marker/marker.svg');
 				}
 				let marker_svg = raw_marker_svg.clone();
 				marker_svg.find('.marker-color').css('fill', layer_info.color);
 
-                if(raw_marker_selected_svg == null || raw_marker_selected_svg == undefined) {
+				if (raw_marker_selected_svg == null || raw_marker_selected_svg == undefined) {
 					raw_marker_selected_svg = await fetchSvg_promise('img/marker/marker_selected.svg')
 				}
 				let marker_selected_svg = raw_marker_selected_svg.clone();
 				marker_selected_svg.find('.marker-color').css('fill', layer_info.color);
 				marker_selected_svg.find('.layername-label').text(layer_info.id);
 
-				if(raw_marker_cluster_svg == null || raw_marker_cluster_svg == undefined) {
+				if (raw_marker_cluster_svg == null || raw_marker_cluster_svg == undefined) {
 					raw_marker_cluster_svg = await fetchSvg_promise('img/marker/marker_cluster.svg');
 				}
 				let marker_cluster_svg = raw_marker_cluster_svg.clone();
 				marker_cluster_svg.find('.marker-color').css('fill', layer_info.color);
 
-				if(raw_marker_cluster_size_svg == null || raw_marker_cluster_size_svg == undefined) {
+				if (raw_marker_cluster_size_svg == null || raw_marker_cluster_size_svg == undefined) {
 					raw_marker_cluster_size_svg = await fetchSvg_promise('img/marker/marker_cluster_size.svg');
 				}
 				let marker_cluster_size_svg = raw_marker_cluster_size_svg.clone();
 
-				if(raw_marker_overlapping_marker_svg == null || raw_marker_overlapping_marker_svg == undefined) {
+				if (raw_marker_overlapping_marker_svg == null || raw_marker_overlapping_marker_svg == undefined) {
 					raw_marker_overlapping_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker.svg')
 				}
 				let marker_overlapping_marker_svg = raw_marker_overlapping_marker_svg.clone();
 				marker_overlapping_marker_svg.find('.marker-color').css('fill', layer_info.color);
 
-				if(raw_marker_overlapping_selected_marker_svg == null || raw_marker_overlapping_selected_marker_svg == undefined) {
+				if (raw_marker_overlapping_selected_marker_svg == null || raw_marker_overlapping_selected_marker_svg == undefined) {
 					raw_marker_overlapping_selected_marker_svg = await fetchSvg_promise('img/marker/marker_overlapping_marker_selected.svg');
 				}
 				let marker_overlapping_selected_marker_svg = raw_marker_overlapping_selected_marker_svg.clone();
@@ -825,7 +794,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
-						src:  'data:image/svg+xml;base64,' + btoa(marker_svg[0].outerHTML),
+						src: 'data:image/svg+xml;base64,' + btoa(marker_svg[0].outerHTML),
 						scale: 0.6
 					}),
 					zIndex: 110
@@ -847,7 +816,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
-						src:  'data:image/svg+xml;base64,' + btoa(marker_selected_svg[0].outerHTML),
+						src: 'data:image/svg+xml;base64,' + btoa(marker_selected_svg[0].outerHTML),
 						scale: 0.6
 					}),
 					zIndex: 111
@@ -860,34 +829,34 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'pixel',
 						opacity: 1,
-						src:  'data:image/svg+xml;base64,' + btoa(marker_cluster_svg[0].outerHTML),
+						src: 'data:image/svg+xml;base64,' + btoa(marker_cluster_svg[0].outerHTML),
 						scale: 0.6
 					})
 				});
 
-                var iconStyleImage = new ol.style.Style({
-                    image: new ol.style.Icon({
-                        anchor: [0.5, +85],
-                        anchorXUnits: 'fraction',
-                        anchorYUnits: 'pixels',
-                        opacity: 1,
-                        src:  'img/marker/icons/' + layer_info.icons[0],
-                        scale: 0.6
-                    }),
+				var iconStyleImage = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, +85],
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'pixels',
+						opacity: 1,
+						src: 'img/marker/icons/' + layer_info.icons[0],
+						scale: 0.6
+					}),
 					zIndex: 112
-                });
+				});
 
-                var iconSelectedStyleImage = new ol.style.Style({
-                    image: new ol.style.Icon({
-                        anchor: [0.5, +120],
-                        anchorXUnits: 'fraction',
-                        anchorYUnits: 'pixels',
-                        opacity: 1,
-                        src:  'img/marker/icons/' + layer_info.icons[0],
-                        scale: 0.6
-                    }),
+				var iconSelectedStyleImage = new ol.style.Style({
+					image: new ol.style.Icon({
+						anchor: [0.5, +120],
+						anchorXUnits: 'fraction',
+						anchorYUnits: 'pixels',
+						opacity: 1,
+						src: 'img/marker/icons/' + layer_info.icons[0],
+						scale: 0.6
+					}),
 					zIndex: 113
-                });
+				});
 
 				var iconOverlappingStyle = new ol.style.Style({
 					image: new ol.style.Icon({
@@ -896,7 +865,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'fraction',
 						opacity: 1,
-						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_marker_svg[0].outerHTML),
+						src: 'data:image/svg+xml;base64,' + btoa(marker_overlapping_marker_svg[0].outerHTML),
 						scale: 0.6
 					}),
 					zIndex: 114
@@ -909,7 +878,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'fraction',
 						opacity: 1,
-						src:  'data:image/svg+xml;base64,' + btoa(marker_overlapping_selected_marker_svg[0].outerHTML),
+						src: 'data:image/svg+xml;base64,' + btoa(marker_overlapping_selected_marker_svg[0].outerHTML),
 						scale: 0.6
 					}),
 					zIndex: 115
@@ -917,7 +886,7 @@ async function map_start_promise()
 
 				var overlappingCenterCircleStyle = new ol.style.Style({
 					image: new ol.style.Circle({
-						radius: 36.5 * 0.6, fill: new ol.style.Fill({color: layer_info.color}), stroke: new ol.style.Stroke({color: layer_info.color}),
+						radius: 36.5 * 0.6, fill: new ol.style.Fill({ color: layer_info.color }), stroke: new ol.style.Stroke({ color: layer_info.color }),
 						scale: 0.6
 					})
 				});
@@ -928,7 +897,7 @@ async function map_start_promise()
 						anchorXUnits: 'fraction',
 						anchorYUnits: 'fraction',
 						opacity: 1,
-						src:  'img/marker/icons/' + layer_info.icons[0],
+						src: 'img/marker/icons/' + layer_info.icons[0],
 						scale: 0.6
 					})
 				});
@@ -936,20 +905,18 @@ async function map_start_promise()
 				var sourcevector = new ol.source.Vector({});
 
 				var clusterSource = new ol.source.Cluster({
-					distance: map.getView().getZoom() < disableClusteringZoomLevel? clusterDistance: 0,
+					distance: map.getView().getZoom() < disableClusteringZoomLevel ? clusterDistance : 0,
 					source: sourcevector
 				});
 
 				let layer = new ol.layer.Vector({
-					visible : true,
-					source : clusterSource,
-					style: function(list)
-					{
+					visible: true,
+					source: clusterSource,
+					style: function (list) {
 						let features = list.get('features')
 						let iconStyle = features[0].get('iconStyle');
 						let valueStyle = features[0].get('valueStyle');
-						if (features.length == 1)
-						{
+						if (features.length == 1) {
 							let isSelected = selectedFeature != null && selectedFeature === features[0];
 							if (features[0].overlapping) {
 								valueStyle.getImage().setScale(0.45);
@@ -960,7 +927,7 @@ async function map_start_promise()
 									valueStyle.getImage().setAnchor([-10, +27]);
 									return [shadowStyle, iconOverlappingStyle, valueStyle];
 								}
-							} else  {
+							} else {
 								valueStyle.getImage().setScale(0.6);
 								if (isSelected) {
 									valueStyle.getImage().setAnchor([-40, +190]);
@@ -1012,24 +979,24 @@ async function map_start_promise()
 				map.addLayer(layerRoute)
 				map.addLayer(layer)
 				layer.set('routesLayer', layerRoute)
-				if(map.getView().getZoom() < disableClusteringZoomLevel) {
+				if (map.getView().getZoom() < disableClusteringZoomLevel) {
 					layerRoute.setVisible(false);
 				}
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=" +
-					(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere): ""),
+					(layer_info.apiWhere ? encodeURIComponent(layer_info.apiWhere) : ""),
 					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
-				if(layer_info.icons.length > 1) {
+				if (layer_info.icons.length > 1) {
 					let datatype_period_duplicates = {};
 					let query_where_datatypes = "";
-					for(let i = 1; i < layer_info.icons.length; i++) {
+					for (let i = 1; i < layer_info.icons.length; i++) {
 						let key = layer_info.icons[i][1] + ";" + layer_info.icons[i][2];
-						if(!datatype_period_duplicates[key]) {
+						if (!datatype_period_duplicates[key]) {
 							datatype_period_duplicates[key] = true;
 							let query_datatype = "and(mperiod.eq." + layer_info.icons[i][2] + ",tname.eq.\"" + layer_info.icons[i][1].replace(/(['"\(\)\\])/g, "\\$1") + "\")";
-							query_where_datatypes += (query_where_datatypes === ""? "or(": ",") + query_datatype;
+							query_where_datatypes += (query_where_datatypes === "" ? "or(" : ",") + query_datatype;
 						}
 					}
 					query_where_datatypes += ")";
@@ -1043,13 +1010,13 @@ async function map_start_promise()
 						"&select=tmeasurements" +
 						"&showNull=true" +
 						"&where=" +
-							(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere) + ",": "") +
-							encodeURIComponent(query_where_datatypes),
+						(layer_info.apiWhere ? encodeURIComponent(layer_info.apiWhere) + "," : "") +
+						encodeURIComponent(query_where_datatypes),
 						AUTHORIZATION_TOKEN, loadingItem)
 					json_stations_status = {};
-					for( let m_stype of layer_info.stationType) {
-						if(json_stations_status_result.data[m_stype]) {
-							json_stations_status = {...json_stations_status, ...(json_stations_status_result.data[m_stype].stations)};
+					for (let m_stype of layer_info.stationType) {
+						if (json_stations_status_result.data[m_stype]) {
+							json_stations_status = { ...json_stations_status, ...(json_stations_status_result.data[m_stype].stations) };
 						}
 					}
 				}
@@ -1060,14 +1027,12 @@ async function map_start_promise()
 				let overlapping_star_features = [];
 				let allFeatures = [];
 
-				for (var i = 0; i < json_stations_flat.data.length; i++)
-				{
+				for (var i = 0; i < json_stations_flat.data.length; i++) {
 
-					let lat = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.y: 0;
-					let lon = json_stations_flat.data[i].scoordinate? json_stations_flat.data[i].scoordinate.x: 0;
+					let lat = json_stations_flat.data[i].scoordinate ? json_stations_flat.data[i].scoordinate.y : 0;
+					let lon = json_stations_flat.data[i].scoordinate ? json_stations_flat.data[i].scoordinate.x : 0;
 
-					if (!lat || !lon)
-					{
+					if (!lat || !lon) {
 						// skip if lat or lon is undefined, otherwise all the markers on the layer will not show!
 						continue;
 					}
@@ -1076,7 +1041,7 @@ async function map_start_promise()
 					var thing = new ol.geom.Point(ol.proj.transform([lon, lat], layer_info.projection, 'EPSG:3857'));
 
 					var featurething = new ol.Feature({
-						geometry : thing,
+						geometry: thing,
 						stationType: json_stations_flat.data[i].stype,
 						scode: json_stations_flat.data[i].scode,
 						'layer_info': layer_info,
@@ -1084,9 +1049,8 @@ async function map_start_promise()
 					});
 					featurething.setId(json_stations_flat.data[i].scode);
 
-					if (overlapping_points[key] != undefined)
-					{
-						if(overlapping_points[key][1] == -1) {
+					if (overlapping_points[key] != undefined) {
+						if (overlapping_points[key][1] == -1) {
 							let overlappingIndex = overlapping_groups.length;
 							overlapping_points[key][1] = overlappingIndex;
 							overlapping_points[key][2].overlapping = true;
@@ -1107,7 +1071,7 @@ async function map_start_promise()
 					var icona = 'transparent.svg';
 
 
-					if(json_stations_status[json_stations_flat.data[i].scode]) {
+					if (json_stations_status[json_stations_flat.data[i].scode]) {
 						for (var ic = 1; ic < layer_info.icons.length; ic++) {
 							// if (ic == 1)
 							// 	icona = 'black.svg'
@@ -1147,11 +1111,11 @@ async function map_start_promise()
 						zIndex: 116
 					});
 
-					featurething.setProperties({'iconStyle': iconStyle, 'valueStyle': valueStyle, 'color': layer_info.color})
+					featurething.setProperties({ 'iconStyle': iconStyle, 'valueStyle': valueStyle, 'color': layer_info.color })
 
 					allFeatures.push(featurething);
 				}
-				if(overlapping_star_features.length > 0) {
+				if (overlapping_star_features.length > 0) {
 
 					for (var i = 0; i < overlapping_star_features.length; i++) {
 						let coordinates = overlapping_star_features[i][0].getGeometry().flatCoordinates;
@@ -1181,22 +1145,19 @@ async function map_start_promise()
 				}
 				sourcevector.addFeatures(allFeatures);
 
-                loadingItem.classList.remove('loading');
+				loadingItem.classList.remove('loading');
 				ok(layer)
 			}
-			catch(e)
-			{
-                loadingItem.classList.remove('loading');
+			catch (e) {
+				loadingItem.classList.remove('loading');
 				fail(e)
 			}
 		})
 
 	}
 
-	async function loadIntegreenEdgeLayer(layer_info, loadingItem)
-	{
-		return new Promise(async function(ok,fail)
-		{
+	async function loadIntegreenEdgeLayer(layer_info, loadingItem) {
+		return new Promise(async function (ok, fail) {
 			try {
 
 				var sourcevector = new ol.source.Vector({
@@ -1205,28 +1166,28 @@ async function map_start_promise()
 
 				let parseColor = function (color) {
 					let m = color.match(/^#([0-9a-f]{3})$/i);
-					if( m) {
+					if (m) {
 						m = m[0];
 						return [
-							parseInt(m.charAt(1),16)*0x11,
-							parseInt(m.charAt(2),16)*0x11,
-							parseInt(m.charAt(3),16)*0x11
+							parseInt(m.charAt(1), 16) * 0x11,
+							parseInt(m.charAt(2), 16) * 0x11,
+							parseInt(m.charAt(3), 16) * 0x11
 						];
 					}
 
 					m = color.match(/^#([0-9a-f]{6})$/i);
-					if( m) {
+					if (m) {
 						m = m[0];
 						return [
-							parseInt(m.substr(1,2),16),
-							parseInt(m.substr(3,2),16),
-							parseInt(m.substr(5,2),16)
+							parseInt(m.substr(1, 2), 16),
+							parseInt(m.substr(3, 2), 16),
+							parseInt(m.substr(5, 2), 16)
 						];
 					}
 
 					m = color.match(/^rgb\s*\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)$/i);
-					if( m) {
-						return [m[1],m[2],m[3]];
+					if (m) {
+						return [m[1], m[2], m[3]];
 					}
 
 					return [0, 0, 0];
@@ -1234,7 +1195,7 @@ async function map_start_promise()
 
 				var layer = new ol.layer.Vector({
 					source: sourcevector,
-					style: function(list) {
+					style: function (list) {
 						let features = list.get('features')
 						let condColor = features[0].get('condColor');
 						if (selectedFeature != null && selectedFeature.getId() === features[0].getId())
@@ -1287,12 +1248,12 @@ async function map_start_promise()
 				map.addLayer(layer)
 
 
-                loadingItem.classList.add('loading');
+				loadingItem.classList.add('loading');
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
 					"/?limit=-1&distinct=true&select=egeometry,ecode,etype&where=eactive.eq.true" +
-					(layer_info.apiWhere? "," + encodeURIComponent(layer_info.apiWhere): ""),
+					(layer_info.apiWhere ? "," + encodeURIComponent(layer_info.apiWhere) : ""),
 					AUTHORIZATION_TOKEN, loadingItem);
 
 				let json_stations_status = {};
@@ -1317,13 +1278,13 @@ async function map_start_promise()
 					"&distinct=true" +
 					"&select=tmeasurements" +
 					"&where=" +
-						(layer_info.apiWhere? encodeURIComponent(layer_info.apiWhere) + ",": "") +
-						encodeURIComponent(query_where_datatypes),
+					(layer_info.apiWhere ? encodeURIComponent(layer_info.apiWhere) + "," : "") +
+					encodeURIComponent(query_where_datatypes),
 					AUTHORIZATION_TOKEN, loadingItem)
 				json_stations_status = {};
-				for( let m_stype of layer_info.stationType) {
-					if(json_stations_status_result.data[m_stype]) {
-						json_stations_status = {...json_stations_status, ...(json_stations_status_result.data[m_stype].stations)};
+				for (let m_stype of layer_info.stationType) {
+					if (json_stations_status_result.data[m_stype]) {
+						json_stations_status = { ...json_stations_status, ...(json_stations_status_result.data[m_stype].stations) };
 					}
 				}
 
@@ -1353,7 +1314,7 @@ async function map_start_promise()
 
 					let conditions = linkstationConfig[json_stations_flat.data[i].ecode];
 
-					if(conditions && json_stations_status[json_stations_flat.data[i].ecode]) {
+					if (conditions && json_stations_status[json_stations_flat.data[i].ecode]) {
 						for (var ic = 0; ic < conditions.length; ic++) {
 							try {
 								var cond = conditions[ic]
@@ -1379,30 +1340,29 @@ async function map_start_promise()
 					}
 
 
-					featurething.setProperties({'condColor': condColor, 'color': layer_info.color})
+					featurething.setProperties({ 'condColor': condColor, 'color': layer_info.color })
 
 					allFeatures.push(featurething);
 				}
 				sourcevector.addFeatures(allFeatures);
 
-                loadingItem.classList.remove('loading');
+				loadingItem.classList.remove('loading');
 				ok(layer)
 			}
-			catch(e)
-			{
+			catch (e) {
 				fail(e)
 			}
 		})
 
 	}
 
-	async function loadRoadEventsLayer(layer_info, loadingItem){
-		return new Promise(async function(ok,fail){
-			try{
+	async function loadRoadEventsLayer(layer_info, loadingItem) {
+		return new Promise(async function (ok, fail) {
+			try {
 				// define a function to compute dynamically the style for a feature/cluster
 				let RoadEventsStyle = function (feature) {
 					const size = feature.get('features').length;
-					if (size > 1){
+					if (size > 1) {
 						// style for clustered features
 						return new ol.style.Style({
 							image: new ol.style.Icon({
@@ -1427,7 +1387,7 @@ async function map_start_promise()
 						const event = feature.get('features')[0].get('data')
 						const evcategory = event.evcategory
 						let icon = layer_info.icons[1]
-						switch(evcategory){
+						switch (evcategory) {
 							// provider A22
 							case "A22:BrennerLEC_BrennerLec B3 90 T3 (km 138-167)":
 							case "A22:BrennerLEC_BrennerLec B3 II 90 T1 (km 77-100)":
@@ -1435,7 +1395,7 @@ async function map_start_promise()
 							case "A22:BrennerLEC_BrennerLec B3Nord 90 T1 (km 121-85)":
 							case "A22:BrennerLEC_BrennerLec B3Nord 90 T2 (km 142-121)":
 								icon = 'A22/h.png'
-								break	
+								break
 							case "A22:BrennerLEC_BrennerLec B4 II S.100/107 vel 90 SUD":
 							case "A22:BrennerLEC_BrennerLec B4 II S.107/100 vel 90 NORD":
 								icon = 'A22/g.png'
@@ -1446,7 +1406,7 @@ async function map_start_promise()
 							case "A22:BrennerLEC_BrennerLec B3Nord 100 T1 (km 121-85)":
 							case "A22:BrennerLEC_BrennerLec B3Nord 100 T2 (km 142-121)":
 								icon = 'A22/j.png'
-								break	
+								break
 							case "A22:BrennerLEC_BrennerLec B4 II S.100/107 vel 100 (BZ-SM)":
 							case "A22:BrennerLEC_BrennerLec B4 (BZ-SM)":
 							case "A22:BrennerLEC_BrennerLec B4 II S.103 (BZ-SM)":
@@ -1532,7 +1492,7 @@ async function map_start_promise()
 							case "intralci viabilità in e fuori Alto Adige | Verkehrsbehinderung für Zonen und aus. Südt.":
 							case "avvenimenti attuali | Aktuelle Ereignisse":
 							case "passi di montagna | Passstrassen":
-								icon = `PROVINCE_BZ/${event.evmetadata.tycodeValue}_${event.evmetadata.subTycodeValue}.gif`
+								icon = getProvinceBZIcon(event.evmetadata.subTycodeValue);
 								break
 							default:
 								console.warn("Please implement me")
@@ -1553,7 +1513,7 @@ async function map_start_promise()
 				})
 
 				var clusterSource = new ol.source.Cluster({
-					distance: map.getView().getZoom() < disableClusteringZoomLevel? clusterDistance: 0,
+					distance: map.getView().getZoom() < disableClusteringZoomLevel ? clusterDistance : 0,
 					source: source_vector
 				});
 
@@ -1566,7 +1526,7 @@ async function map_start_promise()
 
 				let api_uri = env.ODH_MOBILITY_API_URI
 				const api_resource_name = encodeURIComponent(layer_info.stationType)
-				
+
 				// let now = (new Date("2022-04-23T12:00")).toISOString() // use this date to debug
 				let now = (new Date()).toISOString()
 				let events_flat_json = await fetchJson_promise(
@@ -1574,7 +1534,7 @@ async function map_start_promise()
 					AUTHORIZATION_TOKEN,
 					loadingItem
 				);
-				
+
 				let features = []
 				events_flat_json.data.forEach(event => {
 					if (!event.evlgeometry) {
@@ -1600,25 +1560,23 @@ async function map_start_promise()
 						data: event,
 						color: layer_info.color
 					})
-					
+
 					features.push(myFeature)
 				})
 				source_vector.addFeatures(features);
 
 				loadingItem.classList.remove('loading');
 				ok(layer)
-			} catch(e) {
+			} catch (e) {
 				fail(e)
 			}
 		})
 	}
 
-	async function loadWMSLayer(layer_info)
-	{
-		return new Promise(function (ok, fail)
-		{
+	async function loadWMSLayer(layer_info) {
+		return new Promise(function (ok, fail) {
 			var sourcetile = new ol.source.TileWMS({
-				url: layer_info.url ,
+				url: layer_info.url,
 				serverType: 'geoserver'
 			})
 
@@ -1629,8 +1587,7 @@ async function map_start_promise()
 
 			map.addLayer(layer)
 
-			setTimeout(function()
-			{
+			setTimeout(function () {
 				ok(layer)
 			}, 500)
 
@@ -1640,28 +1597,23 @@ async function map_start_promise()
 
 	}
 
-	function fetchJson_promise(url, authorization_header, loadingItem)
-	{
-		return new Promise(function(success, fail)
-		{
+	function fetchJson_promise(url, authorization_header, loadingItem) {
+		return new Promise(function (success, fail) {
 			var xhttp = new XMLHttpRequest()
-			xhttp.open("GET", url , true);
-			if(authorization_header) {
+			xhttp.open("GET", url, true);
+			if (authorization_header) {
 				xhttp.setRequestHeader("Authorization", authorization_header);
 			}
-			xhttp.onreadystatechange = function(readystatechange)
-			{
+			xhttp.onreadystatechange = function (readystatechange) {
 				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
 				{
-					if (xhttp.status == 200)
-					{
+					if (xhttp.status == 200) {
 						var data = JSON.parse(xhttp.responseText)
 						success(data)
 					}
-					else
-					{
-						if(loadingItem) {
-                            loadingItem.classList.remove('loading');
+					else {
+						if (loadingItem) {
+							loadingItem.classList.remove('loading');
 						}
 						fail(url + ': ' + xhttp.status)
 					}
@@ -1671,23 +1623,18 @@ async function map_start_promise()
 		})
 	}
 
-	function fetchSvg_promise(url)
-	{
-		return new Promise(function(success, fail)
-		{
+	function fetchSvg_promise(url) {
+		return new Promise(function (success, fail) {
 			var xhttp = new XMLHttpRequest()
-			xhttp.open("GET", url , true);
-			xhttp.onreadystatechange = function(readystatechange)
-			{
+			xhttp.open("GET", url, true);
+			xhttp.onreadystatechange = function (readystatechange) {
 				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
 				{
-					if (xhttp.status == 200)
-					{
+					if (xhttp.status == 200) {
 						var data = $(xhttp.responseText).filter(function (i, el) { return $(el).is('svg') });
 						success(data);
 					}
-					else
-					{
+					else {
 						fail(url + ': ' + xhttp.status)
 					}
 				}
@@ -1696,25 +1643,20 @@ async function map_start_promise()
 		})
 	}
 
-	function fetchJsonLogin_promise(url, params)
-	{
-		return new Promise(function(success, fail)
-		{
+	function fetchJsonLogin_promise(url, params) {
+		return new Promise(function (success, fail) {
 			var xhttp = new XMLHttpRequest();
-			xhttp.open("POST", url , true);
+			xhttp.open("POST", url, true);
 			xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-			xhttp.onreadystatechange = function(readystatechange)
-			{
+			xhttp.onreadystatechange = function (readystatechange) {
 				if (xhttp.readyState == 4) // DONE: https://developer.mozilla.org/it/docs/Web/API/XMLHttpRequest/readyState
 				{
-					if (xhttp.status == 200)
-					{
+					if (xhttp.status == 200) {
 						var data = JSON.parse(xhttp.responseText)
 						success(data)
 					}
-					else
-					{
+					else {
 						fail(url + ': ' + xhttp.status)
 					}
 				}
@@ -1723,8 +1665,7 @@ async function map_start_promise()
 		})
 	}
 	// (european) date time string
-	function format_time()
-	{
+	function format_time() {
 		const pad0 = (instr) => {
 			let str = String(instr);
 			while (str.length < 2) {
@@ -1733,8 +1674,8 @@ async function map_start_promise()
 			return str;
 		};
 		let d = new Date();
-		return pad0(d.getDate())  + "/" + pad0(d.getMonth() + 1) + "/" + pad0(d.getFullYear()) + " " +
-			pad0(d.getHours()) + ":" + pad0(d.getMinutes())   + ":" + pad0(d.getSeconds());
+		return pad0(d.getDate()) + "/" + pad0(d.getMonth() + 1) + "/" + pad0(d.getFullYear()) + " " +
+			pad0(d.getHours()) + ":" + pad0(d.getMinutes()) + ":" + pad0(d.getSeconds());
 	}
 
 }
@@ -1742,42 +1683,39 @@ async function map_start_promise()
 
 
 
-function showMapOverview()
-{
-	document.getElementById('section_gfx').style.display='none';
+function showMapOverview() {
+	document.getElementById('section_gfx').style.display = 'none';
 	if (document.getElementById("gfx_data_cursor_pane")) {
-		document.getElementById("gfx_data_cursor_pane").style.display='none';
+		document.getElementById("gfx_data_cursor_pane").style.display = 'none';
 	}
 	if (document.getElementById("gfx_data_cursor_mark")) {
-		document.getElementById("gfx_data_cursor_mark").style.display='none';
+		document.getElementById("gfx_data_cursor_mark").style.display = 'none';
 	}
-	document.getElementById('section_map').style.display='flex';
+	document.getElementById('section_map').style.display = 'flex';
 	bzanalytics_map.updateSize();
 	document.getElementById('headline').classList.remove("active");
 	document.getElementById('map_overview').classList.add("active");
-	document.getElementById('section_events').style.display='none';
-    document.getElementById('show_events_btn').classList.remove("active");
+	document.getElementById('section_events').style.display = 'none';
+	document.getElementById('show_events_btn').classList.remove("active");
 }
 
-function showCharts()
-{
-	document.getElementById('section_gfx').style.display='block';
-	document.getElementById('section_map').style.display='none';
-    document.getElementById('map_overview').classList.remove("active");
-    document.getElementById('headline').classList.add("active");
-	document.getElementById('section_events').style.display='none';
-    document.getElementById('show_events_btn').classList.remove("active");
+function showCharts() {
+	document.getElementById('section_gfx').style.display = 'block';
+	document.getElementById('section_map').style.display = 'none';
+	document.getElementById('map_overview').classList.remove("active");
+	document.getElementById('headline').classList.add("active");
+	document.getElementById('section_events').style.display = 'none';
+	document.getElementById('show_events_btn').classList.remove("active");
 }
 
 
-function showEvents()
-{
-	document.getElementById('section_gfx').style.display='none';
-	document.getElementById('section_map').style.display='none';
-	document.getElementById('section_events').style.display='block';
-    document.getElementById('map_overview').classList.remove("active");
-    document.getElementById('headline').classList.remove("active");
-    document.getElementById('show_events_btn').classList.add("active");
+function showEvents() {
+	document.getElementById('section_gfx').style.display = 'none';
+	document.getElementById('section_map').style.display = 'none';
+	document.getElementById('section_events').style.display = 'block';
+	document.getElementById('map_overview').classList.remove("active");
+	document.getElementById('headline').classList.remove("active");
+	document.getElementById('show_events_btn').classList.add("active");
 }
 
 
@@ -1805,20 +1743,57 @@ function generatePointsCircle(count, centerCoords) {
 
 
 function distanceBetwennCoords(lat1, lon1, lat2, lon2) {
-	let degreesToRadians = function(degrees) {
+	let degreesToRadians = function (degrees) {
 		return degrees * Math.PI / 180;
 	}
 
 	var earthRadiusM = 6371000;
 
-	var dLat = degreesToRadians(lat2-lat1);
-	var dLon = degreesToRadians(lon2-lon1);
+	var dLat = degreesToRadians(lat2 - lat1);
+	var dLon = degreesToRadians(lon2 - lon1);
 
 	lat1 = degreesToRadians(lat1);
 	lat2 = degreesToRadians(lat2);
 
-	var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-		Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) * Math.cos(lat2);
-	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+	var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+		Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 	return earthRadiusM * c;
+}
+
+
+function getProvinceBZIcon(subTycodeValue) {
+	switch (subTycodeValue) {
+		case 'SPERRE':
+		case 'STEINSCHLAG':
+			return `PROVINCE_BZ/SPERRE.gif`;
+
+		case 'VORSICHT':
+		case 'BESCHRAENKUNG':
+			return `PROVINCE_BZ/VORSICHT.gif`;
+
+
+		case 'AMPELREGELUNG':
+		case 'EINENGUNG':
+		case 'GEGENVERKEHR':
+		case 'LKW_FAHRVERBOT':
+		case 'OELSPUR':
+		case 'SCHNEEFALL':
+		case 'STAU':
+		case 'UNFALL':
+		case 'WINTERAUSRUEST':
+		case 'BAUSTELLE':
+		case 'EISENBAHN':
+		case 'KREISVERKEHR':
+		case 'MESSE_BOZEN':
+		case 'RADAR':
+		case 'TIERE_AUF_FAHRB':
+		case 'VIEHABTRIEB':
+		case 'WINDBOEHEN':
+			return `PROVINCE_BZ/${subTycodeValue}.gif`;
+
+		default:
+			console.log(`icon not found for: ${subTycodeValue}. Using fallback`);
+			return `caution.svg`;
+	}
 }
