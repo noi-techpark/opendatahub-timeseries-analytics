@@ -1535,11 +1535,17 @@ async function map_start_promise() {
 					loadingItem
 				);
 
+				const yersterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+
 				let features = []
 				events_flat_json.data.forEach(event => {
+
+					// filter out events of type STAU and UNFALL that are not happened in the last 24 hours
+					if ((event.evmetadata.subTycodeValue === 'UNFALL' || event.evmetadata.subTycodeValue === 'STAU') && !('evend' in event) && new Date(event.evstart).getTime() <= yersterday.getTime())
+						return;
 					if (!event.evlgeometry) {
-						console.warn("An event has no geometry!")
-						console.log(event)
+						// console.warn("An event has no geometry!")
+						// console.log(event)
 						return
 					}
 					let coordinates = event.evlgeometry.coordinates
