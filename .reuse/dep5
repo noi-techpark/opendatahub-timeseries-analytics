@@ -3,7 +3,7 @@ Upstream-Name: it.bz.opendatahub.analytics
 Upstream-Contact: NOI Techpark <digital@noi.bz.it>
 Source: https://github.com/noi-techpark/it.bz.opendatahub.analytics
 
-Files: .github/* infrastructure/* .gitignore LICENSE.md .env.example src/main/webapp/fonts/* src/main/webapp/img/* src/main/webapp/*.json src/main/webapp/*.txt src/main/webapp/*.png
+Files: .github/* infrastructure/* .gitignore .pre-commit-config.yaml LICENSE.md .env.example src/main/webapp/fonts/* src/main/webapp/img/* src/main/webapp/*.json src/main/webapp/*.txt src/main/webapp/*.png
 Copyright: (c) NOI Techpark <digital@noi.bz.it>
 License: CC0-1.0
 
