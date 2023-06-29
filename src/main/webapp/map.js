@@ -9,7 +9,7 @@ async function map_start_promise() {
 	let autorefresh_functions = []
 	let unsee_functions = []
 	var disableClusteringZoomLevel = 18;
-	var clusterDistance = 80;
+	var clusterDistance = 40;
 	var clusterNumberIconsCache = {};
 
 	startAutoRefresh();
@@ -88,8 +88,8 @@ async function map_start_promise() {
 			enableRotation: false, // altrimenti sballano i tile calcolati da me
 			center: ol.proj.fromLonLat([11.34, 46.48]),
 			// zoom iniziale mappa
-			zoom: 12
-
+			zoom: 12,
+			maxZoom: 22,
 		})
 	});
 
@@ -413,11 +413,17 @@ async function map_start_promise() {
 			// clustered icon? simply zoom!
 			if (features[0].get("features").length > 1) {
 				let currZoom = map.getView().getZoom();
+
+				// if (currZoom === map.getView().getMaxZoom()) {
+				// 	// multiple points on same coordinate, expand cluster
+
+				// } else {
 				let nextZoom = currZoom + 1;
 				let nextResolution = map.getView().getResolutionForZoom(nextZoom)
 				let newcenter = map.getView().calculateCenterZoom(nextResolution, features[0].getGeometry().getCoordinates());
 				map.getView().setCenter(newcenter)
 				map.getView().setZoom(nextZoom)
+				// }
 				return;
 			}
 
@@ -1528,26 +1534,33 @@ async function map_start_promise() {
 				const api_resource_name = encodeURIComponent(layer_info.stationType)
 
 				// let now = (new Date("2022-04-23T12:00")).toISOString() // use this date to debug
-				let now = (new Date()).toISOString()
+				let date = new Date()
+				let now = date.toISOString()
 				let events_flat_json = await fetchJson_promise(
 					`${api_uri}/flat,event/${api_resource_name}/${now}/?limit=0&distinct=true`,
 					AUTHORIZATION_TOKEN,
 					loadingItem
 				);
 
-				const yersterday = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
+				const realtimeSubTypes = [
+					'UNFALL',
+					'STAU'
+				]
 
 				let features = []
 				events_flat_json.data.forEach(event => {
-
-					// filter out events of type STAU and UNFALL that are not happened in the last 24 hours
-					if ((event.evmetadata.subTycodeValue === 'UNFALL' || event.evmetadata.subTycodeValue === 'STAU') && !('evend' in event) && new Date(event.evstart).getTime() <= yersterday.getTime())
-						return;
 					if (!event.evlgeometry) {
-						// console.warn("An event has no geometry!")
+						console.warn("An event has no geometry!")
 						// console.log(event)
 						return
 					}
+
+					// filter for realtime events that happened in the last 24 hours
+					if (realtimeSubTypes.indexOf(event.evmetadata.subTycodeValue) > -1 &&
+						new Date(event.evstart).getTime() < date.getTime() - (24 * 60 * 60)) {
+						return;
+					}
+
 					let coordinates = event.evlgeometry.coordinates
 					let points = [];
 					if (Array.isArray(coordinates[0])) {
@@ -1569,7 +1582,20 @@ async function map_start_promise() {
 
 					features.push(myFeature)
 				})
-				source_vector.addFeatures(features);
+
+				// remove features with samex coordinates, since clustering currently 
+				// doesn,t support expanding itself if mutiple features are on the same coordinate
+				const coordinates = [];
+				const filteredFeatures = [];
+				features.forEach(feature => {
+					if (coordinates.indexOf(feature.getGeometry().getCoordinates().toString()) == -1) {
+						coordinates.push(feature.getGeometry().getCoordinates().toString());
+						filteredFeatures.push(feature);
+					}
+				});
+
+
+				source_vector.addFeatures(filteredFeatures);
 
 				loadingItem.classList.remove('loading');
 				ok(layer)
@@ -1799,7 +1825,7 @@ function getProvinceBZIcon(subTycodeValue) {
 			return `PROVINCE_BZ/${subTycodeValue}.gif`;
 
 		default:
-			console.log(`icon not found for: ${subTycodeValue}. Using fallback`);
+			// console.log(`icon not found for: ${subTycodeValue}. Using fallback`);
 			return `caution.svg`;
 	}
 }
