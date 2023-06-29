@@ -1557,6 +1557,7 @@ async function map_start_promise() {
 
 					// filter for realtime events that happened in the last 24 hours
 					if (realtimeSubTypes.indexOf(event.evmetadata.subTycodeValue) > -1 &&
+						!('evend' in event) &&
 						new Date(event.evstart).getTime() < date.getTime() - (24 * 60 * 60)) {
 						return;
 					}
