@@ -1542,11 +1542,6 @@ async function map_start_promise() {
 					loadingItem
 				);
 
-				const realtimeSubTypes = [
-					'UNFALL',
-					'STAU'
-				]
-
 				let features = []
 				events_flat_json.data.forEach(event => {
 					if (!event.evlgeometry) {
@@ -1556,9 +1551,7 @@ async function map_start_promise() {
 					}
 
 					// filter for realtime events that happened in the last 24 hours
-					if (realtimeSubTypes.indexOf(event.evmetadata.subTycodeValue) > -1 &&
-						!('evend' in event) &&
-						new Date(event.evstart).getTime() < date.getTime() - (24 * 60 * 60)) {
+					if (event.evorigin === 'PROVINCE_BZ' && new Date(event.evstart).getTime() < date.getTime() - (24 * 60 * 60)) {
 						return;
 					}
 
