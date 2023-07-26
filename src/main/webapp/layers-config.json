@@ -275,6 +275,72 @@
                 ]
             },
             {
+                "id": "BikeParking",
+                "icons": [
+                    "parking.svg",
+                    [
+                        "red.svg",
+                        "free",
+                        300,
+                        0,
+                        10
+                    ],
+                    [
+                        "yellow.svg",
+                        "free",
+                        300,
+                        10,
+                        100
+                    ],
+                    [
+                        "green.svg",
+                        "free",
+                        300,
+                        100,
+                        99999
+                    ],
+                    [
+                        "red.svg",
+                        "free",
+                        1,
+                        0,
+                        1
+                    ],
+                    [
+                        "green.svg",
+                        "free",
+                        1,
+                        1,
+                        99999
+                    ]
+                ],
+                "stationType": [
+                    "BikeParking"
+                ],
+                "projection": "EPSG:4326",
+                "format": "integreen",
+                "custom-function": null,
+                "color": "#E86161",
+                "main-data": [
+                    [
+                        "occupied",
+                        300
+                    ],
+                    [
+                        "free",
+                        300
+                    ],
+                    [
+                        "parking-forecast-30",
+                        1800
+                    ],
+                    [
+                        "parking-forecast-60",
+                        3600
+                    ]
+                ]
+            },
+            {
                 "id": "Bluetooth",
                 "icons": [
                     "bluetooth.svg",
