@@ -481,7 +481,7 @@ async function map_start_promise()
 					nameDiv.className = "details-name"
 					row.appendChild(nameDiv);
 					var valueDiv = document.createElement('div')
-					var valueText = value + "";
+					var valueText = typeof value === 'string'? value : JSON.stringify(value);
 					valueDiv.textContent = valueText;
 					valueDiv.className = "details-value"
 					row.appendChild(valueDiv);
