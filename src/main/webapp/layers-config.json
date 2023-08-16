@@ -281,36 +281,22 @@
                     [
                         "red.svg",
                         "free",
-                        300,
+                        600,
                         0,
                         10
                     ],
                     [
                         "yellow.svg",
                         "free",
-                        300,
+                        600,
                         10,
                         100
                     ],
                     [
                         "green.svg",
                         "free",
-                        300,
+                        600,
                         100,
-                        99999
-                    ],
-                    [
-                        "red.svg",
-                        "free",
-                        1,
-                        0,
-                        1
-                    ],
-                    [
-                        "green.svg",
-                        "free",
-                        1,
-                        1,
                         99999
                     ]
                 ],
@@ -323,20 +309,16 @@
                 "color": "#F58BB5",
                 "main-data": [
                     [
-                        "occupied",
-                        300
-                    ],
-                    [
                         "free",
-                        300
+                        600
                     ],
                     [
-                        "parking-forecast-30",
-                        1800
+                        "freeSpotsRegularBike",
+                        600
                     ],
                     [
-                        "parking-forecast-60",
-                        3600
+                        "freeSpotsElectricBike",
+                        600
                     ]
                 ]
             },
