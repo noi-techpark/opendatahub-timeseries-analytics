@@ -319,6 +319,10 @@
                     [
                         "freeSpotsElectricBike",
                         600
+                    ],
+                    [
+                        "usageState",
+                        600
                     ]
                 ]
             },
