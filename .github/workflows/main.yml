@@ -62,13 +62,6 @@ jobs:
           s3-bucket-name: ${{ env.AWS_S3_BUCKET_NAME }}
           folder: ./src/main/webapp
 
-      # Docker image for Kubernetes
-      - name: Build and push images
-        uses: noi-techpark/github-actions/docker-build-and-push@v2
-        with:
-          docker-username: ${{ github.actor }}
-          docker-password: ${{ secrets.GITHUB_TOKEN }}
-
   deploy-prod:
     runs-on: ubuntu-22.04
     if: github.ref == 'refs/heads/prod'
@@ -108,6 +101,29 @@ jobs:
           region: ${{ env.AWS_REGION }}
           s3-bucket-name: ${{ env.AWS_S3_BUCKET_NAME }}
           folder: ./src/main/webapp
+
+  docker-image:
+    runs-on: ubuntu-22.04
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    concurrency: docker-image
+    steps:
+      - name: Checkout source code
+        uses: noi-techpark/github-actions/checkout@v2
+
+      - name: Create .env file
+        uses: noi-techpark/github-actions/env-file@v2
+        env:
+          X_ENDPOINT_URL: "http://k8s-default-analytic-6c6ea3a111-1151876663.eu-west-1.elb.amazonaws.com"
+          X_ODH_MOBILITY_API_URI: "http://k8s-default-ninjaapi-d8e0f29158-1489128088.eu-west-1.elb.amazonaws.com/"
+          X_KEYCLOAK_AUTHORIZATION_URI: "https://auth.opendatahub.testingmachine.eu/auth"
+          X_KEYCLOAK_REALM: "noi"
+          X_KEYCLOAK_CLIENT_ID: "odh-mobility-analytics"
+          X_KEYCLOAK_REDIRECT_URI: "http://k8s-default-analytic-6c6ea3a111-1151876663.eu-west-1.elb.amazonaws.com"
+          X_KEYCLOAK_SILENT_CHECK_SSO_REDIRECT_URI: http://k8s-default-analytic-6c6ea3a111-1151876663.eu-west-1.elb.amazonaws.com/callback.html"
+
+      - name: Run dotenv-sed.sh
+        run: cd infrastructure && ./dotenv-sed.sh
 
       # Docker image for Kubernetes
       - name: Build and push images
