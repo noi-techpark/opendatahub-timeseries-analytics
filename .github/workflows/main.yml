@@ -115,7 +115,7 @@ jobs:
         uses: noi-techpark/github-actions/env-file@v2
         env:
           X_ENDPOINT_URL: "http://k8s-default-analytic-6c6ea3a111-1151876663.eu-west-1.elb.amazonaws.com"
-          X_ODH_MOBILITY_API_URI: "http://k8s-default-ninjaapi-d8e0f29158-1489128088.eu-west-1.elb.amazonaws.com/"
+          X_ODH_MOBILITY_API_URI: "http://k8s-default-ninjaapi-d8e0f29158-1489128088.eu-west-1.elb.amazonaws.com"
           X_KEYCLOAK_AUTHORIZATION_URI: "https://auth.opendatahub.testingmachine.eu/auth"
           X_KEYCLOAK_REALM: "noi"
           X_KEYCLOAK_CLIENT_ID: "odh-mobility-analytics"
