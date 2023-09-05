@@ -440,9 +440,6 @@ async function map_start_promise() {
 				return
 			}
 
-			console.log(layer_info.icons);
-			console.log(layer_info.icons[0]);
-
 			// show feature details popup
 			let color = selectedFeature.getProperties()['color'];
 			details_content.textContent = 'loading ...';
