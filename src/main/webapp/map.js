@@ -440,12 +440,15 @@ async function map_start_promise() {
 				return
 			}
 
+			console.log(layer_info.icons);
+			console.log(layer_info.icons[0]);
+
 			// show feature details popup
 			let color = selectedFeature.getProperties()['color'];
 			details_content.textContent = 'loading ...';
 			details_title.textContent = '';
 			details_header.style.backgroundColor = color;
-			details_icon.src = "img/marker/icons/" + layer_info.icons[1];
+			details_icon.src = "img/marker/icons/" + layer_info.icons[0];
 			details_content.style.marginTop = details_header.clientHeight + 'px';
 			details_container.style.display = 'block';
 			map.updateSize();
