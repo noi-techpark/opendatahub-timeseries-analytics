@@ -785,21 +785,6 @@
                 "main-data": []
             },
             {
-                "id": "A22",
-                "icons": [
-                    "caution_multiple.svg",
-                    "caution.svg"
-                ],
-                "stationType": [
-                    "A22"
-                ],
-                "format": "road_events",
-                "projection": "xxx",
-                "custom-function": null,
-                "color": "#A5ABB7",
-                "main-data": []
-            },
-            {
                 "id": "Province BZ",
                 "icons": [
                     "caution_multiple.svg",
