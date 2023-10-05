@@ -24,18 +24,19 @@
  * in order to get fed into the table webcomponent. The webcomponent needs also a
  * schema for the input data, which is also dynamically declared in this script.
  */
- 
+
 (() => {
     console.debug("loading the view-events.js script")
     // setTimeout(() => {console.clear()}, 2000)
 
     // this will contain the form state
     let state = {}
-    
+
     // define shorthands
     let $fromdate = jQuery("#events_fromdate")
     let $todate = jQuery("#events_todate")
     let _fromdate = document.querySelector("#events_fromdate")
+    let _openEnd = document.querySelector("#events_openend")
     let _todate = document.querySelector("#events_todate")
     let _today = document.querySelector("#events_range_today")
     let _ytoday = document.querySelector("#events_range_ytoday")
@@ -52,7 +53,7 @@
     $fromdate.datepicker("setDate", "-7")
     $todate.datepicker({ dateFormat: "yy-mm-dd" })
     $todate.datepicker("setDate", "0")
-    
+
     // set some preset dates when clicking on the date button controls
     _today.addEventListener("click", () => {
         $fromdate.datepicker("setDate", "0")
@@ -109,10 +110,10 @@
 
     // define a function to toggle the loading state of the query button
     const toggleLoadingState = () => {
-        _loader.style.visibility = 
+        _loader.style.visibility =
             _loader.style.visibility === 'visible' ?
-            'hidden' : 
-            'visible'
+                'hidden' :
+                'visible'
         _query.disabled = !_query.disabled
     }
 
@@ -120,7 +121,7 @@
     // define a function to transform the data of a single event coming from the API
     // to the data that is going to be fed into the reactive-table webcomponent
     const api2table = (event) => {
-        switch(state.provider) {
+        switch (state.provider) {
             case 'A22':
                 return {
                     evstart: event.evstart,
@@ -149,7 +150,7 @@
 
     // define a function to get the table schema dynamically depending on the data provider
     const getTableSchema = () => {
-        switch(state.provider) {
+        switch (state.provider) {
             case 'A22':
                 return [
                     {
@@ -248,19 +249,21 @@
         // do the ajax request against the API
         toggleLoadingState()
         let api_url = `${env.ODH_MOBILITY_API_URI}/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
-        api_url = !state.category ? api_url + "?limit=-1" : `${api_url}?where=evcategory.eq.${state.category}&limit=-1` 
+        api_url = !state.category ? api_url + "?limit=-1" : `${api_url}?where=evcategory.eq.${state.category}&limit=-1`
         const api_response = await fetchAuthorized(api_url, AUTHORIZATION_TOKEN)
         const response_body = await api_response.json()
         const data = response_body.data[state.provider]?.eventseries
-        
+
         // parse the request into a data structure that is going to be fed into the reactive-table webcomponent
         const events = []
-        for(const eventgroup_index in data) {
+        for (const eventgroup_index in data) {
             // the "tree" representation for events of the opendatahub API already returns all events
             // of a same serie grouped together; so we fist iterate through all event series...
             const eventgroup = data[eventgroup_index]
             for (const event_index in eventgroup.events) {
                 // ...then we loop through the single events inside of each serie
+
+
                 if (Object.keys(eventgroup.events).length > 1) {
                     // if the event serie contains more than one event, it means that there
                     // is a history to show; we collect the history in an array (they're already sorted
@@ -270,7 +273,9 @@
                     const event_with_subrows = []
                     for (const event_index2 in eventgroup.events) {
                         const event = eventgroup.events[event_index2]
-                        event_with_subrows.push(api2table(event))
+                        // open end checkbox
+                        if (_openEnd.checked || 'evend' in event)
+                            event_with_subrows.push(api2table(event))
                     }
                     events.push(event_with_subrows)
                     break // this breaks the loop over the event serie, so the serie is added only once
@@ -279,11 +284,15 @@
                     // dealing with a simple event, and we push it straight as an object, so
                     // that the reactive-table webcomponent will not show the + button
                     const event = eventgroup.events[event_index]
-                    events.push(api2table(event))
+                    // open end checkbox
+                    if (_openEnd.checked || 'evend' in event)
+                        events.push(api2table(event))
                 }
             }
         }
-        
+        console.debug("open end {}", _openEnd.checked);
+        console.debug("events {}", events.length);
+
         // feed the reactive-table webcomponent with the parsed data and its schema
         _table._schema = getTableSchema()
         _table._data = events
