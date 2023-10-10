@@ -295,6 +295,7 @@
 
         // feed the reactive-table webcomponent with the parsed data and its schema
         _table._schema = getTableSchema()
+        _table.data = JSON.stringify(events)
         _table._data = events
         toggleLoadingState()
     })
