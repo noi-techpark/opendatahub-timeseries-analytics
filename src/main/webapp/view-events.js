@@ -249,7 +249,21 @@
         // do the ajax request against the API
         toggleLoadingState()
         let api_url = `${env.ODH_MOBILITY_API_URI}/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
-        api_url = !state.category ? api_url + "?limit=-1" : `${api_url}?where=evcategory.eq.${state.category}&limit=-1`
+
+        // create where parameter
+        let where_params = [];
+        if (state.category)
+            where_params.push(`evcategory.eq.${state.category}`);
+        if (!_openEnd.checked)
+            where_params.push(`evend.neq.null`);
+        if (where_params.length == 0) {
+            api_url += "?limit=-1"
+        } else if (where_params.length == 1){
+            api_url = `${api_url}?where=${where_params[0]}&limit=-1`
+        } else {
+            api_url = `${api_url}?where=and(${where_params.join(',')})&limit=-1`
+        }
+
         const api_response = await fetchAuthorized(api_url, AUTHORIZATION_TOKEN)
         const response_body = await api_response.json()
         const data = response_body.data[state.provider]?.eventseries
@@ -273,9 +287,7 @@
                     const event_with_subrows = []
                     for (const event_index2 in eventgroup.events) {
                         const event = eventgroup.events[event_index2]
-                        // open end checkbox
-                        if (_openEnd.checked || 'evend' in event)
-                            event_with_subrows.push(api2table(event))
+                        event_with_subrows.push(api2table(event))
                     }
                     events.push(event_with_subrows)
                     break // this breaks the loop over the event serie, so the serie is added only once
@@ -284,9 +296,7 @@
                     // dealing with a simple event, and we push it straight as an object, so
                     // that the reactive-table webcomponent will not show the + button
                     const event = eventgroup.events[event_index]
-                    // open end checkbox
-                    if (_openEnd.checked || 'evend' in event)
-                        events.push(api2table(event))
+                    events.push(api2table(event))
                 }
             }
         }
