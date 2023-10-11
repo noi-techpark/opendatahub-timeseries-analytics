@@ -254,7 +254,7 @@
         let where_params = [];
         if (state.category)
             where_params.push(`evcategory.eq.${state.category}`);
-        if (!_openEnd.checked)
+        if (_openEnd.value == 'exclude')
             where_params.push(`evend.neq.null`);
         if (where_params.length == 0) {
             api_url += "?limit=-1"

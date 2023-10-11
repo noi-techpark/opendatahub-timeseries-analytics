@@ -309,8 +309,11 @@ SPDX-License-Identifier: AGPL-3.0-or-later
                 <input id="events_todate" type="text" size="12">
             </div>
             <div class="event_control">
-                <p>INCLUDE OPEN END EVENTS</p>
-                <input id="events_openend" checked="true" type="checkbox">
+                <p>OPEN END EVENTS</p>
+                <select name="events_openend" id="events_openend">
+                    <option value="include">INCLUDE</option>
+                    <option value="exclude">EXCLUDE</option>
+                </select>
             </div>
             <div class="event_control">
                 <p>DATA PROVIDER</p>
