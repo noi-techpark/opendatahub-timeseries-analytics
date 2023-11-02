@@ -93,6 +93,7 @@
             const api_response = await fetchAuthorized(`${env.ODH_MOBILITY_API_URI}/flat,event/${provider}?select=evcategory&distinct=1`, AUTHORIZATION_TOKEN)
             const response_body = await api_response.json()
             const categories = response_body.data.map(c => c.evcategory) // clean up the data
+            categories.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())) // sort alphabetically
             if (categories) {
                 addOption("All", "", _category, true) // add a catch-all fake category
                 categories.forEach(c => {
@@ -258,7 +259,7 @@
             where_params.push(`evend.neq.null`);
         if (where_params.length == 0) {
             api_url += "?limit=-1"
-        } else if (where_params.length == 1){
+        } else if (where_params.length == 1) {
             api_url = `${api_url}?where=${where_params[0]}&limit=-1`
         } else {
             api_url = `${api_url}?where=and(${where_params.join(',')})&limit=-1`
@@ -300,8 +301,6 @@
                 }
             }
         }
-        console.debug("open end {}", _openEnd.checked);
-        console.debug("events {}", events.length);
 
         // feed the reactive-table webcomponent with the parsed data and its schema
         _table._schema = getTableSchema()
