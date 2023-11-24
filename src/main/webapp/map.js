@@ -1711,6 +1711,7 @@ async function map_start_promise() {
 
 function showMapOverview() {
 	document.getElementById('section_gfx').style.display = 'none';
+	document.getElementById('section_events').style.display = 'none';
 	if (document.getElementById("gfx_data_cursor_pane")) {
 		document.getElementById("gfx_data_cursor_pane").style.display = 'none';
 	}
@@ -1721,7 +1722,6 @@ function showMapOverview() {
 	bzanalytics_map.updateSize();
 	document.getElementById('headline').classList.remove("active");
 	document.getElementById('map_overview').classList.add("active");
-	document.getElementById('section_events').style.display = 'none';
 	document.getElementById('show_events_btn').classList.remove("active");
 }
 
