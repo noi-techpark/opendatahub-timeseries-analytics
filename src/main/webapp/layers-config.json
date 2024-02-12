@@ -418,7 +418,8 @@
                     ]
                 ],
                 "stationType": [
-                    "TrafficSensor"
+                    "TrafficSensor",
+                    "TrafficDirection"
                 ],
                 "format": "integreen",
                 "projection": "EPSG:4326",
