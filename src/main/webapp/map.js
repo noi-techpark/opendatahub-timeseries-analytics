@@ -8,8 +8,8 @@
 async function map_start_promise() {
 	let autorefresh_functions = []
 	let unsee_functions = []
-	var disableClusteringZoomLevel = 18;
-	var clusterDistance = 40;
+	var disableClusteringZoomLevel = 1;
+	var clusterDistance = 1;
 	var clusterNumberIconsCache = {};
 
 	startAutoRefresh();
@@ -1779,6 +1779,8 @@ function getProvinceBZIcon(subTycodeValue) {
 			return `PROVINCE_BZ/WINDBOEHEN.gif`;
 		case 'RADARKONTROLLE':
 			return `PROVINCE_BZ/RADAR.gif`;
+		case 'KETTENPFLICHT':
+			return `PROVINCE_BZ/WINTERAUSRUEST.gif`;
 		case 'AMPELREGELUNG':
 		case 'EINENGUNG':
 		case 'GEGENVERKEHR':
