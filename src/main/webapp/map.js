@@ -1368,7 +1368,7 @@ async function map_start_promise() {
 				// define a function to compute dynamically the style for a feature/cluster
 				let RoadEventsStyle = function (feature) {
 					const size = feature.get('features').length;
-					if (size > 10) {
+					if (size > 1) {
 						// style for clustered features
 						return new ol.style.Style({
 							image: new ol.style.Icon({
@@ -1431,7 +1431,6 @@ async function map_start_promise() {
 
 				// let now = (new Date("2022-04-23T12:00")).toISOString() // use this date to debug
 				let date = new Date()
-				let timestamp = date.getTime()
 				let now = date.toISOString()
 				let events_flat_json = await fetchJson_promise(
 					`${api_uri}/flat,event/${api_resource_name}/${now}/?limit=0&distinct=true`,
@@ -1449,7 +1448,7 @@ async function map_start_promise() {
 
 					// filter Province BZ events for following logic
 					// https://github.com/noi-techpark/it.bz.opendatahub.analytics/issues/97
-					if (event.evorigin == "PROVINCE_BZ" && filterProvinceBZ(event, timestamp)) {
+					if (event.evorigin == "PROVINCE_BZ" && filterProvinceBZ(event, date)) {
 						return
 					}
 
@@ -1796,6 +1795,7 @@ function getProvinceBZIcon(subTycodeValue) {
 		case 'RADAR':
 		case 'TIERE_AUF_FAHRB':
 		case 'VIEHABTRIEB':
+		case 'RADWEG_SPERRE':
 			return `PROVINCE_BZ/${subTycodeValue}.gif`;
 
 		default:
@@ -1804,11 +1804,17 @@ function getProvinceBZIcon(subTycodeValue) {
 	}
 }
 
-function filterProvinceBZ(event, now) {
+function filterProvinceBZ(event, date) {
 	const startTs = new Date(event.evstart).getTime()
 	const endTs = new Date(event.evend).getTime()
 	const category = event.evcategory;
-	const last24hours = now - (24 * 60 * 60 * 1000) 
+	const now = date.getTime()
+	// use 00:00:00 for check if event today
+	let startDay = new Date(event.evstart)
+	startDay.setHours(0,0,0,0)
+	startDay = startDay.getTime()
+	date.setHours(0,0,0,0)
+	let today = date.getTime()
 
 	// filter out old events, that don't have new code typeCode_subTypeCode
 	if(!category.includes("_") || category.includes("  | ")){
@@ -1829,11 +1835,10 @@ function filterProvinceBZ(event, now) {
 		case "intralci viabilità in e fuori Alto Adige_caduta frana | Verkehrsbehinderung für Zonen und aus. Südt._Murenabgang und Strassenverlegung":
 		case "intralci viabilità in e fuori Alto Adige_manifestazione | Verkehrsbehinderung für Zonen und aus. Südt._Veranstaltungen":
 		case "intralci viabilità in e fuori Alto Adige_senso unico alternato con semafero | Verkehrsbehinderung für Zonen und aus. Südt._Ampelregelung":
-			return startTs <= last24hours
+			return startDay === today
 		default:
-			// console.warn("PROVINCE_BZ: No fitler defined for category: " + category)
-			// return true;
-			// if (category.includes("Situazione attuale"))
-			return startTs <= last24hours
+			if (category.includes("Situazione attuale"))
+				return startDay === today
+			return false
 	}
 }
