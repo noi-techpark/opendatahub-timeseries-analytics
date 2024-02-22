@@ -1773,12 +1773,13 @@ function getProvinceBZIcon(subTycodeValue) {
 		case 'SPERRE':
 		case 'STEINSCHLAG':
 			return `PROVINCE_BZ/SPERRE.gif`;
-
 		case 'VORSICHT':
 		case 'BESCHRAENKUNG':
 			return `PROVINCE_BZ/VORSICHT.gif`;
-
-
+		case 'WINDBÖHEN':
+			return `PROVINCE_BZ/WINDBOEHEN.gif`;
+		case 'RADARKONTROLLE':
+			return `PROVINCE_BZ/RADAR.gif`;
 		case 'AMPELREGELUNG':
 		case 'EINENGUNG':
 		case 'GEGENVERKEHR':
@@ -1795,7 +1796,6 @@ function getProvinceBZIcon(subTycodeValue) {
 		case 'RADAR':
 		case 'TIERE_AUF_FAHRB':
 		case 'VIEHABTRIEB':
-		case 'WINDBOEHEN':
 			return `PROVINCE_BZ/${subTycodeValue}.gif`;
 
 		default:
@@ -1805,26 +1805,35 @@ function getProvinceBZIcon(subTycodeValue) {
 }
 
 function isVisibleProvinceBZ(event, now) {
-	let startTs = new Date(event.evstart).getTime()
-	let endTs = new Date(event.evend).getTime()
-	let category = event.evcategory;
+	const startTs = new Date(event.evstart).getTime()
+	const endTs = new Date(event.evend).getTime()
+	const category = event.evcategory;
+	const last24hours = now - (24 * 60 * 60 * 1000) 
+
+	// filter out old events, that don't have new code typeCode_subTypeCode
+	if(!category.includes("_") || category.includes("  | ")){
+		return false
+	}
+	console.log(category);
 
 	switch (category) {
-		case "intralci viabilità in e fuori Alto Adige_cantiere | Verkehrsbehinderung für Zonen und aus. Südt._Baustelle":
-			return now >= startTs && now <= endTs
-		case "intralci viabilità in e fuori Alto Adige_chiusura temporanea | Verkehrsbehinderung für Zonen und aus. Südt._kurzfristige oder zeitweilige Sperre":
+		case "intralci viabilità in e fuori Alto Adige_chiusura temporanea  | Verkehrsbehinderung für Zonen und aus. Südt._kurzfristige oder zeitweilige Sperre":
+			console.log("pla");
 			if (endTs === null || endTs === undefined)
 				return true
+			console.log("tata");
+			return now >= startTs && now <= endTs
+		case "intralci viabilità in e fuori Alto Adige_cantiere | Verkehrsbehinderung für Zonen und aus. Südt._Baustelle":
 			return now >= startTs && now <= endTs
 		case "intralci viabilità in e fuori Alto Adige_attenzione | Verkehrsbehinderung für Zonen und aus. Südt._Vorsicht":
 		case "intralci viabilità in e fuori Alto Adige_caduta frana | Verkehrsbehinderung für Zonen und aus. Südt._Murenabgang und Strassenverlegung":
 		case "intralci viabilità in e fuori Alto Adige_manifestazione | Verkehrsbehinderung für Zonen und aus. Südt._Veranstaltungen":
 		case "intralci viabilità in e fuori Alto Adige_senso unico alternato con semafero | Verkehrsbehinderung für Zonen und aus. Südt._Ampelregelung":
-			return startTs < now - (24 * 60 * 60)
+			return startTs >= last24hours
 		default:
-			if (category.includes("Situazione attuale"))
-				return startTs < now - (24 * 60 * 60)
-			console.warn("PROVINCE_BZ: No fitler defined for category: " + category)
-			return false;
+			// console.warn("PROVINCE_BZ: No fitler defined for category: " + category)
+			// return true;
+			// if (category.includes("Situazione attuale"))
+			return startTs >= last24hours
 	}
 }
