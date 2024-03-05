@@ -1448,7 +1448,7 @@ async function map_start_promise() {
 
 					// filter Province BZ events for following logic
 					// https://github.com/noi-techpark/it.bz.opendatahub.analytics/issues/97
-					if (event.evorigin == "PROVINCE_BZ" && filterProvinceBZ(event, date)) {
+					if (filterProvinceBZEvent(event, date)) {
 						return
 					}
 
@@ -1806,41 +1806,43 @@ function getProvinceBZIcon(subTycodeValue) {
 	}
 }
 
-function filterProvinceBZ(event, date) {
+
+// returns true, if PROVINCE_BZ event should NOT be visible on the map
+function filterProvinceBZEvent(event, date) {
+	if (event.evorigin !== "PROVINCE_BZ")
+		return false
+
 	const startTs = new Date(event.evstart).getTime()
 	const endTs = new Date(event.evend).getTime()
 	const category = event.evcategory;
 	const now = date.getTime()
 	// use 00:00:00 for check if event today
 	let startDay = new Date(event.evstart)
-	startDay.setHours(0,0,0,0)
+	startDay.setHours(0, 0, 0, 0)
 	startDay = startDay.getTime()
-	date.setHours(0,0,0,0)
+	date.setHours(0, 0, 0, 0)
 	let today = date.getTime()
 
 	// filter out old events, that don't have new code typeCode_subTypeCode
-	if(!category.includes("_") || category.includes("  | ")){
+	if (!category.includes("_") || category.includes("  | ")) {
 		return true
 	}
-	console.log(category);
 
 	switch (category) {
 		case "intralci viabilità in e fuori Alto Adige_chiusura temporanea  | Verkehrsbehinderung für Zonen und aus. Südt._kurzfristige oder zeitweilige Sperre":
-			console.log("pla");
 			if (endTs === null || endTs === undefined)
 				return false
-			console.log("tata");
-			return !(now >= startTs && now <= endTs)
+			return now <= startTs && now >= endTs
 		case "intralci viabilità in e fuori Alto Adige_cantiere | Verkehrsbehinderung für Zonen und aus. Südt._Baustelle":
-			return !(now >= startTs && now <= endTs)
+			return now <= startTs && now >= endTs
 		case "intralci viabilità in e fuori Alto Adige_attenzione | Verkehrsbehinderung für Zonen und aus. Südt._Vorsicht":
 		case "intralci viabilità in e fuori Alto Adige_caduta frana | Verkehrsbehinderung für Zonen und aus. Südt._Murenabgang und Strassenverlegung":
 		case "intralci viabilità in e fuori Alto Adige_manifestazione | Verkehrsbehinderung für Zonen und aus. Südt._Veranstaltungen":
 		case "intralci viabilità in e fuori Alto Adige_senso unico alternato con semafero | Verkehrsbehinderung für Zonen und aus. Südt._Ampelregelung":
-			return startDay === today
+			return startDay !== today
 		default:
 			if (category.includes("Situazione attuale"))
-				return startDay === today
+				return startDay !== today
 			return false
 	}
 }
