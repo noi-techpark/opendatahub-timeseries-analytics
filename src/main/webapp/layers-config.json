@@ -266,7 +266,8 @@
                 ],
                 "stationType": [
                     "ParkingStation",
-                    "ParkingSensor"
+                    "ParkingSensor",
+                    "ParkingFacility"
                 ],
                 "projection": "EPSG:4326",
                 "format": "integreen",
