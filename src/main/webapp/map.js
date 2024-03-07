@@ -8,8 +8,8 @@
 async function map_start_promise() {
 	let autorefresh_functions = []
 	let unsee_functions = []
-	var disableClusteringZoomLevel = 1;
-	var clusterDistance = 1;
+	var disableClusteringZoomLevel = 18;
+	var clusterDistance = 40;
 	var clusterNumberIconsCache = {};
 
 	startAutoRefresh();
@@ -49,7 +49,7 @@ async function map_start_promise() {
 		} else {
 			sources[sources.length] = new ol.source.OSM({
 				attributions: [
-					'Maps © <a href="http://www.thunderforest.com">Thunderforest</a>, Data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+					'<a target="_blank" href="http://www.opendatahub.com">OpenDataHub.com</a> | Maps © <a target="_blank" href="http://www.thunderforest.com">Thunderforest</a>, Data © <a target="_blank" href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
 				],
 				url: mapTileURLs[i][1] + env.THUNDERFOREST_MAP_API_KEY
 			})
