@@ -73,6 +73,15 @@
     })
 
 
+    const fetchAuthorized = (url, authToken) => {
+        if (authToken) {
+            return fetch(url, { headers: { "Authorization": authToken } })
+        } else {
+            return fetch(url)
+        }
+    }
+
+
     // load the categories dinamically every time the data provider is changed
     _provider.addEventListener("change", async (e) => {
         // add an <option> into a <select>
@@ -229,14 +238,6 @@
                         "type": "string"
                     }
                 ]
-        }
-    }
-
-    const fetchAuthorized = (url, authToken) => {
-        if (authToken) {
-            return fetch(url, { headers: { "Authorization": authToken } })
-        } else {
-            return fetch(url)
         }
     }
 
