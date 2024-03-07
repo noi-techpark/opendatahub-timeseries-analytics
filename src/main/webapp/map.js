@@ -45,7 +45,11 @@ async function map_start_promise() {
 
 	for (let i = 0; i < mapTileURLs.length; i++) {
 		if (i == 0) {
-			sources[0] = new ol.source.OSM();
+			sources[0] = new ol.source.OSM({
+				attributions: [
+					'<a target="_blank" href="http://www.opendatahub.com">OpenDataHub.com</a> | © <a target="_blank" href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+				],
+			});
 		} else {
 			sources[sources.length] = new ol.source.OSM({
 				attributions: [
