@@ -14,8 +14,6 @@ async function map_start_promise() {
 
 	startAutoRefresh();
 
-	let error_console = document.getElementById('error-console')
-
 	var layers_container = document.getElementById('layers-container')
 
 
@@ -309,7 +307,6 @@ async function map_start_promise() {
 					}
 				}
 				catch (e) {
-					error_console.textContent = format_time() + ': ' + e;
 					console.error(e)
 				}
 				finally {
