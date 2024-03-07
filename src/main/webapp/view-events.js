@@ -106,10 +106,7 @@
             if (categories) {
                 addOption("All", "", _category, true) // add a catch-all fake category
                 categories.forEach(c => {
-                    // filter out old categories, that don't have new code typeCode_subTypeCode
-                    if (c.includes("_") && !c.includes("  | ")) {
-                        addOption(c, encodeURIComponent(c), _category)
-                    }
+                    addOption(c, encodeURIComponent(c), _category)
                 })
             }
         }

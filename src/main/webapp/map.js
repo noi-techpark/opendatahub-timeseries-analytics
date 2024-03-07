@@ -1824,13 +1824,8 @@ function filterProvinceBZEvent(event, date) {
 	date.setHours(0, 0, 0, 0)
 	let today = date.getTime()
 
-	// filter out old events, that don't have new code typeCode_subTypeCode
-	if (!category.includes("_") || category.includes("  | ")) {
-		return true
-	}
-
 	switch (category) {
-		case "intralci viabilità in e fuori Alto Adige_chiusura temporanea  | Verkehrsbehinderung für Zonen und aus. Südt._kurzfristige oder zeitweilige Sperre":
+		case "intralci viabilità in e fuori Alto Adige_chiusura temporanea | Verkehrsbehinderung für Zonen und aus. Südt._kurzfristige oder zeitweilige Sperre":
 			if (endTs === null || endTs === undefined)
 				return false
 			return now <= startTs && now >= endTs
