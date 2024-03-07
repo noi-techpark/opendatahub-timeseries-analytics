@@ -16,6 +16,16 @@
                     [
                         "green.svg",
                         "precipitation",
+<<<<<<< HEAD
+=======
+                        600,
+                        0,
+                        0.1
+                    ],
+                    [
+                        "green.svg",
+                        "precipitation",
+>>>>>>> main
                         900,
                         0,
                         0.1
@@ -30,6 +40,16 @@
                     [
                         "yellow.svg",
                         "precipitation",
+<<<<<<< HEAD
+=======
+                        600,
+                        0.1,
+                        1
+                    ],
+                    [
+                        "yellow.svg",
+                        "precipitation",
+>>>>>>> main
                         900,
                         0.1,
                         1
@@ -44,6 +64,16 @@
                     [
                         "red.svg",
                         "precipitation",
+<<<<<<< HEAD
+=======
+                        600,
+                        1,
+                        99999
+                    ],
+                    [
+                        "red.svg",
+                        "precipitation",
+>>>>>>> main
                         900,
                         1,
                         99999
@@ -249,7 +279,8 @@
                 ],
                 "stationType": [
                     "ParkingStation",
-                    "ParkingSensor"
+                    "ParkingSensor",
+                    "ParkingFacility"
                 ],
                 "projection": "EPSG:4326",
                 "format": "integreen",
@@ -763,21 +794,6 @@
                     "LinkStation"
                 ],
                 "format": "integreen",
-                "projection": "xxx",
-                "custom-function": null,
-                "color": "#A5ABB7",
-                "main-data": []
-            },
-            {
-                "id": "A22",
-                "icons": [
-                    "caution_multiple.svg",
-                    "caution.svg"
-                ],
-                "stationType": [
-                    "A22"
-                ],
-                "format": "road_events",
                 "projection": "xxx",
                 "custom-function": null,
                 "color": "#A5ABB7",

@@ -2,12 +2,14 @@
     bz analytics
     graphics web ui / javascript
 
-    (C) 2018 IDM Suedtirol - Alto Adige
-    (C) 2019 NOI Techpark Suedtirol/Alto Adige
+    SPDX-FileCopyrightText: (C) 2018 IDM Suedtirol - Alto Adige
+    SPDX-FileCopyrightText: (C) 2019 NOI Techpark Suedtirol/Alto Adige
 
     see vendor/ for third pary libraries needed by this code
 
     author: chris@1006.org  
+
+    SPDX-License-Identifier: AGPL-3.0-or-later
 */
 
 'use strict';

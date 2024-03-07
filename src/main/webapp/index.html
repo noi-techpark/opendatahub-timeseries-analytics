@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,6 +16,7 @@
     <link rel="stylesheet" href="vendor/ol-ext/3.1.17/ol-ext.css">
     <link rel="stylesheet" href="map.css">
     <link rel="stylesheet" href="gfx.css">
+    <link rel="stylesheet" href="view-events.css">
     <link rel="stylesheet" href="https://scripts.opendatahub.testingmachine.eu/cookieconsent/cookieconsent.css">
     <link rel="stylesheet" href="vendor/jquery-ui/1.12.1/datepicker/jquery-ui.css">
     <link rel="stylesheet" href="fonts/roboto/style.css">
@@ -26,6 +33,7 @@
     <script src="authentification.js"></script>
     <script src="map.js"></script>
     <script src="gfx.js" defer></script>
+    <script src="view-events.js" defer></script>
     <script defer src="https://scripts.opendatahub.testingmachine.eu/cookieconsent/cookieconsent.js"></script>
     <script defer src="https://scripts.opendatahub.testingmachine.eu/cookieconsent/cookieconsent-init.js"></script>
 
@@ -55,6 +63,9 @@
             </div>
             <div class="header-nav-item" id="headline" onClick="showCharts()">
                 <span>Charts</span>
+            </div>
+            <div class="header-nav-item" id="show_events_btn" onClick="showEvents()">
+                <span>Events</span>
             </div>
         </div>
         <div class="header-login">
@@ -141,7 +152,7 @@
             })
         </script>
 
-        <div style="flex-shrink:0; background-color:#dddddd">(C) 2018 :::: ::: :::</div>
+        <div style="flex-shrink:0; background-color:#dddddd">(C) 2018-2023 NOI Techpark</div>
 
     </div>
 
@@ -281,6 +292,65 @@
 
     </div>
 
+    <!-- *** EVENTS ************************************************************************* -->
+    <div id="section_events" style="display:none; margin-top: 85px;">
+        <div id="events_controls">
+            <div class="event_control">
+                <p>PICK PRESET VALUES</p>
+                <button id="events_range_today">Today</button>
+                <button id="events_range_ytoday">Yesterday &amp; today</button>
+                <button id="events_range_week">One week</button>
+                <button id="events_range_month">One month</button>
+            </div>
+            <div class="event_control">
+                <p>OR SELECT A CUSTOM DATE RANGE</p>
+                <input id="events_fromdate" type="text" size="12">
+                <img src="img/ic_arrow_forward.svg" alt="to" style="width: 10px; margin-left: 10px; margin-right: 10px">
+                <input id="events_todate" type="text" size="12">
+            </div>
+            <div class="event_control">
+                <p>OPEN END EVENTS</p>
+                <select name="events_openend" id="events_openend">
+                    <option value="include">INCLUDE</option>
+                    <option value="exclude">EXCLUDE</option>
+                </select>
+            </div>
+            <div class="event_control">
+                <p>DATA PROVIDER</p>
+                <select name="events_data_provider" id="events_data_provider">
+                    <option value="">Select...</option>
+                    <option value="A22">A22</option>
+                    <option value="PROVINCE_BZ">PROVINCE_BZ</option>
+                </select>
+            </div>
+            <div class="event_control">
+                <p>CATEGORY</p>
+                <select name="events_category" id="events_category">
+                    <option value="">None</option>
+                </select>
+            </div>
+            <div class="event_control">
+                <p>AND HERE WE GO</p>
+                <button id="events_query_btn">
+                    <img src="img/marker/icons/gear.svg" id="icon_query_loading"/>
+                    Query
+                </button>
+            </div>
+        </div>
+        <div id="events_main">
+            <reactive-table id="events_table"
+                schema='[
+                    {
+                        "key": "empty",
+                        "name": "No query performed",
+                        "type": "string"
+                    }
+                ]'
+                date-format="DD/MM/YYYY - HH:mm"
+            />
+            <script src="https://cdn.webcomponents.opendatahub.testingmachine.eu/dist/1c694fdf-c113-4554-b6a6-febcb4c90155/reactive-table.min.js"></script>
+        </div>
+    </div>
 </body>
 
 </html>
