@@ -90,6 +90,9 @@ jobs:
       - name: Change scripts host to prod
         run: sed -i -e "s%https://scripts.opendatahub.testingmachine.eu%${{env.SCRIPTS_HOST}}%g" src/main/webapp/index.html
 
+      - name: Remove noindex, nofollow meta
+        run: sed -i -e 's/<meta name="robots" content="noindex, nofollow" \/>//g' src/main/webapp/index.html
+
       - name: Run dotenv-sed.sh
         run: cd infrastructure && ./dotenv-sed.sh
 
