@@ -251,11 +251,14 @@
         // do the ajax request against the API
         toggleLoadingState()
         let api_url = `${env.ODH_MOBILITY_API_URI}/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
+        
+        // must escape some special chars for timeseries API filter. %5C is a backslash
+        let escapeFilter = (str) => str.replaceAll(/[\(\),'"]/g, (match) => `%5C${match}`)
 
         // create where parameter
         let where_params = [];
         if (state.category)
-            where_params.push(`evcategory.eq.${state.category}`);
+            where_params.push(`evcategory.eq."${escapeFilter(state.category)}"`);
         if (_openEnd.value == 'exclude')
             where_params.push(`evend.neq.null`);
         if (where_params.length == 0) {
