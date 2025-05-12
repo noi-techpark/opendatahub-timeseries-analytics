@@ -252,8 +252,8 @@
         toggleLoadingState()
         let api_url = `${env.ODH_MOBILITY_API_URI}/tree,event/${state.provider}/${state.fromdate}/${state.todate}`
         
-        // must escape some special chars for timeseries API filter. %5C is a backslash
-        let escapeFilter = (str) => str.replaceAll(/[\(\),'"]/g, (match) => `%5C${match}`)
+        // must escape some special chars for timeseries API filter.
+        let escapeFilter = (str) => encodeURIComponent(decodeURIComponent(str).replaceAll(/[(),'"]/g, (match) => `\\${match}`))
 
         // create where parameter
         let where_params = [];
