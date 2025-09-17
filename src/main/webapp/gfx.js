@@ -737,7 +737,7 @@ const load_data = () => {
                 url += "?limit=-1";
                 url += "&distinct=true";
                 url += "&select=mvalue,mvalidtime,mperiod";
-                url += "&where=scode.eq.%22" + graph.station + "%22,mperiod.eq." + graph.period +",sactive.eq.true";
+                url += "&where=scode.eq.%22" + graph.station + "%22,mperiod.eq." + graph.period;
 
                 let headers = {};
                 if (AUTHORIZATION_TOKEN !== undefined && AUTHORIZATION_TOKEN !== null && AUTHORIZATION_TOKEN != "") {
