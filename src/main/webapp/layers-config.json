@@ -498,6 +498,20 @@
                 "main-data": []
             },
             {
+                "id": "PeopleCounter",
+                "icons": [
+                    "traffic.svg"
+                ],
+                "stationType": [
+                    "PeopleCounter"
+                ],
+                "format": "integreen",
+                "projection": "EPSG:4326",
+                "custom-function": null,
+                "color": "#4EB946",
+                "main-data": []
+            },
+            {
                 "id": "Road weather",
                 "icons": [
                     "road_weather.svg",
