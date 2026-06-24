@@ -170,11 +170,11 @@ const init_range = () => {
 
     jQuery("#gfx_fromdate").datepicker({ dateFormat: "yy-mm-dd",
                                          onSelect: show_days });
-    jQuery("#gfx_fromdate").datepicker("setDate", "-8");
+    jQuery("#gfx_fromdate").datepicker("setDate", state.scale.from ? new Date(state.scale.from) : "-8");
 
-    jQuery("#gfx_todate"  ).datepicker({ dateFormat: "yy-mm-dd", 
+    jQuery("#gfx_todate"  ).datepicker({ dateFormat: "yy-mm-dd",
                                          onSelect: show_days });
-    jQuery("#gfx_todate"  ).datepicker("setDate", "-1");
+    jQuery("#gfx_todate"  ).datepicker("setDate", state.scale.to   ? new Date(state.scale.to)   : "-1");
 
     qs("#gfx_fromdate").addEventListener("change", show_days);
     qs("#gfx_todate"  ).addEventListener("change", show_days);
@@ -936,9 +936,9 @@ let plot = ()  => {
 debug_log("gfx.js start");
 
 init_tabs();
+init_state_from_permalink();
 init_range();
 init_tab_dataset();
-init_state_from_permalink();
 init_plot_height();
 init_auto_refresh();
 show_legend();
