@@ -204,7 +204,7 @@ async function map_start_promise() {
 					encodeURIComponent(layer_info.stationType) +
 					"/" +
 					encodeURIComponent(layer_info.imageMapping[i].dataType) +
-					"/?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
+					"?limit=200&offset=0&shownull=false&distinct=true&select=tmetadata";
 				$.ajax({
 					url: imagesCall,
 					beforeSend: function (xhr) {
@@ -991,7 +991,7 @@ async function map_start_promise() {
 				}
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=" +
+					"?limit=-1&distinct=true&select=scoordinate%2Cscode%2Cstype&where=" +
 					(layer_info.apiWhere ? encodeURIComponent(layer_info.apiWhere) : ""),
 					AUTHORIZATION_TOKEN, loadingItem)
 				let json_stations_status = {};
@@ -1259,7 +1259,7 @@ async function map_start_promise() {
 
 
 				let json_stations_flat = await fetchJson_promise(env.ODH_MOBILITY_API_URI + "/flat,edge/" + encodeURIComponent(layer_info.stationType) +
-					"/?limit=-1&distinct=true&select=egeometry,ecode,etype&where=eactive.eq.true" +
+					"?limit=-1&distinct=true&select=egeometry,ecode,etype&where=eactive.eq.true" +
 					(layer_info.apiWhere ? "," + encodeURIComponent(layer_info.apiWhere) : ""),
 					AUTHORIZATION_TOKEN, loadingItem);
 
@@ -1434,7 +1434,7 @@ async function map_start_promise() {
 				let date = new Date()
 				let now = date.toISOString()
 				let events_flat_json = await fetchJson_promise(
-					`${api_uri}/flat,event/${api_resource_name}/${now}/?limit=0&distinct=true`,
+					`${api_uri}/flat,event/${api_resource_name}/${now}?limit=0&distinct=true`,
 					AUTHORIZATION_TOKEN,
 					loadingItem
 				);

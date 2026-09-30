@@ -52,6 +52,7 @@ let state = {
 
 let statedata = [];
 let statedata_status = [];
+let prepopulate_target_station = null;
 
 const CAT_CONFIG_URL = "layers-config.json";
 
@@ -170,11 +171,11 @@ const init_range = () => {
 
     jQuery("#gfx_fromdate").datepicker({ dateFormat: "yy-mm-dd",
                                          onSelect: show_days });
-    jQuery("#gfx_fromdate").datepicker("setDate", "-8");
+    jQuery("#gfx_fromdate").datepicker("setDate", state.scale.from ? new Date(state.scale.from) : "-8");
 
-    jQuery("#gfx_todate"  ).datepicker({ dateFormat: "yy-mm-dd", 
+    jQuery("#gfx_todate"  ).datepicker({ dateFormat: "yy-mm-dd",
                                          onSelect: show_days });
-    jQuery("#gfx_todate"  ).datepicker("setDate", "-1");
+    jQuery("#gfx_todate"  ).datepicker("setDate", state.scale.to   ? new Date(state.scale.to)   : "-1");
 
     qs("#gfx_fromdate").addEventListener("change", show_days);
     qs("#gfx_todate"  ).addEventListener("change", show_days);
@@ -208,8 +209,9 @@ const init_range = () => {
         refresh(); 
     });
 
+    state.scale.from = Number(jQuery("#gfx_fromdate").datepicker("getDate"));
+    state.scale.to   = Number(jQuery("#gfx_todate"  ).datepicker("getDate"));
     show_days();
-    refresh();
 };
 
 const show_days = () => {
@@ -353,6 +355,23 @@ const show_legend = () => {
 // --- SECTION_TAB_DATASET: tabbed panel -> add data set -----------------------
 // -----------------------------------------------------------------------------
 
+const prepopulate_add_form = () => {
+    if (state.graphs.length === 0) return;
+    if (Object.keys(CAT_BACKENDS).length === 0) return;
+
+    const categories = [...new Set(state.graphs.map(g => g.category))];
+    if (categories.length !== 1) return;
+
+    const common_category = categories[0];
+    const stations = [...new Set(state.graphs.map(g => g.station))];
+    if (stations.length === 1) {
+        prepopulate_target_station = state.graphs[0].station;
+    }
+
+    qs("#gfx_selcategory").value = common_category;
+    qs("#gfx_selcategory").dispatchEvent(new Event("change"));
+};
+
 const init_tab_dataset = () => {
 
     qs("#gfx_selstation").style.display = "none";
@@ -407,6 +426,15 @@ const init_tab_dataset = () => {
                     let next = qs("#gfx_selstation");
                     next.innerHTML = opt;
                     next.style.display = "inline-block";
+                    if (prepopulate_target_station !== null) {
+                        const target = prepopulate_target_station;
+                        prepopulate_target_station = null;
+                        const match = Array.from(next.options).find(o => o.value.startsWith(target + ";"));
+                        if (match) {
+                            next.value = match.value;
+                            next.dispatchEvent(new Event("change"));
+                        }
+                    }
                 });
                 break;
 
@@ -437,7 +465,7 @@ const init_tab_dataset = () => {
             default: 
 
                 jQuery.getJSON(CAT_BACKENDS[cat] + 
-                               "/*/?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22",
+                               "/*?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22",
                                (data) => {
                     data = data.data;
                     debug_log("got data types -> length = " + data.length);
@@ -603,6 +631,7 @@ const init_tab_dataset = () => {
         qs("#gfx_selperiod").style.display  = "none";
         qs("#gfx_addset").style.display     = "none";
         show_tab(0);
+        prepopulate_add_form();
 
     });
 
@@ -936,9 +965,9 @@ let plot = ()  => {
 debug_log("gfx.js start");
 
 init_tabs();
+init_state_from_permalink();
 init_range();
 init_tab_dataset();
-init_state_from_permalink();
 init_plot_height();
 init_auto_refresh();
 show_legend();
@@ -961,6 +990,7 @@ let conditionally_load_data = () => {
         return;
     }
     load_data();
+    prepopulate_add_form();
 };
 
 conditionally_load_data();
