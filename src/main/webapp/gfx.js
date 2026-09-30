@@ -465,7 +465,7 @@ const init_tab_dataset = () => {
             default: 
 
                 jQuery.getJSON(CAT_BACKENDS[cat] + 
-                               "/*/?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22",
+                               "/*?limit=-1&distinct=true&where=scode.eq.%22" + station + "%22",
                                (data) => {
                     data = data.data;
                     debug_log("got data types -> length = " + data.length);
