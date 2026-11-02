@@ -3,6 +3,8 @@ SPDX-FileCopyrightText: NOI Techpark <digital@noi.bz.it>
 
 SPDX-License-Identifier: CC0-1.0
 -->
+# ARCHIVED
+Replaced by [https://github.com/noi-techpark/opendatahub-timeseries-analytics](https://github.com/noi-techpark/opendatahub-analytics-v2)
 
 # it.bz.opendatahub.analytics
 
